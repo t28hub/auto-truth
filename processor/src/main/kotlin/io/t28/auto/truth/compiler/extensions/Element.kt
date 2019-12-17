@@ -18,8 +18,15 @@ package io.t28.auto.truth.compiler.extensions
 
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
+import javax.lang.model.element.Modifier
 import javax.lang.model.element.PackageElement
 import javax.lang.model.util.ElementFilter
+
+val Element.isPrivate: Boolean
+    get() = this.modifiers.contains(Modifier.PRIVATE)
+
+val Element.isProtected: Boolean
+    get() = this.modifiers.contains(Modifier.PROTECTED)
 
 fun Element.getPackage(): PackageElement {
     var enclosing = this
@@ -28,3 +35,4 @@ fun Element.getPackage(): PackageElement {
     }
     return ElementFilter.packagesIn(setOf(enclosing)).first()
 }
+

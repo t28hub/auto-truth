@@ -51,26 +51,40 @@ object AutoTruthProcessorSpec : Spek({
         }
 
         describe("process") {
-            it("should generate a class with 'Auto_' prefix") {
+            it("should generate a class with 'Auto_' prefix and 'Subject' suffix") {
                 // Arrange
                 val subject = forSourceString(
-                        "test.TestSubject",
+                        "test.TestValue",
                         """
                             package test;
                             
                             import io.t28.auto.truth.AutoSubject;
                             
-                            @AutoSubject(String.class)
-                            public class TestSubject {
+                            @AutoSubject
+                            public class TestValue {
+                                public boolean isOk;
                             }
                         """.trimIndent())
 
                 val generated = forSourceString(
-                        "test.Auto_TestSubject",
+                        "test.Auto_TestValueSubject",
                         """
                             package test;
                             
-                            public class Auto_TestSubject {
+                            import com.google.common.truth.FailureMetadata;
+                            import com.google.common.truth.Subject;
+                            
+                            public class Auto_TestValueSubject <T extends TestValue> extends Subject {
+                                private final TestValue actual;
+
+                                private Auto_TestValueSubject(FailureMetadata failureMetadata, TestValue actual) {
+                                    super(failureMetadata, actual);
+                                    this.actual = actual;
+                                }
+                                
+                                public static Subject.Factory<Auto_TestValueSubject, TestValue> testValue() {
+                                    return Auto_TestValueSubject::new;
+                                }
                             }
                         """.trimIndent()
 
