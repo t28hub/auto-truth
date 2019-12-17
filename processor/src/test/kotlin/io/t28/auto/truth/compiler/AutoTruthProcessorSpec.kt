@@ -16,10 +16,10 @@
 
 package io.t28.auto.truth.compiler
 
+import com.google.common.truth.Truth.assertAbout
 import com.google.common.truth.Truth.assertThat
 import com.google.testing.compile.JavaFileObjects.forSourceString
-import com.google.testing.compile.JavaSourcesSubject.assertThat
-import io.t28.auto.truth.AutoSubject
+import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 import javax.lang.model.SourceVersion
@@ -35,7 +35,7 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Assert
                 assertThat(actual)
-                    .isEqualTo(SourceVersion.latestSupported())
+                        .isEqualTo(SourceVersion.latestSupported())
             }
         }
 
@@ -46,24 +46,43 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Assert
                 assertThat(actual)
-                    .containsExactly("${AutoSubject::class.simpleName}")
+                        .containsExactly("io.t28.auto.truth.AutoSubject")
             }
         }
 
         describe("process") {
-            it("should compile without error") {
+            it("should generate a class with 'Auto_' prefix") {
                 // Arrange
                 val subject = forSourceString(
-                    "test.TestSubject",
-                    """
+                        "test.TestSubject",
+                        """
                             package test;
                             
-                            class TestSubject {
+                            import io.t28.auto.truth.AutoSubject;
+                            
+                            @AutoSubject(String.class)
+                            public class TestSubject {
                             }
                         """.trimIndent())
-                assertThat(subject)
-                    .processedWith(processor)
-                    .compilesWithoutError()
+
+                val generated = forSourceString(
+                        "test.Auto_TestSubject",
+                        """
+                            package test;
+                            
+                            public class Auto_TestSubject {
+                            }
+                        """.trimIndent()
+
+                )
+
+                // Act & Assert
+                assertAbout(javaSources())
+                        .that(setOf(subject))
+                        .processedWith(processor)
+                        .compilesWithoutError()
+                        .and()
+                        .generatesSources(generated)
             }
         }
     }

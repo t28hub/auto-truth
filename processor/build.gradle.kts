@@ -40,6 +40,9 @@ dependencies {
     implementation("com.google.auto.service:auto-service-annotations:${autoServiceVersion}")
     kapt("com.google.auto.service:auto-service:${autoServiceVersion}")
 
+    // JavaPoet
+    implementation("com.squareup:javapoet:1.11.1")
+
     // Spek
     val spekVersion = "2.0.9"
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:${spekVersion}")
