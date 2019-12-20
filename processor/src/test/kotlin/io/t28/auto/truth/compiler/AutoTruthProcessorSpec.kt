@@ -61,8 +61,14 @@ object AutoTruthProcessorSpec : Spek({
                             import io.t28.auto.truth.AutoSubject;
                             
                             @AutoSubject
-                            public class TestValue {
-                                public boolean isOk;
+                            public interface TestValue {
+                                long id();
+                                
+                                String name();
+                                
+                                void accept();
+                                
+                                Void accept2();
                             }
                         """.trimIndent())
 
@@ -84,6 +90,14 @@ object AutoTruthProcessorSpec : Spek({
                                 
                                 public static Subject.Factory<Auto_TestValueSubject, TestValue> testValue() {
                                     return Auto_TestValueSubject::new;
+                                }
+                                
+                                public void hasId(long expected) {
+                                    check("id()").that(this.actual.id()).isEqualTo(expected);
+                                }
+
+                                public void hasName(String expected) {
+                                    check("name()").that(this.actual.name()).isEqualTo(expected);
                                 }
                             }
                         """.trimIndent()

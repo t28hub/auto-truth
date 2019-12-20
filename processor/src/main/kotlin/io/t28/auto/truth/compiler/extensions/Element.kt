@@ -22,11 +22,17 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.element.PackageElement
 import javax.lang.model.util.ElementFilter
 
-val Element.isPrivate: Boolean
-    get() = this.modifiers.contains(Modifier.PRIVATE)
+val Element.isPublic: Boolean
+    get() = this.modifiers.contains(Modifier.PUBLIC)
 
 val Element.isProtected: Boolean
     get() = this.modifiers.contains(Modifier.PROTECTED)
+
+val Element.isPrivate: Boolean
+    get() = this.modifiers.contains(Modifier.PRIVATE)
+
+val Element.isStatic: Boolean
+    get() = this.modifiers.contains(Modifier.STATIC)
 
 fun Element.getPackage(): PackageElement {
     var enclosing = this
