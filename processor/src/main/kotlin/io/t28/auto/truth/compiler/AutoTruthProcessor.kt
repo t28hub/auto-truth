@@ -16,7 +16,6 @@
 
 package io.t28.auto.truth.compiler
 
-import io.t28.auto.truth.AutoSubject
 import com.google.auto.service.AutoService
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
@@ -30,8 +29,8 @@ import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import com.squareup.javapoet.TypeVariableName
+import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.compiler.extensions.getAnnotatedElements
-import io.t28.auto.truth.compiler.extensions.getPackage
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
@@ -57,22 +56,20 @@ class AutoTruthProcessor : AbstractProcessor() {
         roundEnv.getAnnotatedElements<AutoSubject>()
                 .filterIsInstance<TypeElement>()
                 .forEach { element ->
-                    val qualifiedName = "${element.qualifiedName}"
-                    val packageName = "${element.getPackage().qualifiedName}"
-                    val valueClassName = qualifiedName.removePrefix("${packageName}.")
-                    val normalizedValueClassName = valueClassName.replace('$', '_')
-                    val className = ClassName.get(packageName, "Auto_${normalizedValueClassName}Subject")
+                    val type = ElementWrapper.wrap(element)
+                    val normalizedValueClassName = type.name.replace('$', '_')
+                    val className = ClassName.get(type.packageName, "Auto_${normalizedValueClassName}Subject")
                     val typeBuilder = TypeSpec.classBuilder(className)
                             .superclass(Subject::class.java)
                             .addModifiers(Modifier.PUBLIC)
                             .addTypeVariable(TypeVariableName.get("T", TypeName.get(element.asType())))
 
-                    val field = FieldSpec.builder(TypeName.get(element.asType()), "actual")
+                    val actualField = FieldSpec.builder(TypeName.get(element.asType()), "actual")
                             .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                             .build()
-                    typeBuilder.addField(field)
+                    typeBuilder.addField(actualField)
 
-                    val factoryMethod = MethodSpec.methodBuilder(valueClassName.decapitalize())
+                    val factoryMethod = MethodSpec.methodBuilder(type.name.decapitalize())
                             .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                             .returns(ParameterizedTypeName.get(ClassName.get(Subject.Factory::class.java), className, TypeName.get(element.asType())))
                             .addCode(CodeBlock.builder().addStatement("return \$T::new", className).build())
@@ -88,7 +85,40 @@ class AutoTruthProcessor : AbstractProcessor() {
                             .build()
                     typeBuilder.addMethod(constructor)
 
-                    val javaFile = JavaFile.builder(packageName, typeBuilder.build())
+                    val fieldAccessors = type.findFields { field -> !field.isStatic }
+                            .filterNot { field -> field.isPrivate or field.isProtected }
+                            .filterNot { field ->
+                                val fieldType = TypeName.get(field.type)
+                                return@filterNot (fieldType == TypeName.VOID) or (fieldType == TypeName.get(Void::class.java))
+                            }
+                            .map { field ->
+                                val name = field.name
+                                MethodSpec.methodBuilder("has${name.capitalize()}")
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .addParameter(TypeName.get(field.type), "expected")
+                                        .addCode(CodeBlock.builder().addStatement("check(\$S).that(this.\$L.\$L).isEqualTo(\$L)", name, "actual", name, "expected").build())
+                                        .build()
+                            }
+                    typeBuilder.addMethods(fieldAccessors)
+
+                    val methodAccessors = type.findMethods { method -> !method.hasParameter }
+                            .filterNot { method -> method.isStatic }
+                            .filterNot { method -> method.isPrivate or method.isProtected }
+                            .filterNot { method ->
+                                val returnType = TypeName.get(method.returnType)
+                                return@filterNot (returnType == TypeName.VOID) or (returnType == TypeName.get(Void::class.java))
+                            }
+                            .map { method ->
+                                val name = method.name
+                                MethodSpec.methodBuilder("has${name.capitalize()}")
+                                        .addModifiers(Modifier.PUBLIC)
+                                        .addParameter(TypeName.get(method.returnType), "expected")
+                                        .addCode(CodeBlock.builder().addStatement("check(\$S).that(this.\$L.\$L()).isEqualTo(\$L)", "${name}()", "actual", name, "expected").build())
+                                        .build()
+                            }
+                    typeBuilder.addMethods(methodAccessors)
+
+                    val javaFile = JavaFile.builder(className.packageName(), typeBuilder.build())
                             .indent("    ")
                             .skipJavaLangImports(true)
                             .build()
