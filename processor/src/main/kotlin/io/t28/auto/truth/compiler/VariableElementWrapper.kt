@@ -17,12 +17,11 @@
 package io.t28.auto.truth.compiler
 
 import javax.lang.model.element.VariableElement
-import javax.lang.model.type.TypeMirror
 
 class VariableElementWrapper(element: VariableElement) : ElementWrapper<VariableElement>(element) {
     override val name: String
         get() = "${element.simpleName}"
 
-    val type: TypeMirror
-        get() = element.asType()
+    val type: TypeWrapper
+        get() = TypeWrapper.wrap(element.asType())
 }
