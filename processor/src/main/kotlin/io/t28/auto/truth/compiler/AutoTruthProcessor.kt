@@ -88,14 +88,14 @@ class AutoTruthProcessor : AbstractProcessor() {
                     val fieldAccessors = type.findFields { field -> !field.isStatic }
                             .filterNot { field -> field.isPrivate or field.isProtected }
                             .filterNot { field ->
-                                val fieldType = TypeName.get(field.type)
-                                return@filterNot (fieldType == TypeName.VOID) or (fieldType == TypeName.get(Void::class.java))
+                                val fieldType = field.type
+                                fieldType.isVoid or fieldType.isClassOf<Void>()
                             }
                             .map { field ->
                                 val name = field.name
                                 MethodSpec.methodBuilder("has${name.capitalize()}")
                                         .addModifiers(Modifier.PUBLIC)
-                                        .addParameter(TypeName.get(field.type), "expected")
+                                        .addParameter(field.type.asTypeName(), "expected")
                                         .addCode(CodeBlock.builder().addStatement("check(\$S).that(this.\$L.\$L).isEqualTo(\$L)", name, "actual", name, "expected").build())
                                         .build()
                             }
@@ -105,14 +105,14 @@ class AutoTruthProcessor : AbstractProcessor() {
                             .filterNot { method -> method.isStatic }
                             .filterNot { method -> method.isPrivate or method.isProtected }
                             .filterNot { method ->
-                                val returnType = TypeName.get(method.returnType)
-                                return@filterNot (returnType == TypeName.VOID) or (returnType == TypeName.get(Void::class.java))
+                                val returnType = method.returnType
+                                returnType.isVoid or returnType.isClassOf<Void>()
                             }
                             .map { method ->
                                 val name = method.name
                                 MethodSpec.methodBuilder("has${name.capitalize()}")
                                         .addModifiers(Modifier.PUBLIC)
-                                        .addParameter(TypeName.get(method.returnType), "expected")
+                                        .addParameter(method.returnType.asTypeName(), "expected")
                                         .addCode(CodeBlock.builder().addStatement("check(\$S).that(this.\$L.\$L()).isEqualTo(\$L)", "${name}()", "actual", name, "expected").build())
                                         .build()
                             }

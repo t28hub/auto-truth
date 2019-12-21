@@ -17,7 +17,6 @@
 package io.t28.auto.truth.compiler
 
 import javax.lang.model.element.ExecutableElement
-import javax.lang.model.type.TypeMirror
 
 class ExecutableElementWrapper(element: ExecutableElement) : ElementWrapper<ExecutableElement>(element) {
     override val name: String
@@ -26,6 +25,6 @@ class ExecutableElementWrapper(element: ExecutableElement) : ElementWrapper<Exec
     val hasParameter: Boolean
         get() = element.parameters.isNotEmpty()
 
-    val returnType: TypeMirror
-        get() = element.returnType
+    val returnType: TypeWrapper
+        get() = TypeWrapper.wrap(element.returnType)
 }
