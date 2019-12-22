@@ -19,15 +19,19 @@ package io.t28.auto.truth.compiler
 import com.google.auto.service.AutoService
 import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.compiler.extensions.getAnnotatedElements
-import io.t28.auto.truth.compiler.writer.ClassWriter
 import javax.annotation.processing.AbstractProcessor
+import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
 import javax.annotation.processing.RoundEnvironment
+import javax.annotation.processing.SupportedOptions
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
 
 @AutoService(Processor::class)
+@SupportedOptions("debug")
 class AutoTruthProcessor : AbstractProcessor() {
+    private lateinit var context: Context
+
     override fun getSupportedSourceVersion(): SourceVersion {
         return SourceVersion.latestSupported()
     }
@@ -36,15 +40,22 @@ class AutoTruthProcessor : AbstractProcessor() {
         return setOf(AutoSubject::class.java.canonicalName)
     }
 
+    override fun init(processingEnv: ProcessingEnvironment) {
+        super.init(processingEnv)
+        context = Context.get(processingEnv)
+    }
+
     override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
         if (roundEnv.processingOver()) {
             return true
         }
 
-        val writer = ClassWriter(processingEnv)
+        val logger = context.logger
+        val writer = context.writer
         roundEnv.getAnnotatedElements<AutoSubject>()
                 .filterIsInstance<TypeElement>()
                 .forEach { element ->
+                    logger.debug(element, "Found annotated class: %s", element.simpleName)
                     val type = ElementWrapper.wrap(element)
                     val declaration = SubjectClass(type)
                     writer.write(declaration)

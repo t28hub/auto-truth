@@ -24,12 +24,12 @@ import io.t28.auto.truth.compiler.ClassDeclaration
 import javax.annotation.Generated
 import javax.annotation.processing.ProcessingEnvironment
 
-class ClassWriter(private val processingEnv: ProcessingEnvironment) {
+class ProcessingEnvWriter(private val processingEnv: ProcessingEnvironment) : Writer {
     companion object {
         private const val INDENT = "    "
     }
 
-    fun write(declaration: ClassDeclaration) {
+    override fun write(declaration: ClassDeclaration) {
         val builder = declaration.toSpec().toBuilder()
         processingEnv.elementUtils.getTypeElement(Generated::class.java.canonicalName)?.run {
             val annotationName = ClassName.get(this)

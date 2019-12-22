@@ -110,6 +110,7 @@ object AutoTruthProcessorSpec : Spek({
                 // Act & Assert
                 assertAbout(javaSources())
                         .that(setOf(subject))
+                        .withCompilerOptions("-Adebug")
                         .processedWith(processor)
                         .compilesWithoutError()
                         .and()
