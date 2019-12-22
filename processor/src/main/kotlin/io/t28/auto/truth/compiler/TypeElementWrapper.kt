@@ -23,6 +23,9 @@ class TypeElementWrapper(element: TypeElement) : ElementWrapper<TypeElement>(ele
     val qualifiedName: String
         get() = "${element.qualifiedName}"
 
+    val type: TypeWrapper
+        get() = TypeWrapper.wrap(element.asType())
+
     override val name: String
         get() = qualifiedName.removePrefix("${packageName}.")
 
