@@ -79,7 +79,10 @@ object AutoTruthProcessorSpec : Spek({
                             
                             import com.google.common.truth.FailureMetadata;
                             import com.google.common.truth.Subject;
+                            import javax.annotation.Generated;
                             
+                            @Generated("io.t28.auto.truth.compiler.AutoTruthProcessor")
+                            @SuppressWarnings("unckecked")
                             public class Auto_TestValueSubject <T extends TestValue> extends Subject {
                                 private final TestValue actual;
 
