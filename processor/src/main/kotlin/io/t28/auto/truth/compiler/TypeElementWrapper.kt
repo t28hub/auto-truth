@@ -45,3 +45,4 @@ class TypeElementWrapper(element: TypeElement) : ElementWrapper<TypeElement>(ele
         return methods.filter(predicate)
     }
 }
+
