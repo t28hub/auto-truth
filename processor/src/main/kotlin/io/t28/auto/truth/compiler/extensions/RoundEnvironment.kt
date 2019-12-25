@@ -22,4 +22,3 @@ import javax.lang.model.element.Element
 inline fun <reified T : Annotation> RoundEnvironment.getAnnotatedElements(): Set<Element> {
     return getElementsAnnotatedWith(T::class.java)
 }
-

@@ -20,9 +20,9 @@ import com.google.common.truth.Truth.assertAbout
 import com.google.common.truth.Truth.assertThat
 import com.google.testing.compile.JavaFileObjects.forSourceString
 import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
+import javax.lang.model.SourceVersion
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-import javax.lang.model.SourceVersion
 
 object AutoTruthProcessorSpec : Spek({
     describe("Processor") {

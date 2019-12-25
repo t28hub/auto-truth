@@ -27,6 +27,25 @@ jobs:
           no_output_timeout: 3m
       - save_cache: *save-cache
 
+  lint:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    working_directory: ~/auto-truth
+    steps:
+      - checkout
+      - restore_cache: *restore-cache
+      - run:
+          name: Check code style and run lint
+          command: ./gradlew :processor:check --stacktrace
+          no_output_timeout: 3m
+      - save_cache: *save-cache
+      - store_artifacts:
+          path: ./processor/reports/ktlint
+          destination: ktlint
+      - store_artifacts:
+          path: ./processor/reports/detekt
+          destination: detekt
+
   test:
     docker:
       - image: circleci/openjdk:8-jdk
@@ -49,5 +68,13 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - build
+      - lint:
+          filters:
+            branches:
+              ignore:
+                - master
       - test
+      - build:
+          requires:
+            - lint
+            - test

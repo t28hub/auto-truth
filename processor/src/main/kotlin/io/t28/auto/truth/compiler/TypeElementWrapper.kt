@@ -27,7 +27,7 @@ class TypeElementWrapper(element: TypeElement) : ElementWrapper<TypeElement>(ele
         get() = TypeWrapper.wrap(element.asType())
 
     override val name: String
-        get() = qualifiedName.removePrefix("${packageName}.")
+        get() = qualifiedName.removePrefix("$packageName.")
 
     private val fields: Collection<VariableElementWrapper>
         get() = ElementFilter.fieldsIn(element.enclosedElements)
@@ -45,4 +45,3 @@ class TypeElementWrapper(element: TypeElement) : ElementWrapper<TypeElement>(ele
         return methods.filter(predicate)
     }
 }
-
