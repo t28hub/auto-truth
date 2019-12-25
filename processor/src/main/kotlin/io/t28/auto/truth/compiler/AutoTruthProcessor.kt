@@ -18,6 +18,7 @@ package io.t28.auto.truth.compiler
 
 import com.google.auto.service.AutoService
 import io.t28.auto.truth.AutoSubject
+import io.t28.auto.truth.compiler.element.AnnotatedTypeElement
 import io.t28.auto.truth.compiler.extensions.getAnnotatedElements
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
@@ -56,8 +57,8 @@ class AutoTruthProcessor : AbstractProcessor() {
                 .filterIsInstance<TypeElement>()
                 .forEach { element ->
                     logger.debug(element, "Found annotated class: %s", element.simpleName)
-                    val type = ElementWrapper.wrap(element)
-                    val declaration = SubjectClass(type)
+                    val annotated = AnnotatedTypeElement(element)
+                    val declaration = SubjectClass(annotated)
                     writer.write(declaration)
                 }
         return true

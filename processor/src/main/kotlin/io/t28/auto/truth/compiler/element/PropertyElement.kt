@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.compiler
+package io.t28.auto.truth.compiler.element
 
+import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
+import javax.lang.model.element.VariableElement
+import javax.lang.model.type.TypeMirror
 
-class ExecutableElementWrapper(element: ExecutableElement) : ElementWrapper<ExecutableElement>(element) {
-    override val name: String
-        get() = "${element.simpleName}"
+interface PropertyElement<E : Element> {
+    val element: E
+    val type: TypeMirror
+    val name: String
+    val identifier: String
+    val simpleName: String
 
-    val hasParameter: Boolean
-        get() = element.parameters.isNotEmpty()
+    companion object {
+        fun get(element: VariableElement): PropertyElement<VariableElement> {
+            return VariablePropertyElement(element)
+        }
 
-    val returnType: TypeWrapper
-        get() = TypeWrapper.wrap(element.returnType)
+        fun get(element: ExecutableElement): PropertyElement<ExecutableElement> {
+            return ExecutablePropertyElement(element)
+        }
+    }
 }

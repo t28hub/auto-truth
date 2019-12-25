@@ -18,6 +18,7 @@ package io.t28.auto.truth.compiler.extensions
 
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.PackageElement
 import javax.lang.model.util.ElementFilter
@@ -25,14 +26,11 @@ import javax.lang.model.util.ElementFilter
 val Element.isPublic: Boolean
     get() = this.modifiers.contains(Modifier.PUBLIC)
 
-val Element.isProtected: Boolean
-    get() = this.modifiers.contains(Modifier.PROTECTED)
-
-val Element.isPrivate: Boolean
-    get() = this.modifiers.contains(Modifier.PRIVATE)
-
 val Element.isStatic: Boolean
     get() = this.modifiers.contains(Modifier.STATIC)
+
+val ExecutableElement.hasParameter: Boolean
+    get() = this.parameters.isNotEmpty()
 
 fun Element.getPackage(): PackageElement {
     var enclosing = this
