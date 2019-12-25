@@ -31,6 +31,7 @@ import javax.lang.model.element.Modifier.PRIVATE
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
 
+@Suppress("StringLiteralDuplication")
 class SubjectClass(private val element: TypeElementWrapper) : ClassDeclaration {
     override val packageName: String
         get() = element.packageName
@@ -100,7 +101,7 @@ class SubjectClass(private val element: TypeElementWrapper) : ClassDeclaration {
                         param(type.asTypeName(), "expected")
                 ) {
                     modifiers(PUBLIC)
-                    statement("check(\$S).that(this.\$L.\$L()).isEqualTo(\$L)", "${name}()", "actual", name, "expected")
+                    statement("check(\$S).that(this.\$L.\$L()).isEqualTo(\$L)", "$name()", "actual", name, "expected")
                 }
             }
         }

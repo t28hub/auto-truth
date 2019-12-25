@@ -20,6 +20,7 @@ import java.lang.IllegalStateException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
+@Suppress("UnnecessaryAbstractClass")
 abstract class TypeReference<T> {
     internal val type by lazy {
         val superclass = this::class.java.genericSuperclass

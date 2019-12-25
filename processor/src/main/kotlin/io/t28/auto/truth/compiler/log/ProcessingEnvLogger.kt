@@ -52,6 +52,7 @@ class ProcessingEnvLogger(private val messager: Messager, private val debug: Boo
         messager.printMessage(ERROR, message.format(args), element)
     }
 
+    @Suppress("SwallowedException")
     private fun String.safeFormat(vararg args: Any): String {
         return try {
             format(args)

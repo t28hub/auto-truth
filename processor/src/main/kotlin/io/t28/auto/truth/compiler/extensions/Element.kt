@@ -41,4 +41,3 @@ fun Element.getPackage(): PackageElement {
     }
     return ElementFilter.packagesIn(setOf(enclosing)).first()
 }
-

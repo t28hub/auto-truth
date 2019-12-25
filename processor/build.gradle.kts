@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.konan.util.visibleName
-
 /*
  * Copyright 2019 Tatsuya Maki
  *
@@ -16,14 +14,19 @@ import org.jetbrains.kotlin.konan.util.visibleName
  * limitations under the License.
  */
 
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
     val kotlinVersion = "1.3.61"
     kotlin("jvm") version kotlinVersion
     kotlin("kapt") version kotlinVersion
+    id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
+    id("io.gitlab.arturbosch.detekt") version "1.3.0"
 }
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -37,16 +40,16 @@ dependencies {
 
     // AutoService
     val autoServiceVersion = "1.0-rc6"
-    implementation("com.google.auto.service:auto-service-annotations:${autoServiceVersion}")
-    kapt("com.google.auto.service:auto-service:${autoServiceVersion}")
+    implementation("com.google.auto.service:auto-service-annotations:$autoServiceVersion")
+    kapt("com.google.auto.service:auto-service:$autoServiceVersion")
 
     // JavaPoet
     implementation("com.squareup:javapoet:1.11.1")
 
     // Spek
     val spekVersion = "2.0.9"
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:${spekVersion}")
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:${spekVersion}")
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
 
     // Compile Testing
     testImplementation("com.google.testing.compile:compile-testing:0.18")
@@ -59,5 +62,27 @@ tasks {
     }
     compileTestKotlin {
         kotlinOptions.jvmTarget = jvmTarget
+    }
+}
+
+ktlint {
+    version.set("0.35.0")
+    filter {
+        include("src/main/kotlin/**")
+        exclude("**/generated/**")
+    }
+    reporters {
+        reporter(ReporterType.PLAIN)
+    }
+}
+
+detekt {
+    input = files("src/main/kotlin")
+    config = files("${project.rootDir}/.detekt/config.yml")
+    reports {
+        html {
+            enabled = true
+            destination = file("$buildDir/reports/detekt/index.html")
+        }
     }
 }
