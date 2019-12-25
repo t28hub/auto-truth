@@ -82,8 +82,8 @@ object AutoTruthProcessorSpec : Spek({
                             import javax.annotation.Generated;
                             
                             @Generated("io.t28.auto.truth.compiler.AutoTruthProcessor")
-                            @SuppressWarnings("unckecked")
-                            public class Auto_TestValueSubject <T extends TestValue> extends Subject {
+                            @SuppressWarnings("unchecked")
+                            public class Auto_TestValueSubject<T extends TestValue> extends Subject {
                                 private final TestValue actual;
 
                                 private Auto_TestValueSubject(FailureMetadata failureMetadata, TestValue actual) {
