@@ -16,12 +16,8 @@
 
 package io.t28.auto.truth.compiler.writer
 
-import com.squareup.javapoet.AnnotationSpec
-import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.JavaFile
-import io.t28.auto.truth.compiler.AutoTruthProcessor
 import io.t28.auto.truth.compiler.ClassDeclaration
-import javax.annotation.Generated
 import javax.annotation.processing.ProcessingEnvironment
 
 class ProcessingEnvWriter(private val processingEnv: ProcessingEnvironment) : Writer {
@@ -30,19 +26,7 @@ class ProcessingEnvWriter(private val processingEnv: ProcessingEnvironment) : Wr
     }
 
     override fun write(declaration: ClassDeclaration) {
-        val builder = declaration.toSpec().toBuilder()
-        processingEnv.elementUtils.getTypeElement(Generated::class.java.canonicalName)?.run {
-            val annotationName = ClassName.get(this)
-            builder.addAnnotation(AnnotationSpec.builder(annotationName)
-                    .addMember("value", "\$S", AutoTruthProcessor::class.java.canonicalName)
-                    .build())
-        }
-
-        builder.addAnnotation(AnnotationSpec.builder(SuppressWarnings::class.java)
-                .addMember("value", "\$S", "unckecked")
-                .build())
-
-        val javaFile = JavaFile.builder(declaration.packageName, builder.build())
+        val javaFile = JavaFile.builder(declaration.packageName, declaration.toSpec())
                 .indent(INDENT)
                 .skipJavaLangImports(true)
                 .build()
