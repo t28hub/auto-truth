@@ -16,7 +16,7 @@
 
 package io.t28.auto.truth.compiler.log
 
-import java.util.IllegalFormatException
+import io.t28.auto.truth.compiler.extensions.safeFormat
 import javax.annotation.processing.Messager
 import javax.lang.model.element.Element
 import javax.tools.Diagnostic.Kind.ERROR
@@ -37,26 +37,18 @@ class ProcessingEnvLogger(private val messager: Messager, private val debug: Boo
     }
 
     override fun warn(message: String, vararg args: Any) {
-        messager.printMessage(WARNING, message.format(*args))
+        messager.printMessage(WARNING, message.safeFormat(*args))
     }
 
     override fun warn(element: Element, message: String, vararg args: Any) {
-        messager.printMessage(WARNING, message.format(*args), element)
+        messager.printMessage(WARNING, message.safeFormat(*args), element)
     }
 
     override fun error(message: String, vararg args: Any) {
-        messager.printMessage(ERROR, message.format(*args))
+        messager.printMessage(ERROR, message.safeFormat(*args))
     }
 
     override fun error(element: Element, message: String, vararg args: Any) {
-        messager.printMessage(ERROR, message.format(*args), element)
-    }
-
-    private fun String.safeFormat(vararg args: Any): String {
-        return try {
-            format(args)
-        } catch (e: IllegalFormatException) {
-            this
-        }
+        messager.printMessage(ERROR, message.safeFormat(*args), element)
     }
 }
