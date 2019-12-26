@@ -28,8 +28,47 @@ import org.spekframework.spek2.style.specification.describe
 
 object AutoTruthProcessorSpec : Spek({
     describe("Processor") {
+        describe("getSupportedOptions") {
+            it("should return") {
+                // Act
+                val processor = AutoTruthProcessor()
+                val actual = processor.supportedOptions
+
+                // Assert
+                assertThat(actual).apply {
+                    hasSize(1)
+                    contains("debug")
+                }
+            }
+        }
+
+        describe("getSupportedSourceVersion") {
+            it("should return latest source version") {
+                // Act
+                val processor = AutoTruthProcessor()
+                val actual = processor.supportedSourceVersion
+
+                // Assert
+                assertThat(actual)
+                    .isEqualTo(SourceVersion.latestSupported())
+            }
+        }
+
+        describe("getSupportedAnnotationTypes") {
+            it("should return a set that contains @AutoSubject only") {
+                // Act
+                val processor = AutoTruthProcessor()
+                val actual = processor.supportedAnnotationTypes
+
+                // Assert
+                assertThat(actual)
+                    .containsExactly("io.t28.auto.truth.AutoSubject")
+            }
+        }
+
         describe("prefix") {
             fun createJavaFile(prefix: String? = null): JavaFileObject {
+                // language=java
                 val template = """
                     package test;
                             
@@ -101,6 +140,7 @@ object AutoTruthProcessorSpec : Spek({
 
         describe("suffix") {
             fun createJavaFile(suffix: String? = null): JavaFileObject {
+                // language=java
                 val template = """
                     package test;
                             
@@ -167,30 +207,6 @@ object AutoTruthProcessorSpec : Spek({
                         .processedWith(AutoTruthProcessor())
                         .failsToCompile()
                         .withErrorContaining("AutoTestValue@Subject")
-            }
-        }
-
-        describe("getSupportedSourceVersion") {
-            it("should return latest source version") {
-                // Act
-                val processor = AutoTruthProcessor()
-                val actual = processor.supportedSourceVersion
-
-                // Assert
-                assertThat(actual)
-                        .isEqualTo(SourceVersion.latestSupported())
-            }
-        }
-
-        describe("getSupportedAnnotationTypes") {
-            it("should return a set that contains @AutoSubject only") {
-                // Act
-                val processor = AutoTruthProcessor()
-                val actual = processor.supportedAnnotationTypes
-
-                // Assert
-                assertThat(actual)
-                        .containsExactly("io.t28.auto.truth.AutoSubject")
             }
         }
 
