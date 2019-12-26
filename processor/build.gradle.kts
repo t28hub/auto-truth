@@ -53,6 +53,9 @@ dependencies {
 
     // Compile Testing
     testImplementation("com.google.testing.compile:compile-testing:0.18")
+
+    // Mockito
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
 }
 
 tasks {
