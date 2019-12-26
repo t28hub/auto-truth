@@ -19,6 +19,7 @@ package io.t28.auto.truth.compiler
 import com.google.auto.service.AutoService
 import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.compiler.element.AnnotatedTypeElement
+import io.t28.auto.truth.compiler.element.AutoSubjectAnnotation
 import io.t28.auto.truth.compiler.extensions.getAnnotatedElements
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
@@ -53,14 +54,28 @@ class AutoTruthProcessor : AbstractProcessor() {
 
         val logger = context.logger
         val writer = context.writer
+        val typeUtils = processingEnv.typeUtils
+        val elementUtils = processingEnv.elementUtils
         roundEnv.getAnnotatedElements<AutoSubject>()
-                .filterIsInstance<TypeElement>()
-                .forEach { element ->
-                    logger.debug(element, "Found annotated class: %s", element.simpleName)
-                    val annotated = AnnotatedTypeElement(element)
-                    val declaration = SubjectClass(annotated)
+            .filterIsInstance<TypeElement>()
+            .forEach { element ->
+                logger.debug(element, "Found annotated class: %s", element.simpleName)
+                val annotated = AnnotatedTypeElement(element)
+                val annotation = elementUtils.getAllAnnotationMirrors(element)
+                    .first { annotationMirror ->
+                        val annotationElement = typeUtils.asElement(annotationMirror.annotationType)
+                        annotationElement.simpleName.contentEquals(AutoSubject::class.java.simpleName)
+                    }
+                    .let { annotationMirror -> AutoSubjectAnnotation(annotationMirror, elementUtils) }
+
+                val declaration = SubjectClass(annotated, annotation)
+                @Suppress("TooGenericExceptionCaught")
+                try {
                     writer.write(declaration)
+                } catch (e: Exception) {
+                    logger.error(element, "Failed to compile: %s", "${e.message}")
                 }
+            }
         return true
     }
 }

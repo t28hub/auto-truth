@@ -26,33 +26,32 @@ import javax.tools.Diagnostic.Kind.WARNING
 class ProcessingEnvLogger(private val messager: Messager, private val debug: Boolean) : Logger {
     override fun debug(message: String, vararg args: Any) {
         if (debug) {
-            messager.printMessage(NOTE, message.safeFormat(args))
+            messager.printMessage(NOTE, message.safeFormat(*args))
         }
     }
 
     override fun debug(element: Element, message: String, vararg args: Any) {
         if (debug) {
-            messager.printMessage(NOTE, message.safeFormat(args), element)
+            messager.printMessage(NOTE, message.safeFormat(*args), element)
         }
     }
 
     override fun warn(message: String, vararg args: Any) {
-        messager.printMessage(WARNING, message.format(args))
+        messager.printMessage(WARNING, message.format(*args))
     }
 
     override fun warn(element: Element, message: String, vararg args: Any) {
-        messager.printMessage(WARNING, message.format(args), element)
+        messager.printMessage(WARNING, message.format(*args), element)
     }
 
     override fun error(message: String, vararg args: Any) {
-        messager.printMessage(ERROR, message.format(args))
+        messager.printMessage(ERROR, message.format(*args))
     }
 
     override fun error(element: Element, message: String, vararg args: Any) {
-        messager.printMessage(ERROR, message.format(args), element)
+        messager.printMessage(ERROR, message.format(*args), element)
     }
 
-    @Suppress("SwallowedException")
     private fun String.safeFormat(vararg args: Any): String {
         return try {
             format(args)

@@ -21,16 +21,159 @@ import com.google.common.truth.Truth.assertThat
 import com.google.testing.compile.JavaFileObjects.forSourceString
 import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
 import javax.lang.model.SourceVersion
+import javax.tools.JavaFileObject
+import javax.tools.StandardLocation.CLASS_OUTPUT
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
 object AutoTruthProcessorSpec : Spek({
     describe("Processor") {
-        val processor = AutoTruthProcessor()
+        describe("prefix") {
+            fun createJavaFile(prefix: String? = null): JavaFileObject {
+                val template = """
+                    package test;
+                            
+                    import io.t28.auto.truth.AutoSubject;
+                            
+                    ${prefix?.let { """@AutoSubject(prefix = "$it")""" } ?: "@AutoSubject"}
+                    public interface TestValue {
+                        String name();
+                    }
+                """.trimIndent()
+                return forSourceString("test.TestValue", template)
+            }
+
+            it("should generate class with default prefix") {
+                // Arrange
+                val subject = createJavaFile()
+
+                // Act & Assert
+                assertAbout(javaSources())
+                        .that(setOf(subject))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueSubject.class")
+            }
+
+            it("should generate class with specified prefix") {
+                // Arrange
+                val subject = createJavaFile("MyPrefix")
+
+                // Act & Assert
+                assertAbout(javaSources())
+                        .that(setOf(subject))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(CLASS_OUTPUT, "test", "MyPrefixTestValueSubject.class")
+            }
+
+            it("should generate class with no prefix") {
+                // Arrange
+                val subject = createJavaFile("")
+
+                // Act & Assert
+                assertAbout(javaSources())
+                        .that(setOf(subject))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(CLASS_OUTPUT, "test", "TestValueSubject.class")
+            }
+
+            it("should fail to compile when prefix contains invalid chars") {
+                // Arrange
+                val subject = createJavaFile("1nvalid")
+
+                // Act & Assert
+                assertAbout(javaSources())
+                        .that(setOf(subject))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .failsToCompile()
+                        .withErrorContaining("1nvalidTestValueSubject")
+            }
+        }
+
+        describe("suffix") {
+            fun createJavaFile(suffix: String? = null): JavaFileObject {
+                val template = """
+                    package test;
+                            
+                    import io.t28.auto.truth.AutoSubject;
+                            
+                    ${suffix?.let { """@AutoSubject(suffix = "$it")""" } ?: "@AutoSubject"}
+                    public interface TestValue {
+                        String name();
+                    }
+                """.trimIndent()
+                return forSourceString("test.TestValue", template)
+            }
+
+            it("should generate class with default suffix") {
+                // Arrange
+                val subject = createJavaFile()
+
+                // Act & Assert
+                assertAbout(javaSources())
+                        .that(setOf(subject))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueSubject.class")
+            }
+
+            it("should generate class with specified suffix") {
+                // Arrange
+                val subject = createJavaFile("MySubject")
+
+                // Act & Assert
+                assertAbout(javaSources())
+                        .that(setOf(subject))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueMySubject.class")
+            }
+
+            it("should generate class with no suffix") {
+                // Arrange
+                val subject = createJavaFile("")
+
+                // Act & Assert
+                assertAbout(javaSources())
+                        .that(setOf(subject))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValue.class")
+            }
+
+            it("should fail to compile when suffix contains invalid chars") {
+                // Arrange
+                val subject = createJavaFile("@Subject")
+
+                // Act & Assert
+                assertAbout(javaSources())
+                        .that(setOf(subject))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .failsToCompile()
+                        .withErrorContaining("AutoTestValue@Subject")
+            }
+        }
 
         describe("getSupportedSourceVersion") {
             it("should return latest source version") {
                 // Act
+                val processor = AutoTruthProcessor()
                 val actual = processor.supportedSourceVersion
 
                 // Assert
@@ -42,6 +185,7 @@ object AutoTruthProcessorSpec : Spek({
         describe("getSupportedAnnotationTypes") {
             it("should return a set that contains @AutoSubject only") {
                 // Act
+                val processor = AutoTruthProcessor()
                 val actual = processor.supportedAnnotationTypes
 
                 // Assert
@@ -73,7 +217,8 @@ object AutoTruthProcessorSpec : Spek({
                         """.trimIndent())
 
                 val generated = forSourceString(
-                        "test.Auto_TestValueSubject",
+                        "test.AutoTestValueSubject",
+                        // language=java
                         """
                             package test;
                             
@@ -83,16 +228,16 @@ object AutoTruthProcessorSpec : Spek({
                             
                             @Generated("io.t28.auto.truth.compiler.AutoTruthProcessor")
                             @SuppressWarnings("unchecked")
-                            public class Auto_TestValueSubject<T extends TestValue> extends Subject {
+                            public class AutoTestValueSubject<T extends TestValue> extends Subject {
                                 private final TestValue actual;
 
-                                private Auto_TestValueSubject(FailureMetadata failureMetadata, TestValue actual) {
+                                private AutoTestValueSubject(FailureMetadata failureMetadata, TestValue actual) {
                                     super(failureMetadata, actual);
                                     this.actual = actual;
                                 }
                                 
-                                public static Subject.Factory<Auto_TestValueSubject, TestValue> testValue() {
-                                    return Auto_TestValueSubject::new;
+                                public static Subject.Factory<AutoTestValueSubject, TestValue> testValue() {
+                                    return AutoTestValueSubject::new;
                                 }
                                 
                                 public void hasId(long expected) {
@@ -111,7 +256,7 @@ object AutoTruthProcessorSpec : Spek({
                 assertAbout(javaSources())
                         .that(setOf(subject))
                         .withCompilerOptions("-Adebug")
-                        .processedWith(processor)
+                        .processedWith(AutoTruthProcessor())
                         .compilesWithoutError()
                         .and()
                         .generatesSources(generated)

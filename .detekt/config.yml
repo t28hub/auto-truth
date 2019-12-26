@@ -32,7 +32,7 @@ exceptions:
     active: true
   SwallowedException:
     active: true
-    ignoredExceptionTypes: 'InterruptedException,NumberFormatException,ParseException,MalformedURLException'
+    ignoredExceptionTypes: 'InterruptedException,NumberFormatException,IllegalFormatException,ParseException,MalformedURLException'
   ThrowingExceptionFromFinally:
     active: true
   ThrowingExceptionsWithoutMessageOrCause:
