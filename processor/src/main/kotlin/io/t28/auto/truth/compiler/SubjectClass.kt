@@ -26,6 +26,7 @@ import io.t28.auto.truth.compiler.dsl.`class`
 import io.t28.auto.truth.compiler.dsl.extends
 import io.t28.auto.truth.compiler.dsl.param
 import io.t28.auto.truth.compiler.element.AnnotatedTypeElement
+import io.t28.auto.truth.compiler.element.AutoSubjectAnnotation
 import javax.annotation.Generated
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PRIVATE
@@ -33,7 +34,10 @@ import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
 
 @Suppress("StringLiteralDuplication")
-class SubjectClass(private val element: AnnotatedTypeElement) : ClassDeclaration {
+class SubjectClass(
+    private val element: AnnotatedTypeElement,
+    private val annotation: AutoSubjectAnnotation
+) : ClassDeclaration {
     override val packageName: String
         get() = element.packageName
 
@@ -41,7 +45,7 @@ class SubjectClass(private val element: AnnotatedTypeElement) : ClassDeclaration
         get() = element.name.replace('$', '_')
 
     private val className: ClassName
-        get() = ClassName.get(packageName, "Auto_${normalizedName}Subject")
+        get() = ClassName.get(packageName, "${annotation.prefix}${normalizedName}${annotation.suffix}")
 
     private val type: TypeName
         get() = TypeName.get(element.type)
@@ -67,8 +71,8 @@ class SubjectClass(private val element: AnnotatedTypeElement) : ClassDeclaration
             }
 
             constructor(
-                    param(FailureMetadata::class, "failureMetadata"),
-                    param(type, "actual")
+                param(FailureMetadata::class, "failureMetadata"),
+                param(type, "actual")
             ) {
                 modifiers(PRIVATE)
                 statement("super(\$L, \$L)", "failureMetadata", "actual")
@@ -87,8 +91,8 @@ class SubjectClass(private val element: AnnotatedTypeElement) : ClassDeclaration
                 val simpleName = property.simpleName
                 val identifier = property.identifier
                 method(
-                        "has${simpleName.capitalize()}",
-                        param(type, "expected")
+                    "has${simpleName.capitalize()}",
+                    param(type, "expected")
                 ) {
                     modifiers(PUBLIC)
                     statement("check(\$S).that(this.\$L.\$L).isEqualTo(\$L)", identifier, "actual", identifier, "expected")

@@ -32,7 +32,7 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.ElementFilter.fieldsIn
 import javax.lang.model.util.ElementFilter.methodsIn
 
-data class AnnotatedTypeElement(val element: TypeElement) {
+data class AnnotatedTypeElement(private val element: TypeElement) {
     companion object {
         private val BOXED_VOID = ClassName.get(Void::class.java)
     }
@@ -56,22 +56,22 @@ data class AnnotatedTypeElement(val element: TypeElement) {
         val getterProperties = findMethods { method ->
             method.isPublic and !method.isStatic and !method.hasParameter
         }
-                .filterNot { method ->
-                    val type = TypeName.get(method.returnType)
-                    (type == VOID) or (type == BOXED_VOID)
-                }
-                .map(PropertyElement.Companion::get)
+            .filterNot { method ->
+                val type = TypeName.get(method.returnType)
+                (type == VOID) or (type == BOXED_VOID)
+            }
+            .map(PropertyElement.Companion::get)
         return fieldProperties + getterProperties
     }
 
     private fun findFields(predicate: (VariableElement) -> Boolean): Collection<VariableElement> {
         return fieldsIn(element.enclosedElements)
-                .filter { field -> field.kind == FIELD } // Exclude ElementKind.ENUM_CONSTANT
-                .filter(predicate)
+            .filter { field -> field.kind == FIELD } // Exclude ElementKind.ENUM_CONSTANT
+            .filter(predicate)
     }
 
     private fun findMethods(predicate: (ExecutableElement) -> Boolean): Collection<ExecutableElement> {
         return methodsIn(element.enclosedElements)
-                .filter(predicate)
+            .filter(predicate)
     }
 }
