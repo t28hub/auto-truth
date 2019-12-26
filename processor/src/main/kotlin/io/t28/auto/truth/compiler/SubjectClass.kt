@@ -25,6 +25,7 @@ import com.squareup.javapoet.TypeSpec
 import io.t28.auto.truth.compiler.dsl.`class`
 import io.t28.auto.truth.compiler.dsl.extends
 import io.t28.auto.truth.compiler.dsl.param
+import io.t28.auto.truth.compiler.element.AnnotatedTypeElement
 import javax.annotation.Generated
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PRIVATE
@@ -32,7 +33,7 @@ import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
 
 @Suppress("StringLiteralDuplication")
-class SubjectClass(private val element: TypeElementWrapper) : ClassDeclaration {
+class SubjectClass(private val element: AnnotatedTypeElement) : ClassDeclaration {
     override val packageName: String
         get() = element.packageName
 
@@ -43,7 +44,7 @@ class SubjectClass(private val element: TypeElementWrapper) : ClassDeclaration {
         get() = ClassName.get(packageName, "Auto_${normalizedName}Subject")
 
     private val type: TypeName
-        get() = element.type.asTypeName()
+        get() = TypeName.get(element.type)
 
     override fun toSpec(): TypeSpec {
         return `class`(className) {
@@ -81,48 +82,18 @@ class SubjectClass(private val element: TypeElementWrapper) : ClassDeclaration {
                 this returns ParameterizedTypeName.get(ClassName.get(Subject.Factory::class.java), className, type)
             }
 
-            findPropertyFields().map { field ->
-                val name = field.name
-                val type = field.type
+            element.properties().forEach { property ->
+                val type = TypeName.get(property.type)
+                val simpleName = property.simpleName
+                val identifier = property.identifier
                 method(
-                        "has${name.capitalize()}",
-                        param(type.asTypeName(), "expected")
+                        "has${simpleName.capitalize()}",
+                        param(type, "expected")
                 ) {
                     modifiers(PUBLIC)
-                    statement("check(\$S).that(this.\$L.\$L).isEqualTo(\$L)", name, "actual", name, "expected")
-                }
-            }
-
-            findGetterMethods().map { method ->
-                val name = method.name
-                val type = method.returnType
-                method(
-                        "has${name.capitalize()}",
-                        param(type.asTypeName(), "expected")
-                ) {
-                    modifiers(PUBLIC)
-                    statement("check(\$S).that(this.\$L.\$L()).isEqualTo(\$L)", "$name()", "actual", name, "expected")
+                    statement("check(\$S).that(this.\$L.\$L).isEqualTo(\$L)", identifier, "actual", identifier, "expected")
                 }
             }
         }
-    }
-
-    private fun findPropertyFields(): Collection<VariableElementWrapper> {
-        return element.findFields { field -> !field.isStatic }
-                .filterNot { field -> field.isPrivate or field.isProtected }
-                .filterNot { field ->
-                    val fieldType = field.type
-                    fieldType.isVoid or fieldType.isClassOf<Void>()
-                }
-    }
-
-    private fun findGetterMethods(): Collection<ExecutableElementWrapper> {
-        return element.findMethods { method -> !method.hasParameter }
-                .filterNot { method -> method.isStatic }
-                .filterNot { method -> method.isPrivate or method.isProtected }
-                .filterNot { method ->
-                    val returnType = method.returnType
-                    returnType.isVoid or returnType.isClassOf<Void>()
-                }
     }
 }
