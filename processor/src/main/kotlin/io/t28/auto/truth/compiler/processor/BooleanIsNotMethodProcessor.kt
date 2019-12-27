@@ -23,14 +23,14 @@ import javax.lang.model.element.Modifier
 
 class BooleanIsNotMethodProcessor(
     private val name: String,
-    private val identifier: String
+    private val symbol: String
 ) : Processor<MethodSpec> {
     override fun process(): MethodSpec {
         return method("isNot${name.capitalize()}") {
             modifiers(Modifier.PUBLIC)
 
             statement {
-                `if`("this.actual.\$L", identifier) {
+                `if`("this.actual.\$L", symbol) {
                     statement("failWithActual(\$T.simpleFact(\$S))", Fact::class.java, "expected not to be $name")
                 }.end()
             }

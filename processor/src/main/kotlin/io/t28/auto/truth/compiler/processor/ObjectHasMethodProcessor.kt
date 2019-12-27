@@ -25,13 +25,12 @@ import javax.lang.model.type.TypeMirror
 class ObjectHasMethodProcessor(
     private val type: TypeMirror,
     private val name: String,
-    private val identifier: String
+    private val symbol: String
 ) : Processor<MethodSpec> {
     override fun process(): MethodSpec {
         return method("has${name.capitalize()}", param(type, "expected")) {
             modifiers(Modifier.PUBLIC)
-
-            statement("check(\$S).that(this.\$L.\$L).isEqualTo(\$L)", identifier, "actual", identifier, "expected")
+            statement("check(\$S).that(this.\$L.\$L).isEqualTo(\$L)", symbol, "actual", symbol, "expected")
         }
     }
 }

@@ -24,31 +24,31 @@ import javax.tools.Diagnostic.Kind.NOTE
 import javax.tools.Diagnostic.Kind.WARNING
 
 class ProcessingEnvLogger(private val messager: Messager, private val debug: Boolean) : Logger {
-    override fun debug(message: String, vararg args: Any) {
+    override fun debug(message: String, vararg args: Any?) {
         if (debug) {
             messager.printMessage(NOTE, message.safeFormat(*args))
         }
     }
 
-    override fun debug(element: Element, message: String, vararg args: Any) {
+    override fun debug(element: Element, message: String, vararg args: Any?) {
         if (debug) {
             messager.printMessage(NOTE, message.safeFormat(*args), element)
         }
     }
 
-    override fun warn(message: String, vararg args: Any) {
+    override fun warn(message: String, vararg args: Any?) {
         messager.printMessage(WARNING, message.safeFormat(*args))
     }
 
-    override fun warn(element: Element, message: String, vararg args: Any) {
+    override fun warn(element: Element, message: String, vararg args: Any?) {
         messager.printMessage(WARNING, message.safeFormat(*args), element)
     }
 
-    override fun error(message: String, vararg args: Any) {
+    override fun error(message: String, vararg args: Any?) {
         messager.printMessage(ERROR, message.safeFormat(*args))
     }
 
-    override fun error(element: Element, message: String, vararg args: Any) {
+    override fun error(element: Element, message: String, vararg args: Any?) {
         messager.printMessage(ERROR, message.safeFormat(*args), element)
     }
 }
