@@ -40,6 +40,11 @@ class MethodDsl private constructor(private val builder: MethodSpec.Builder) {
         builder.addStatement(format, *args)
     }
 
+    fun statement(init: CodeBlockDsl.() -> Unit) {
+        val statement = CodeBlockDsl().apply(init).build()
+        builder.addCode(statement)
+    }
+
     infix fun returns(type: TypeName) {
         builder.returns(type)
     }

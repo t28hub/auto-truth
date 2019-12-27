@@ -36,6 +36,6 @@ data class VariablePropertyElement(override val element: VariableElement) : Prop
             if (candidate.first() !in 'A'..'Z') {
                 return name
             }
-            return candidate
+            return candidate.decapitalize()
         }
 }

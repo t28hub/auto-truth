@@ -226,6 +226,8 @@ object AutoTruthProcessorSpec : Spek({
                                 
                                 String name();
                                 
+                                boolean isAdmin();
+                                
                                 void accept();
                                 
                                 Void accept2();
@@ -238,6 +240,7 @@ object AutoTruthProcessorSpec : Spek({
                         """
                             package test;
                             
+                            import com.google.common.truth.Fact;
                             import com.google.common.truth.FailureMetadata;
                             import com.google.common.truth.Subject;
                             import javax.annotation.Generated;
@@ -262,6 +265,18 @@ object AutoTruthProcessorSpec : Spek({
 
                                 public void hasName(String expected) {
                                     check("name()").that(this.actual.name()).isEqualTo(expected);
+                                }
+                                
+                                public void isAdmin() {
+                                    if (!this.actual.isAdmin()) {
+                                        failWithActual(Fact.simpleFact("expected to be admin"));
+                                    }
+                                }
+
+                                public void isNotAdmin() {
+                                    if (this.actual.isAdmin()) {
+                                        failWithActual(Fact.simpleFact("expected not to be admin"));
+                                    }
                                 }
                             }
                         """.trimIndent()

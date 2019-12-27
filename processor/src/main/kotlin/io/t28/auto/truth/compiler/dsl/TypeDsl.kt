@@ -17,6 +17,7 @@
 package io.t28.auto.truth.compiler.dsl
 
 import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
@@ -66,6 +67,10 @@ class TypeDsl private constructor(private val builder: TypeSpec.Builder) {
     fun method(name: String, vararg params: ParameterSpec, init: MethodDsl.() -> Unit) {
         val methodSpec = MethodDsl.method(name).apply { params(*params) }.apply(init).build()
         builder.addMethod(methodSpec)
+    }
+
+    fun method(method: MethodSpec) {
+        builder.addMethod(method)
     }
 
     fun build(): TypeSpec {

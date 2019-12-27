@@ -19,6 +19,7 @@ package io.t28.auto.truth.compiler
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
 import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
@@ -27,11 +28,20 @@ import io.t28.auto.truth.compiler.dsl.extends
 import io.t28.auto.truth.compiler.dsl.param
 import io.t28.auto.truth.compiler.element.AnnotatedTypeElement
 import io.t28.auto.truth.compiler.element.AutoSubjectAnnotation
+import io.t28.auto.truth.compiler.processor.BooleanIsMethodProcessor
+import io.t28.auto.truth.compiler.processor.BooleanIsNotMethodProcessor
+import io.t28.auto.truth.compiler.processor.ObjectHasMethodProcessor
+import io.t28.auto.truth.compiler.processor.Processor
 import javax.annotation.Generated
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PRIVATE
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
+import javax.lang.model.type.NoType
+import javax.lang.model.type.PrimitiveType
+import javax.lang.model.type.TypeKind
+import javax.lang.model.type.TypeMirror
+import javax.lang.model.util.SimpleTypeVisitor8
 
 @Suppress("StringLiteralDuplication")
 class SubjectClass(
@@ -86,18 +96,35 @@ class SubjectClass(
                 this returns ParameterizedTypeName.get(ClassName.get(Subject.Factory::class.java), className, type)
             }
 
-            element.properties().forEach { property ->
-                val type = TypeName.get(property.type)
-                val simpleName = property.simpleName
-                val identifier = property.identifier
-                method(
-                    "has${simpleName.capitalize()}",
-                    param(type, "expected")
-                ) {
-                    modifiers(PUBLIC)
-                    statement("check(\$S).that(this.\$L.\$L).isEqualTo(\$L)", identifier, "actual", identifier, "expected")
+            element.properties()
+                .flatMap { property ->
+                    val simpleName = property.simpleName
+                    val identifier = property.identifier
+                    property.type.accept(object : SimpleTypeVisitor8<Collection<Processor<MethodSpec>>, Unit>() {
+                        override fun visitPrimitive(type: PrimitiveType, parameter: Unit): Collection<Processor<MethodSpec>> {
+                            if (type.kind == TypeKind.BOOLEAN) {
+                                return listOf(
+                                    BooleanIsMethodProcessor(simpleName, identifier),
+                                    BooleanIsNotMethodProcessor(simpleName, identifier)
+                                )
+                            }
+                            return defaultAction(type, parameter)
+                        }
+
+                        override fun visitNoType(type: NoType, parameter: Unit): Collection<Processor<MethodSpec>> {
+                            return emptyList()
+                        }
+
+                        override fun defaultAction(type: TypeMirror, p: Unit): Collection<Processor<MethodSpec>> {
+                            return listOf(
+                                ObjectHasMethodProcessor(type, simpleName, identifier)
+                            )
+                        }
+                    }, Unit)
+                }.forEach {
+                    val method = it.process()
+                    method(method)
                 }
-            }
         }
     }
 }

@@ -33,10 +33,10 @@ data class ExecutablePropertyElement(override val element: ExecutableElement) : 
     override val simpleName: String
         get() {
             val matched = GETTER_PREFIX.find(name) ?: return name
-            val candidate = matched.groups[1]?.value ?: return name
+            val candidate = matched.groups[2]?.value ?: return name
             if (candidate.first() !in 'A'..'Z') {
                 return name
             }
-            return candidate
+            return candidate.decapitalize()
         }
 }
