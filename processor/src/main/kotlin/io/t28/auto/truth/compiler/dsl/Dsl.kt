@@ -17,11 +17,13 @@
 package io.t28.auto.truth.compiler.dsl
 
 import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import com.squareup.javapoet.TypeVariableName
 import java.lang.reflect.Type
+import javax.lang.model.type.TypeMirror
 import kotlin.reflect.KClass
 
 fun `class`(name: String, init: TypeDsl.() -> Unit = {}): TypeSpec {
@@ -44,8 +46,18 @@ fun param(type: TypeName, name: String, init: ParameterDsl.() -> Unit = {}): Par
     return ParameterDsl(type, name).apply(init).build()
 }
 
+fun param(type: TypeMirror, name: String, init: ParameterDsl.() -> Unit = {}): ParameterSpec {
+    return ParameterDsl(TypeName.get(type), name).apply(init).build()
+}
+
 fun param(type: KClass<*>, name: String, init: ParameterDsl.() -> Unit = {}): ParameterSpec {
     return ParameterDsl(type.java, name).apply(init).build()
+}
+
+fun method(name: String, vararg params: ParameterSpec, init: MethodDsl.() -> Unit): MethodSpec {
+    return MethodDsl.method(name).apply {
+        params(*params)
+    }.apply(init).build()
 }
 
 infix fun String.extends(bound: TypeName): TypeVariableName {
