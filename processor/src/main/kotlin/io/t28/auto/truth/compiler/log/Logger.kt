@@ -19,15 +19,15 @@ package io.t28.auto.truth.compiler.log
 import javax.lang.model.element.Element
 
 interface Logger {
-    fun debug(message: String, vararg args: Any)
+    fun debug(message: String, vararg args: Any?)
 
-    fun debug(element: Element, message: String, vararg args: Any)
+    fun debug(element: Element, message: String, vararg args: Any?)
 
-    fun warn(message: String, vararg args: Any)
+    fun warn(message: String, vararg args: Any?)
 
-    fun warn(element: Element, message: String, vararg args: Any)
+    fun warn(element: Element, message: String, vararg args: Any?)
 
-    fun error(message: String, vararg args: Any)
+    fun error(message: String, vararg args: Any?)
 
-    fun error(element: Element, message: String, vararg args: Any)
+    fun error(element: Element, message: String, vararg args: Any?)
 }

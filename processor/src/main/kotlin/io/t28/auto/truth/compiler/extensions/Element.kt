@@ -16,26 +16,52 @@
 
 package io.t28.auto.truth.compiler.extensions
 
+import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ElementKind.FIELD
+import javax.lang.model.element.ElementKind.PACKAGE
 import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.Modifier
+import javax.lang.model.element.Modifier.PUBLIC
+import javax.lang.model.element.Modifier.STATIC
 import javax.lang.model.element.PackageElement
-import javax.lang.model.util.ElementFilter
+import javax.lang.model.element.TypeElement
+import javax.lang.model.element.VariableElement
+import javax.lang.model.util.ElementFilter.fieldsIn
+import javax.lang.model.util.ElementFilter.methodsIn
+import javax.lang.model.util.ElementFilter.packagesIn
 
 val Element.isPublic: Boolean
-    get() = this.modifiers.contains(Modifier.PUBLIC)
+    get() = this.modifiers.contains(PUBLIC)
 
 val Element.isStatic: Boolean
-    get() = this.modifiers.contains(Modifier.STATIC)
+    get() = this.modifiers.contains(STATIC)
 
 val ExecutableElement.hasParameter: Boolean
     get() = this.parameters.isNotEmpty()
 
 fun Element.getPackage(): PackageElement {
     var enclosing = this
-    while (enclosing.kind != ElementKind.PACKAGE) {
+    while (enclosing.kind != PACKAGE) {
         enclosing = enclosing.enclosingElement
     }
-    return ElementFilter.packagesIn(setOf(enclosing)).first()
+    return packagesIn(setOf(enclosing)).first()
+}
+
+inline fun <reified T : Annotation> Element.findAnnotationMirror(): AnnotationMirror? {
+    val annotationName = T::class.java.canonicalName
+    return annotationMirrors.firstOrNull {
+        val annotationTypeElement = it.annotationType.asTypeElement()
+        annotationTypeElement.qualifiedName.contentEquals(annotationName)
+    }
+}
+
+fun TypeElement.findFields(predicate: (VariableElement) -> Boolean): List<VariableElement> {
+    return fieldsIn(enclosedElements)
+        .filter { it.kind == FIELD }
+        .filter(predicate)
+}
+
+fun TypeElement.findMethods(predicate: (ExecutableElement) -> Boolean): List<ExecutableElement> {
+    return methodsIn(enclosedElements)
+        .filter(predicate)
 }

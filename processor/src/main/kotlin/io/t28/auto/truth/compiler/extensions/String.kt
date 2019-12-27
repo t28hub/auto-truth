@@ -18,7 +18,7 @@ package io.t28.auto.truth.compiler.extensions
 
 import java.util.IllegalFormatException
 
-fun String.safeFormat(vararg args: Any): String {
+fun String.safeFormat(vararg args: Any?): String {
     return try {
         format(*args)
     } catch (e: IllegalFormatException) {

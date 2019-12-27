@@ -16,8 +16,8 @@
 
 package io.t28.auto.truth.compiler.writer
 
-import io.t28.auto.truth.compiler.ClassDeclaration
+import com.squareup.javapoet.TypeSpec
 
 interface Writer {
-    fun write(declaration: ClassDeclaration)
+    fun write(packageName: String, spec: TypeSpec)
 }

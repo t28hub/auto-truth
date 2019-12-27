@@ -17,7 +17,7 @@
 package io.t28.auto.truth.compiler.writer
 
 import com.squareup.javapoet.JavaFile
-import io.t28.auto.truth.compiler.ClassDeclaration
+import com.squareup.javapoet.TypeSpec
 import javax.annotation.processing.ProcessingEnvironment
 
 class ProcessingEnvWriter(private val processingEnv: ProcessingEnvironment) : Writer {
@@ -25,8 +25,8 @@ class ProcessingEnvWriter(private val processingEnv: ProcessingEnvironment) : Wr
         private const val INDENT = "    "
     }
 
-    override fun write(declaration: ClassDeclaration) {
-        val javaFile = JavaFile.builder(declaration.packageName, declaration.toSpec())
+    override fun write(packageName: String, spec: TypeSpec) {
+        val javaFile = JavaFile.builder(packageName, spec)
                 .indent(INDENT)
                 .skipJavaLangImports(true)
                 .build()
