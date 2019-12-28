@@ -88,12 +88,12 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Act & Assert
                 assertAbout(javaSources())
-                        .that(setOf(subject))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
-                        .compilesWithoutError()
-                        .and()
-                        .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueSubject.class")
+                    .that(setOf(subject))
+                    .withCompilerOptions("-Adebug")
+                    .processedWith(AutoTruthProcessor())
+                    .compilesWithoutError()
+                    .and()
+                    .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueSubject.class")
             }
 
             it("should generate class with specified prefix") {
@@ -102,12 +102,12 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Act & Assert
                 assertAbout(javaSources())
-                        .that(setOf(subject))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
-                        .compilesWithoutError()
-                        .and()
-                        .generatesFileNamed(CLASS_OUTPUT, "test", "MyPrefixTestValueSubject.class")
+                    .that(setOf(subject))
+                    .withCompilerOptions("-Adebug")
+                    .processedWith(AutoTruthProcessor())
+                    .compilesWithoutError()
+                    .and()
+                    .generatesFileNamed(CLASS_OUTPUT, "test", "MyPrefixTestValueSubject.class")
             }
 
             it("should generate class with no prefix") {
@@ -116,12 +116,12 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Act & Assert
                 assertAbout(javaSources())
-                        .that(setOf(subject))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
-                        .compilesWithoutError()
-                        .and()
-                        .generatesFileNamed(CLASS_OUTPUT, "test", "TestValueSubject.class")
+                    .that(setOf(subject))
+                    .withCompilerOptions("-Adebug")
+                    .processedWith(AutoTruthProcessor())
+                    .compilesWithoutError()
+                    .and()
+                    .generatesFileNamed(CLASS_OUTPUT, "test", "TestValueSubject.class")
             }
 
             it("should fail to compile when prefix contains invalid chars") {
@@ -130,11 +130,11 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Act & Assert
                 assertAbout(javaSources())
-                        .that(setOf(subject))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
-                        .failsToCompile()
-                        .withErrorContaining("1nvalidTestValueSubject")
+                    .that(setOf(subject))
+                    .withCompilerOptions("-Adebug")
+                    .processedWith(AutoTruthProcessor())
+                    .failsToCompile()
+                    .withErrorContaining("1nvalidTestValueSubject")
             }
         }
 
@@ -160,12 +160,12 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Act & Assert
                 assertAbout(javaSources())
-                        .that(setOf(subject))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
-                        .compilesWithoutError()
-                        .and()
-                        .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueSubject.class")
+                    .that(setOf(subject))
+                    .withCompilerOptions("-Adebug")
+                    .processedWith(AutoTruthProcessor())
+                    .compilesWithoutError()
+                    .and()
+                    .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueSubject.class")
             }
 
             it("should generate class with specified suffix") {
@@ -174,12 +174,12 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Act & Assert
                 assertAbout(javaSources())
-                        .that(setOf(subject))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
-                        .compilesWithoutError()
-                        .and()
-                        .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueMySubject.class")
+                    .that(setOf(subject))
+                    .withCompilerOptions("-Adebug")
+                    .processedWith(AutoTruthProcessor())
+                    .compilesWithoutError()
+                    .and()
+                    .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueMySubject.class")
             }
 
             it("should generate class with no suffix") {
@@ -188,12 +188,12 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Act & Assert
                 assertAbout(javaSources())
-                        .that(setOf(subject))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
-                        .compilesWithoutError()
-                        .and()
-                        .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValue.class")
+                    .that(setOf(subject))
+                    .withCompilerOptions("-Adebug")
+                    .processedWith(AutoTruthProcessor())
+                    .compilesWithoutError()
+                    .and()
+                    .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValue.class")
             }
 
             it("should fail to compile when suffix contains invalid chars") {
@@ -202,11 +202,11 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Act & Assert
                 assertAbout(javaSources())
-                        .that(setOf(subject))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
-                        .failsToCompile()
-                        .withErrorContaining("AutoTestValue@Subject")
+                    .that(setOf(subject))
+                    .withCompilerOptions("-Adebug")
+                    .processedWith(AutoTruthProcessor())
+                    .failsToCompile()
+                    .withErrorContaining("AutoTestValue@Subject")
             }
         }
 
@@ -214,8 +214,8 @@ object AutoTruthProcessorSpec : Spek({
             it("should generate a class with 'Auto_' prefix and 'Subject' suffix") {
                 // Arrange
                 val subject = forSourceString(
-                        "test.TestValue",
-                        """
+                    "test.TestValue",
+                    """
                             package test;
                             
                             import io.t28.auto.truth.AutoSubject;
@@ -228,6 +228,8 @@ object AutoTruthProcessorSpec : Spek({
                                 
                                 boolean isAdmin();
                                 
+                                Boolean isOwner();
+                                
                                 void accept();
                                 
                                 Void accept2();
@@ -235,9 +237,9 @@ object AutoTruthProcessorSpec : Spek({
                         """.trimIndent())
 
                 val generated = forSourceString(
-                        "test.AutoTestValueSubject",
-                        // language=java
-                        """
+                    "test.AutoTestValueSubject",
+                    // language=java
+                    """
                             package test;
                             
                             import com.google.common.truth.Fact;
@@ -278,6 +280,18 @@ object AutoTruthProcessorSpec : Spek({
                                         failWithActual(Fact.simpleFact("expected not to be admin"));
                                     }
                                 }
+                                
+                                public void isOwner() {
+                                    if (!this.actual.isOwner()) {
+                                        failWithActual(Fact.simpleFact("expected to be owner"));
+                                    }
+                                }
+
+                                public void isNotOwner() {
+                                    if (this.actual.isOwner()) {
+                                        failWithActual(Fact.simpleFact("expected not to be owner"));
+                                    }
+                                }
                             }
                         """.trimIndent()
 
@@ -285,12 +299,12 @@ object AutoTruthProcessorSpec : Spek({
 
                 // Act & Assert
                 assertAbout(javaSources())
-                        .that(setOf(subject))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
-                        .compilesWithoutError()
-                        .and()
-                        .generatesSources(generated)
+                    .that(setOf(subject))
+                    .withCompilerOptions("-Adebug")
+                    .processedWith(AutoTruthProcessor())
+                    .compilesWithoutError()
+                    .and()
+                    .generatesSources(generated)
             }
         }
     }
