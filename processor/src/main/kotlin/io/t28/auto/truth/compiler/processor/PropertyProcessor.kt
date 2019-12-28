@@ -39,6 +39,7 @@ abstract class PropertyProcessor<E : Element> internal constructor(
     companion object {
         private val GETTER_PREFIX = Regex("^(is|get)(.+?)$")
         private val BOXED_VOID = ClassName.get("java.lang", "Void")
+        private val BOXED_BOOLEAN = ClassName.get("java.lang", "Boolean")
 
         fun create(context: Context, element: Element): PropertyProcessor<out Element> {
             return element.accept(PropertyProcessorFactory, context)
@@ -85,11 +86,20 @@ abstract class PropertyProcessor<E : Element> internal constructor(
     }
 
     private fun process(type: DeclaredType): List<MethodSpec> {
-        val typeName = TypeName.get(type)
-        if (typeName == BOXED_VOID) {
-            return emptyList()
+        return when (TypeName.get(type)) {
+            BOXED_VOID -> {
+                emptyList()
+            }
+            BOXED_BOOLEAN -> {
+                return listOf(
+                    BooleanIsMethodProcessor(name = name, symbol = symbol),
+                    BooleanIsNotMethodProcessor(name = name, symbol = symbol)
+                ).map(Processor<MethodSpec>::process)
+            }
+            else -> {
+                process(type as TypeMirror)
+            }
         }
-        return process(type as TypeMirror)
     }
 
     private fun process(type: NoType): List<MethodSpec> {
