@@ -47,7 +47,7 @@ import javax.lang.model.element.Modifier.STATIC
 import javax.lang.model.element.TypeElement
 
 class AutoSubjectProcessor(
-    context: Context,
+    private val context: Context,
     private val element: TypeElement
 ) : Processor<TypeSpec> {
     val packageName: String
@@ -110,8 +110,8 @@ class AutoSubjectProcessor(
 
     private fun assertionMethods(): List<MethodSpec> {
         return findProperties()
-            .flatMap(AssertionMethodProcessorFactory::create)
-            .map(Processor<MethodSpec>::process)
+            .map { PropertyProcessor.create(context, it) }
+            .flatMap(PropertyProcessor<out Element>::process)
     }
 
     private fun findProperties(): List<Element> {
