@@ -23,9 +23,8 @@ import io.t28.auto.truth.compiler.Context
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
+import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.NoType
-import javax.lang.model.type.NullType
 import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind.BOOLEAN
 import javax.lang.model.type.TypeMirror
@@ -65,24 +64,34 @@ abstract class PropertyProcessor<E : Element> internal constructor(
         return type.accept(object : SimpleTypeVisitor8<List<MethodSpec>, Unit>() {
             override fun visitPrimitive(type: PrimitiveType, parameter: Unit) = process(type)
 
+            override fun visitArray(type: ArrayType, parameter: Unit) = process(type)
+
             override fun visitDeclared(type: DeclaredType, parameter: Unit) = process(type)
-
-            override fun visitNoType(type: NoType, parameter: Unit) = process(type)
-
-            override fun visitNull(type: NullType, parameter: Unit) = process(type)
 
             override fun defaultAction(type: TypeMirror, parameter: Unit) = process(type)
         }, Unit)
     }
 
     private fun process(type: PrimitiveType): List<MethodSpec> {
-        if (type.kind == BOOLEAN) {
-            return listOf(
-                BooleanIsMethodProcessor(name = name, symbol = symbol),
-                BooleanIsNotMethodProcessor(name = name, symbol = symbol)
-            ).map(Processor<MethodSpec>::process)
+        return when (type.kind) {
+            BOOLEAN -> {
+                listOf(
+                    BooleanIsMethodProcessor(name = name, symbol = symbol),
+                    BooleanIsNotMethodProcessor(name = name, symbol = symbol)
+                ).map(Processor<MethodSpec>::process)
+            }
+            else -> {
+                listOf(
+                    ObjectHasMethodProcessor(type, name = name, symbol = symbol)
+                ).map(Processor<MethodSpec>::process)
+            }
         }
-        return process(type as TypeMirror)
+    }
+
+    private fun process(type: ArrayType): List<MethodSpec> {
+        return listOf(
+            ArrayTypePropertyProcessor(type, name = name, symbol = symbol)
+        ).map(Processor<MethodSpec>::process)
     }
 
     private fun process(type: DeclaredType): List<MethodSpec> {
@@ -91,31 +100,22 @@ abstract class PropertyProcessor<E : Element> internal constructor(
                 emptyList()
             }
             BOXED_BOOLEAN -> {
-                return listOf(
+                listOf(
                     BooleanIsMethodProcessor(name = name, symbol = symbol),
                     BooleanIsNotMethodProcessor(name = name, symbol = symbol)
                 ).map(Processor<MethodSpec>::process)
             }
             else -> {
-                process(type as TypeMirror)
+                listOf(
+                    ObjectHasMethodProcessor(type, name = name, symbol = symbol)
+                ).map(Processor<MethodSpec>::process)
             }
         }
     }
 
-    private fun process(type: NoType): List<MethodSpec> {
-        context.logger.debug(element, "Unsupported property type: %s", type)
-        return emptyList()
-    }
-
-    private fun process(type: NullType): List<MethodSpec> {
-        context.logger.debug(element, "Unsupported property type: %s", type)
-        return emptyList()
-    }
-
     private fun process(type: TypeMirror): List<MethodSpec> {
-        return listOf(
-            ObjectHasMethodProcessor(type, name = name, symbol = symbol)
-        ).map(Processor<MethodSpec>::process)
+        context.logger.debug(element, "Unsupported property type: %s", type)
+        return emptyList()
     }
 
     private object PropertyProcessorFactory : SimpleElementVisitor8<PropertyProcessor<out Element>, Context>() {

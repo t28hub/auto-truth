@@ -230,6 +230,10 @@ object AutoTruthProcessorSpec : Spek({
                                 
                                 Boolean isOwner();
                                 
+                                int[] values();
+                                
+                                String[] names();
+                                
                                 void accept();
                                 
                                 Void accept2();
