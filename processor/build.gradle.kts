@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
+import org.gradle.internal.jvm.Jvm
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     val kotlinVersion = "1.3.61"
     kotlin("jvm") version kotlinVersion
     kotlin("kapt") version kotlinVersion
+    jacoco
     id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
     id("io.gitlab.arturbosch.detekt") version "1.3.0"
 }
@@ -56,6 +58,9 @@ dependencies {
 
     // Mockito
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+
+    // Compiler Tree API
+    testImplementation(files(Jvm.current().toolsJar))
 }
 
 tasks {
@@ -63,9 +68,29 @@ tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = jvmTarget
     }
+
     compileTestKotlin {
         kotlinOptions.jvmTarget = jvmTarget
     }
+
+    test {
+        useJUnitPlatform {
+            includeEngines("spek2")
+        }
+    }
+
+    jacocoTestReport {
+        reports {
+            csv.isEnabled = false
+            xml.isEnabled = false
+            html.destination = file("$buildDir/reports/jacoco")
+        }
+        dependsOn("test")
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.5"
 }
 
 ktlint {

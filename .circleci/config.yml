@@ -57,12 +57,19 @@ jobs:
           name: Test 'processor' module
           command: ./gradlew :processor:test --stacktrace
           no_output_timeout: 3m
+      - run:
+          name: Measure code coverage
+          command: ./gradlew :processor:jacocoTestReport --stacktrace
+          no_output_timeout: 3m
       - save_cache: *save-cache
       - store_test_results:
           path: ./processor/test-results/test
       - store_artifacts:
           path: ./processor/reports/test
           destination: spek
+      - store_artifacts:
+          path: ./processor/reports/jacoco
+          destination: jacoco
 
 workflows:
   version: 2
