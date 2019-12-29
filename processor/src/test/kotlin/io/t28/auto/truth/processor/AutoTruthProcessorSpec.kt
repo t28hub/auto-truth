@@ -216,19 +216,28 @@ object AutoTruthProcessorSpec : Spek({
         }
 
         describe("process") {
-            it("should generate a class for basic value class") {
-                // Arrange
-                val valueJavaFile = "User.java".readResource()
-                val expectedJavaFile = "AutoUserSubject.java".readResource()
+            listOf(
+                "User.java" to "AutoUserSubject.java",
+                "VoidValueObject.java" to "AutoVoidValueObjectSubject.java",
+                "BooleanValueObject.java" to "AutoBooleanValueObjectSubject.java",
+                "PrimitiveValueObject.java" to "AutoPrimitiveValueObjectSubject.java",
+                "PrimitiveArrayValueObject.java" to "AutoPrimitiveArrayValueObjectSubject.java",
+                "ObjectArrayValueObject.java" to "AutoObjectArrayValueObjectSubject.java"
+            ).forEach { (value, expected) ->
+                it("should generate Subject class for $value") {
+                    // Arrange
+                    val valueJavaFile = value.readResource()
+                    val expectedJavaFile = expected.readResource()
 
-                // Act & Assert
-                assertAbout(javaSources())
-                    .that(setOf(valueJavaFile))
-                    .withCompilerOptions("-Adebug")
-                    .processedWith(AutoTruthProcessor())
-                    .compilesWithoutError()
-                    .and()
-                    .generatesSources(expectedJavaFile)
+                    // Act & Assert
+                    assertAbout(javaSources())
+                        .that(setOf(valueJavaFile))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesSources(expectedJavaFile)
+                }
             }
         }
     }
