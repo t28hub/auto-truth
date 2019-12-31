@@ -16,21 +16,20 @@
 
 package io.t28.auto.truth.processor.processor
 
-import com.squareup.javapoet.MethodSpec
-import io.t28.auto.truth.processor.dsl.method
-import io.t28.auto.truth.processor.dsl.param
-import javax.lang.model.element.Modifier
-import javax.lang.model.type.TypeMirror
+import io.t28.auto.truth.processor.Context
+import io.t28.auto.truth.processor.data.Property
+import javax.lang.model.element.ExecutableElement
 
-class ObjectHasMethodProcessor(
-    private val type: TypeMirror,
-    private val name: String,
-    private val symbol: String
-) : Processor<MethodSpec> {
-    override fun process(): MethodSpec {
-        return method("has${name.capitalize()}", param(type, "expected")) {
-            modifiers(Modifier.PUBLIC)
-            statement("check(\$S).that(this.\$L.\$L).isEqualTo(\$L)", symbol, "actual", symbol, "expected")
-        }
+class ExecutablePropertyProcessor(context: Context) : PropertyProcessor<ExecutableElement>(context) {
+    override fun process(element: ExecutableElement): Property {
+        context.logger.debug(element, "Processing executable property: %s", element.simpleName)
+
+        val simpleName = "${element.simpleName}"
+        return Property(
+            element = element,
+            type = element.returnType,
+            name = simpleName.simplify(),
+            symbol = "$simpleName()"
+        )
     }
 }

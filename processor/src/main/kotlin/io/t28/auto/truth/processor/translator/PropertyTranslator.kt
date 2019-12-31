@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.dsl
+package io.t28.auto.truth.processor.translator
 
-import com.squareup.javapoet.AnnotationSpec
+import com.squareup.javapoet.MethodSpec
+import io.t28.auto.truth.processor.data.Property
+import javax.lang.model.type.TypeMirror
 
-class AnnotationDsl private constructor(private val builder: AnnotationSpec.Builder) {
-    internal constructor(type: Class<*>) : this(AnnotationSpec.builder(type))
-
-    infix fun String.`is`(value: String) {
-        member(this, "\$S", value)
-    }
-
-    fun member(name: String, format: String, vararg args: Any) {
-        builder.addMember(name, format, *args)
-    }
-
-    fun build(): AnnotationSpec {
-        return builder.build()
-    }
+interface PropertyTranslator : Translator<Property, MethodSpec> {
+    fun matches(type: TypeMirror): Boolean
 }

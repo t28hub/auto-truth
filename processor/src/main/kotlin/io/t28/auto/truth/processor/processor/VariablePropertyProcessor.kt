@@ -16,24 +16,20 @@
 
 package io.t28.auto.truth.processor.processor
 
-import com.google.common.truth.Fact
-import com.squareup.javapoet.MethodSpec
-import io.t28.auto.truth.processor.dsl.method
-import javax.lang.model.element.Modifier
+import io.t28.auto.truth.processor.Context
+import io.t28.auto.truth.processor.data.Property
+import javax.lang.model.element.VariableElement
 
-class BooleanIsMethodProcessor(
-    private val name: String,
-    private val symbol: String
-) : Processor<MethodSpec> {
-    override fun process(): MethodSpec {
-        return method("is${name.capitalize()}") {
-            modifiers(Modifier.PUBLIC)
+class VariablePropertyProcessor(context: Context) : PropertyProcessor<VariableElement>(context) {
+    override fun process(element: VariableElement): Property {
+        context.logger.debug(element, "Processing variable property: %s", element.simpleName)
 
-            statement {
-                `if`("!this.actual.\$L", symbol) {
-                    statement("failWithActual(\$T.simpleFact(\$S))", Fact::class.java, "expected to be $name")
-                }.end()
-            }
-        }
+        val simpleName = "${element.simpleName}"
+        return Property(
+            element = element,
+            type = element.asType(),
+            name = simpleName.simplify(),
+            symbol = simpleName
+        )
     }
 }
