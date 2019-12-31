@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.writer
+package io.t28.auto.truth.processor.translator
 
-import com.squareup.javapoet.TypeSpec
-
-interface Writer {
-    fun write(packageName: String, spec: TypeSpec)
+interface Translator<I : Any, O : Any> {
+    fun translate(input: I): O
 }

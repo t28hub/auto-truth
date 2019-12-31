@@ -17,9 +17,16 @@
 package io.t28.auto.truth.processor
 
 import com.google.auto.service.AutoService
+import com.squareup.javapoet.JavaFile
 import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.processor.extensions.getAnnotatedElements
 import io.t28.auto.truth.processor.processor.AutoSubjectProcessor
+import io.t28.auto.truth.processor.processor.ExecutablePropertyProcessor
+import io.t28.auto.truth.processor.processor.VariablePropertyProcessor
+import io.t28.auto.truth.processor.translator.SubjectClassTranslator
+import io.t28.auto.truth.processor.translator.property.ArrayPropertyTranslator
+import io.t28.auto.truth.processor.translator.property.BooleanPropertyTranslator
+import io.t28.auto.truth.processor.translator.property.DefaultPropertyTranslator
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
@@ -52,15 +59,25 @@ class AutoTruthProcessor : AbstractProcessor() {
         }
 
         val logger = context.logger
-        val writer = context.writer
+        val processor = AutoSubjectProcessor(context, VariablePropertyProcessor(context), ExecutablePropertyProcessor(context))
+        val translator = SubjectClassTranslator(
+            ArrayPropertyTranslator(),
+            BooleanPropertyTranslator.PositiveTranslator(),
+            BooleanPropertyTranslator.NegativeTranslator(),
+            DefaultPropertyTranslator()
+        )
         roundEnv.getAnnotatedElements<AutoSubject>()
             .filterIsInstance<TypeElement>()
             .forEach { element ->
                 logger.debug(element, "Found annotated class: %s", element.simpleName)
-                val processor = AutoSubjectProcessor(context, element)
                 @Suppress("TooGenericExceptionCaught")
                 try {
-                    writer.write(processor.packageName, processor.process())
+                    val subjectClass = processor.process(element)
+                    val typeSpec = translator.translate(subjectClass)
+                    JavaFile.builder(subjectClass.packageName, typeSpec)
+                        .skipJavaLangImports(true)
+                        .indent("    ")
+                        .build().writeTo(processingEnv.filer)
                 } catch (e: Exception) {
                     logger.error(element, "Failed to compile: %s", "${e.message}")
                 }

@@ -18,8 +18,6 @@ package io.t28.auto.truth.processor
 
 import io.t28.auto.truth.processor.log.Logger
 import io.t28.auto.truth.processor.log.ProcessingEnvLogger
-import io.t28.auto.truth.processor.writer.ProcessingEnvWriter
-import io.t28.auto.truth.processor.writer.Writer
 import javax.annotation.processing.ProcessingEnvironment
 
 interface Context {
@@ -31,14 +29,9 @@ interface Context {
             return object : Context {
                 override val logger: Logger
                     get() = ProcessingEnvLogger(processingEnv.messager, options.containsKey(DEBUG_OPTION))
-
-                override val writer: Writer
-                    get() = ProcessingEnvWriter(processingEnv)
             }
         }
     }
 
     val logger: Logger
-
-    val writer: Writer
 }

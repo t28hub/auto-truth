@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.processor
+package io.t28.auto.truth.processor.data
 
 import javax.lang.model.element.Element
+import javax.lang.model.type.TypeMirror
 
-interface Processor<I : Element, T : Any> {
-    fun process(element: I): T
-}
+data class Property(
+    val element: Element,
+    val type: TypeMirror,
+    val name: String,
+    val symbol: String
+)

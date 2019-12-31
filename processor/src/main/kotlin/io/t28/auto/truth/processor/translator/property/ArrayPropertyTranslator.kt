@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.processor
+package io.t28.auto.truth.processor.translator.property
 
 import com.google.common.truth.ObjectArraySubject
 import com.google.common.truth.PrimitiveBooleanArraySubject
@@ -29,8 +29,9 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeName
-import io.t28.auto.truth.processor.dsl.method
-import javax.lang.model.element.Modifier
+import io.t28.auto.truth.processor.data.Property
+import io.t28.auto.truth.processor.translator.PropertyTranslator
+import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.type.ArrayType
 import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind.BOOLEAN
@@ -44,21 +45,27 @@ import javax.lang.model.type.TypeKind.SHORT
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.SimpleTypeVisitor8
 
-class ArrayTypePropertyProcessor(
-    private val type: ArrayType,
-    private val name: String,
-    private val symbol: String
-) : Processor<MethodSpec> {
-    override fun process(): MethodSpec {
-        val subjectType = findSubjectType()
-        return method(name.decapitalize()) {
-            this returns subjectType
-            modifiers(Modifier.PUBLIC)
-            statement("return check(\$S).that(this.\$L.\$L)", symbol, "actual", symbol)
-        }
+class ArrayPropertyTranslator : PropertyTranslator {
+    override fun matches(type: TypeMirror): Boolean {
+        return type.accept(object : SimpleTypeVisitor8<Boolean, Unit>() {
+            override fun visitArray(type: ArrayType, parameter: Unit) = true
+
+            override fun defaultAction(type: TypeMirror, parameter: Unit) = false
+        }, Unit)
     }
 
-    private fun findSubjectType(): TypeName {
+    override fun translate(input: Property): MethodSpec {
+        require(matches(input.type))
+
+        val returnType = findReturnType(input.type as ArrayType)
+        return MethodSpec.methodBuilder(input.name.decapitalize()).apply {
+            returns(returnType)
+            addModifiers(PUBLIC)
+            addStatement("return check(\$S).that(this.\$L.\$L)", input.symbol, "actual", input.symbol)
+        }.build()
+    }
+
+    private fun findReturnType(type: ArrayType): TypeName {
         return type.componentType.accept(object : SimpleTypeVisitor8<TypeName, Unit>() {
             override fun visitPrimitive(type: PrimitiveType, parameter: Unit): TypeName {
                 return when (type.kind) {
