@@ -19,6 +19,7 @@ package io.t28.auto.truth.processor.log
 import io.t28.auto.truth.processor.extensions.safeFormat
 import javax.annotation.processing.Messager
 import javax.lang.model.element.Element
+import javax.tools.Diagnostic.Kind
 import javax.tools.Diagnostic.Kind.ERROR
 import javax.tools.Diagnostic.Kind.NOTE
 import javax.tools.Diagnostic.Kind.WARNING
@@ -26,29 +27,37 @@ import javax.tools.Diagnostic.Kind.WARNING
 class ProcessingEnvLogger(private val messager: Messager, private val debug: Boolean) : Logger {
     override fun debug(message: String, vararg args: Any?) {
         if (debug) {
-            messager.printMessage(NOTE, message.safeFormat(*args))
+            print(NOTE, message, *args)
         }
     }
 
     override fun debug(element: Element, message: String, vararg args: Any?) {
         if (debug) {
-            messager.printMessage(NOTE, message.safeFormat(*args), element)
+            print(NOTE, message, *args, element = element)
         }
     }
 
     override fun warn(message: String, vararg args: Any?) {
-        messager.printMessage(WARNING, message.safeFormat(*args))
+        print(WARNING, message, *args)
     }
 
     override fun warn(element: Element, message: String, vararg args: Any?) {
-        messager.printMessage(WARNING, message.safeFormat(*args), element)
+        print(WARNING, message, *args, element = element)
     }
 
     override fun error(message: String, vararg args: Any?) {
-        messager.printMessage(ERROR, message.safeFormat(*args))
+        print(ERROR, message, *args)
     }
 
     override fun error(element: Element, message: String, vararg args: Any?) {
-        messager.printMessage(ERROR, message.safeFormat(*args), element)
+        print(ERROR, message, *args, element = element)
+    }
+
+    private fun print(kind: Kind, message: String, vararg args: Any?, element: Element? = null) {
+        element?.run {
+            messager.printMessage(kind, message.safeFormat(*args), this)
+        } ?: run {
+            messager.printMessage(kind, message.safeFormat(*args))
+        }
     }
 }
