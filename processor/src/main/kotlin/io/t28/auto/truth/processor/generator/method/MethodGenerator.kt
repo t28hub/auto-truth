@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.translator
+package io.t28.auto.truth.processor.generator.method
 
-interface Translator<I : Any, O : Any> {
-    fun translate(input: I): O
+import com.squareup.javapoet.MethodSpec
+import io.t28.auto.truth.processor.data.Property
+import io.t28.auto.truth.processor.generator.Generator
+import javax.lang.model.type.TypeMirror
+
+interface MethodGenerator : Generator<Property, MethodSpec> {
+    fun matches(type: TypeMirror): Boolean
 }

@@ -20,8 +20,6 @@ import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.IterableSubject;
 import com.google.common.truth.Subject;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import javax.annotation.Generated;
 
 @Generated("io.t28.auto.truth.processor.AutoTruthProcessor")
@@ -50,10 +48,6 @@ public class AutoIterableValueObjectSubject extends Subject {
         check("getIterable()").that(actual.getIterable()).containsNoneIn(Arrays.asList(expected));
     }
 
-    public void hasIterable(Iterable<Object> expected) {
-        check("getIterable()").that(this.actual.getIterable()).isEqualTo(expected);
-    }
-
     public IterableSubject collection() {
         return check("getCollection()").that(actual.getCollection());
     }
@@ -64,10 +58,6 @@ public class AutoIterableValueObjectSubject extends Subject {
 
     public void doesNotHaveCollection(String... expected) {
         check("getCollection()").that(actual.getCollection()).containsNoneIn(Arrays.asList(expected));
-    }
-
-    public void hasCollection(Collection<String> expected) {
-        check("getCollection()").that(this.actual.getCollection()).isEqualTo(expected);
     }
 
     public IterableSubject list() {
@@ -82,15 +72,7 @@ public class AutoIterableValueObjectSubject extends Subject {
         check("getList()").that(actual.getList()).containsNoneIn(Arrays.asList(expected));
     }
 
-    public void hasList(List<Integer> expected) {
-        check("getList()").that(this.actual.getList()).isEqualTo(expected);
-    }
-
     public IterableSubject customList() {
         return check("getCustomList()").that(actual.getCustomList());
-    }
-
-    public void hasCustomList(IterableValueObject.CustomList expected) {
-        check("getCustomList()").that(this.actual.getCustomList()).isEqualTo(expected);
     }
 }

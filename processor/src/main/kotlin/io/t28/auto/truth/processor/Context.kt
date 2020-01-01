@@ -18,48 +18,30 @@ package io.t28.auto.truth.processor
 
 import io.t28.auto.truth.processor.log.Logger
 import io.t28.auto.truth.processor.log.ProcessingEnvLogger
+import io.t28.auto.truth.processor.utils.ProcessingEnvTypeUtils
+import io.t28.auto.truth.processor.utils.TypeUtils
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.TypeElement
-import javax.lang.model.type.ArrayType
-import javax.lang.model.type.TypeMirror
-import kotlin.reflect.KClass
 
 interface Context {
     companion object {
         private const val DEBUG_OPTION = "debug"
 
         fun get(processingEnv: ProcessingEnvironment): Context {
-            val options = processingEnv.options
-            return object : Context {
-                override val logger: Logger
-                    get() = ProcessingEnvLogger(processingEnv.messager, options.containsKey(DEBUG_OPTION))
-
-                override fun getTypeElement(type: KClass<*>): TypeElement {
-                    return processingEnv.elementUtils.getTypeElement(type.java.canonicalName)
-                }
-
-                override fun getArrayType(componentType: TypeMirror): ArrayType {
-                    return processingEnv.typeUtils.getArrayType(componentType)
-                }
-
-                override fun erasureType(type: TypeMirror): TypeMirror {
-                    return processingEnv.typeUtils.erasure(type)
-                }
-
-                override fun isInherited(first: TypeMirror, second: TypeMirror): Boolean {
-                    return processingEnv.typeUtils.isAssignable(first, second)
-                }
-            }
+            return ProcessingContext(processingEnv)
         }
     }
 
     val logger: Logger
 
-    fun getTypeElement(type: KClass<*>): TypeElement
+    val utils: TypeUtils
 
-    fun getArrayType(componentType: TypeMirror): ArrayType
+    class ProcessingContext(private val processingEnv: ProcessingEnvironment) : Context {
+        override val logger: Logger by lazy {
+            ProcessingEnvLogger(processingEnv.messager, processingEnv.options.containsKey(DEBUG_OPTION))
+        }
 
-    fun erasureType(type: TypeMirror): TypeMirror
-
-    fun isInherited(first: TypeMirror, second: TypeMirror): Boolean
+        override val utils: TypeUtils by lazy {
+            ProcessingEnvTypeUtils(processingEnv.typeUtils, processingEnv.elementUtils)
+        }
+    }
 }

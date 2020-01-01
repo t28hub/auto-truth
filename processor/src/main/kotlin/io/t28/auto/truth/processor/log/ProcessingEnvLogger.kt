@@ -33,7 +33,7 @@ class ProcessingEnvLogger(private val messager: Messager, private val debug: Boo
 
     override fun debug(element: Element, message: String, vararg args: Any?) {
         if (debug) {
-            print(NOTE, message, *args, element = element)
+            print(NOTE, element, message, *args)
         }
     }
 
@@ -42,7 +42,7 @@ class ProcessingEnvLogger(private val messager: Messager, private val debug: Boo
     }
 
     override fun warn(element: Element, message: String, vararg args: Any?) {
-        print(WARNING, message, *args, element = element)
+        print(WARNING, element, message, *args)
     }
 
     override fun error(message: String, vararg args: Any?) {
@@ -50,14 +50,14 @@ class ProcessingEnvLogger(private val messager: Messager, private val debug: Boo
     }
 
     override fun error(element: Element, message: String, vararg args: Any?) {
-        print(ERROR, message, *args, element = element)
+        print(ERROR, element, message, *args)
     }
 
-    private fun print(kind: Kind, message: String, vararg args: Any?, element: Element? = null) {
-        element?.run {
-            messager.printMessage(kind, message.safeFormat(*args), this)
-        } ?: run {
-            messager.printMessage(kind, message.safeFormat(*args))
-        }
+    private fun print(kind: Kind, message: String, vararg args: Any?) {
+        messager.printMessage(kind, message.safeFormat(*args))
+    }
+
+    private fun print(kind: Kind, element: Element, message: String, vararg args: Any?) {
+        messager.printMessage(kind, message.safeFormat(*args), element)
     }
 }

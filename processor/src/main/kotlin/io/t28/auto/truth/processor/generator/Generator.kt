@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.translator
+package io.t28.auto.truth.processor.generator
 
-import com.squareup.javapoet.MethodSpec
-import io.t28.auto.truth.processor.data.Property
-import javax.lang.model.type.TypeMirror
-
-interface PropertyTranslator : Translator<Property, MethodSpec> {
-    fun matches(type: TypeMirror): Boolean
+interface Generator<I : Any, O : Any> {
+    fun generate(input: I): O
 }

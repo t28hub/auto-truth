@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.translator.property
+package io.t28.auto.truth.processor.generator.method
 
-import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
+import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
-import io.t28.auto.truth.processor.translator.PropertyTranslator
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
@@ -30,19 +29,19 @@ import javax.lang.model.type.TypeKind.BOOLEAN
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.SimpleTypeVisitor8
 
-class DefaultPropertyTranslator : PropertyTranslator {
-    companion object {
-        private val BOXED_VOID = ClassName.get("java.lang", "Void")
-        private val BOXED_BOOLEAN = ClassName.get("java.lang", "Boolean")
-    }
-
+class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
     override fun matches(type: TypeMirror): Boolean {
         return type.accept(object : SimpleTypeVisitor8<Boolean, Unit>() {
-            override fun visitPrimitive(type: PrimitiveType, parameter: Unit) = type.kind != BOOLEAN
+            override fun visitPrimitive(type: PrimitiveType, parameter: Unit): Boolean {
+                return type.kind != BOOLEAN
+            }
 
             override fun visitDeclared(type: DeclaredType, parameter: Unit): Boolean {
-                val typeName = TypeName.get(type)
-                return (typeName != BOXED_VOID) and (typeName != BOXED_BOOLEAN)
+                val utils = context.utils
+                return !utils.isBoxedVoid(type) and
+                    !utils.isBoxedBoolean(type) and
+                    !utils.isIterable(type) and
+                    !utils.isMap(type)
             }
 
             override fun visitError(type: ErrorType, parameter: Unit): Boolean {
@@ -53,8 +52,9 @@ class DefaultPropertyTranslator : PropertyTranslator {
         }, Unit)
     }
 
-    override fun translate(input: Property): MethodSpec {
+    override fun generate(input: Property): MethodSpec {
         require(matches(input.type))
+        context.logger.debug(input.element, "Generating an assertion method for %s", input.type)
 
         return MethodSpec.methodBuilder("has${input.name.capitalize()}").apply {
             addModifiers(PUBLIC)
