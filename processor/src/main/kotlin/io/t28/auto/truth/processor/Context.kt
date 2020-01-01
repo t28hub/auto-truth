@@ -19,6 +19,10 @@ package io.t28.auto.truth.processor
 import io.t28.auto.truth.processor.log.Logger
 import io.t28.auto.truth.processor.log.ProcessingEnvLogger
 import javax.annotation.processing.ProcessingEnvironment
+import javax.lang.model.element.TypeElement
+import javax.lang.model.type.ArrayType
+import javax.lang.model.type.TypeMirror
+import kotlin.reflect.KClass
 
 interface Context {
     companion object {
@@ -29,9 +33,33 @@ interface Context {
             return object : Context {
                 override val logger: Logger
                     get() = ProcessingEnvLogger(processingEnv.messager, options.containsKey(DEBUG_OPTION))
+
+                override fun getTypeElement(type: KClass<*>): TypeElement {
+                    return processingEnv.elementUtils.getTypeElement(type.java.canonicalName)
+                }
+
+                override fun getArrayType(componentType: TypeMirror): ArrayType {
+                    return processingEnv.typeUtils.getArrayType(componentType)
+                }
+
+                override fun erasureType(type: TypeMirror): TypeMirror {
+                    return processingEnv.typeUtils.erasure(type)
+                }
+
+                override fun isInherited(first: TypeMirror, second: TypeMirror): Boolean {
+                    return processingEnv.typeUtils.isAssignable(first, second)
+                }
             }
         }
     }
 
     val logger: Logger
+
+    fun getTypeElement(type: KClass<*>): TypeElement
+
+    fun getArrayType(componentType: TypeMirror): ArrayType
+
+    fun erasureType(type: TypeMirror): TypeMirror
+
+    fun isInherited(first: TypeMirror, second: TypeMirror): Boolean
 }
