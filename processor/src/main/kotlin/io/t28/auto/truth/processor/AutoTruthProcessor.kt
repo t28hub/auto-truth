@@ -27,6 +27,7 @@ import io.t28.auto.truth.processor.translator.SubjectClassTranslator
 import io.t28.auto.truth.processor.translator.property.ArrayPropertyTranslator
 import io.t28.auto.truth.processor.translator.property.BooleanPropertyTranslator
 import io.t28.auto.truth.processor.translator.property.DefaultPropertyTranslator
+import io.t28.auto.truth.processor.translator.property.IterablePropertyTranslator
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
@@ -64,6 +65,9 @@ class AutoTruthProcessor : AbstractProcessor() {
             ArrayPropertyTranslator(),
             BooleanPropertyTranslator.PositiveTranslator(),
             BooleanPropertyTranslator.NegativeTranslator(),
+            IterablePropertyTranslator(context),
+            IterablePropertyTranslator.PositiveTranslator(context),
+            IterablePropertyTranslator.NegativeTranslator(context),
             DefaultPropertyTranslator()
         )
         roundEnv.getAnnotatedElements<AutoSubject>()
