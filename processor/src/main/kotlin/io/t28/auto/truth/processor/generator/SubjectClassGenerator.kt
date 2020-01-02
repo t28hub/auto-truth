@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.translator
+package io.t28.auto.truth.processor.generator
 
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
@@ -28,20 +28,19 @@ import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import io.t28.auto.truth.processor.AutoTruthProcessor
 import io.t28.auto.truth.processor.data.SubjectClass
+import io.t28.auto.truth.processor.generator.method.MethodGenerator
 import javax.annotation.Generated
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PRIVATE
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
 
-class SubjectClassTranslator(
-    private val propertyTranslators: List<PropertyTranslator>
-) : Translator<SubjectClass, TypeSpec> {
-    constructor(vararg propertyTranslators: PropertyTranslator) : this(
-        propertyTranslators.toList()
-    )
+class SubjectClassGenerator(
+    private val methodGenerators: List<MethodGenerator>
+) : Generator<SubjectClass, TypeSpec> {
+    constructor(vararg generators: MethodGenerator) : this(generators.toList())
 
-    override fun translate(input: SubjectClass): TypeSpec {
+    override fun generate(input: SubjectClass): TypeSpec {
         val element = input.element
         val type = TypeName.get(input.type)
         val className = ClassName.get(input.packageName, "${input.prefix}${element.simpleName}${input.suffix}")
@@ -77,8 +76,8 @@ class SubjectClassTranslator(
 
             // Assertion methods
             val methods = input.properties.flatMap { property ->
-                propertyTranslators.filter { translator -> translator.matches(property.type) }
-                    .map { translator -> translator.translate(property) }
+                methodGenerators.filter { generator -> generator.matches(property.type) }
+                    .map { generator -> generator.generate(property) }
             }
             addMethods(methods)
         }.build()

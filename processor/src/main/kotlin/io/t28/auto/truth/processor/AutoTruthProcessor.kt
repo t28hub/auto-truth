@@ -20,14 +20,18 @@ import com.google.auto.service.AutoService
 import com.squareup.javapoet.JavaFile
 import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.processor.extensions.getAnnotatedElements
+import io.t28.auto.truth.processor.generator.SubjectClassGenerator
+import io.t28.auto.truth.processor.generator.method.AbstractArraySubjectGenerator
+import io.t28.auto.truth.processor.generator.method.BooleanNegativeAssertionGenerator
+import io.t28.auto.truth.processor.generator.method.BooleanPositiveAssertionGenerator
+import io.t28.auto.truth.processor.generator.method.IterableNegativeAssertionGenerator
+import io.t28.auto.truth.processor.generator.method.IterablePositiveAssertionGenerator
+import io.t28.auto.truth.processor.generator.method.IterableSubjectGenerator
+import io.t28.auto.truth.processor.generator.method.MapSubjectGenerator
+import io.t28.auto.truth.processor.generator.method.ObjectAssertionGenerator
 import io.t28.auto.truth.processor.processor.AutoSubjectProcessor
 import io.t28.auto.truth.processor.processor.ExecutablePropertyProcessor
 import io.t28.auto.truth.processor.processor.VariablePropertyProcessor
-import io.t28.auto.truth.processor.translator.SubjectClassTranslator
-import io.t28.auto.truth.processor.translator.property.ArrayPropertyTranslator
-import io.t28.auto.truth.processor.translator.property.BooleanPropertyTranslator
-import io.t28.auto.truth.processor.translator.property.DefaultPropertyTranslator
-import io.t28.auto.truth.processor.translator.property.IterablePropertyTranslator
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
@@ -61,14 +65,15 @@ class AutoTruthProcessor : AbstractProcessor() {
 
         val logger = context.logger
         val processor = AutoSubjectProcessor(context, VariablePropertyProcessor(context), ExecutablePropertyProcessor(context))
-        val translator = SubjectClassTranslator(
-            ArrayPropertyTranslator(),
-            BooleanPropertyTranslator.PositiveTranslator(),
-            BooleanPropertyTranslator.NegativeTranslator(),
-            IterablePropertyTranslator(context),
-            IterablePropertyTranslator.PositiveTranslator(context),
-            IterablePropertyTranslator.NegativeTranslator(context),
-            DefaultPropertyTranslator()
+        val generator = SubjectClassGenerator(
+            AbstractArraySubjectGenerator(context),
+            BooleanPositiveAssertionGenerator(context),
+            BooleanNegativeAssertionGenerator(context),
+            IterableSubjectGenerator(context),
+            IterablePositiveAssertionGenerator(context),
+            IterableNegativeAssertionGenerator(context),
+            MapSubjectGenerator(context),
+            ObjectAssertionGenerator(context)
         )
         roundEnv.getAnnotatedElements<AutoSubject>()
             .filterIsInstance<TypeElement>()
@@ -77,7 +82,7 @@ class AutoTruthProcessor : AbstractProcessor() {
                 @Suppress("TooGenericExceptionCaught")
                 try {
                     val subjectClass = processor.process(element)
-                    val typeSpec = translator.translate(subjectClass)
+                    val typeSpec = generator.generate(subjectClass)
                     JavaFile.builder(subjectClass.packageName, typeSpec)
                         .skipJavaLangImports(true)
                         .indent("    ")
