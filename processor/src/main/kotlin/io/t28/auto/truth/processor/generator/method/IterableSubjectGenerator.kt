@@ -16,35 +16,33 @@
 
 package io.t28.auto.truth.processor.generator.method
 
+import com.google.common.collect.Multiset
 import com.google.common.truth.IterableSubject
-import com.squareup.javapoet.MethodSpec
+import com.google.common.truth.MultisetSubject
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
-import io.t28.auto.truth.processor.data.Property
-import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.util.SimpleTypeVisitor8
 
-class IterableSubjectGenerator(private val context: Context) : MethodGenerator {
+class IterableSubjectGenerator(context: Context) : AbstractSubjectGenerator(context) {
     override fun matches(type: TypeMirror): Boolean {
-        return type.accept(object : SimpleTypeVisitor8<Boolean, Unit>() {
-            override fun visitDeclared(type: DeclaredType, parameter: Unit): Boolean {
-                return context.utils.isIterable(type)
-            }
-
-            override fun defaultAction(type: TypeMirror, parameter: Unit) = false
-        }, Unit)
+        return type.accept(IterableTypeMatcher, context)
     }
 
-    override fun generate(input: Property): MethodSpec {
-        require(matches(input.type))
-        context.logger.debug(input.element, "Generating a method returns IterableSubject")
+    override fun findSubjectType(type: TypeMirror): TypeName {
+        val multisetType = context.utils.getDeclaredType(Multiset::class)
+        return if (context.utils.isAssignableType(type, multisetType)) {
+            ClassName.get(MultisetSubject::class.java)
+        } else {
+            ClassName.get(IterableSubject::class.java)
+        }
+    }
 
-        val symbol = input.symbol
-        return MethodSpec.methodBuilder(input.name.decapitalize()).apply {
-            returns(IterableSubject::class.java)
-            addModifiers(PUBLIC)
-            addStatement("return check(\$S).that(\$L.\$L)", symbol, "actual", symbol)
-        }.build()
+    internal object IterableTypeMatcher : SupportedTypeMatcher() {
+        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
+            val iterableType = context.utils.getDeclaredType(Iterable::class)
+            return context.utils.isAssignableType(type, iterableType)
+        }
     }
 }

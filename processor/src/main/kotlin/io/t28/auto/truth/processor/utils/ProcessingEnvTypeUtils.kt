@@ -23,47 +23,20 @@ import javax.lang.model.util.Elements
 import javax.lang.model.util.Types
 import kotlin.reflect.KClass
 
-class ProcessingEnvTypeUtils(
-    private val types: Types,
-    private val elements: Elements
-) : TypeUtils {
-    private val boxedVoidType: TypeMirror by lazy {
-        getDeclaredType(java.lang.Void::class)
+class ProcessingEnvTypeUtils(private val types: Types, private val elements: Elements) : TypeUtils {
+    override fun isSameType(type1: TypeMirror, type2: TypeMirror): Boolean {
+        return types.isSameType(type1, type2)
     }
 
-    private val boxedBooleanType: TypeMirror by lazy {
-        getDeclaredType(java.lang.Boolean::class)
-    }
-
-    private val iterableType: TypeMirror by lazy {
-        getDeclaredType(Iterable::class)
-    }
-
-    private val mapType: TypeMirror by lazy {
-        getDeclaredType(Map::class)
-    }
-
-    override fun isBoxedVoid(type: TypeMirror): Boolean {
-        return types.isSameType(type, boxedVoidType)
-    }
-
-    override fun isBoxedBoolean(type: TypeMirror): Boolean {
-        return types.isSameType(type, boxedBooleanType)
-    }
-
-    override fun isIterable(type: TypeMirror): Boolean {
-        return types.isAssignable(type, iterableType)
-    }
-
-    override fun isMap(type: TypeMirror): Boolean {
-        return types.isAssignable(type, mapType)
+    override fun isAssignableType(type1: TypeMirror, type2: TypeMirror): Boolean {
+        return types.isAssignable(type1, type2)
     }
 
     override fun getArrayType(componentType: TypeMirror): ArrayType {
         return types.getArrayType(componentType)
     }
 
-    private fun getDeclaredType(type: KClass<*>): DeclaredType {
+    override fun getDeclaredType(type: KClass<*>): DeclaredType {
         val typeArgs = type.typeParameters.map {
             types.getWildcardType(null, null)
         }.toTypedArray()

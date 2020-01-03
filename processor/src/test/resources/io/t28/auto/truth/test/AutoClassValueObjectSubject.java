@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,34 @@
 
 package io.t28.auto.truth.test;
 
+import com.google.common.truth.ClassSubject;
 import com.google.common.truth.FailureMetadata;
-import com.google.common.truth.ObjectArraySubject;
 import com.google.common.truth.Subject;
 import javax.annotation.Generated;
 
 @Generated("io.t28.auto.truth.processor.AutoTruthProcessor")
 @SuppressWarnings("unchecked")
-public class AutoObjectArrayValueObjectSubject extends Subject {
-    private final ObjectArrayValueObject actual;
+public class AutoClassValueObjectSubject extends Subject {
+    private final ClassValueObject actual;
 
-    AutoObjectArrayValueObjectSubject(FailureMetadata failureMetadata, ObjectArrayValueObject actual) {
+    AutoClassValueObjectSubject(FailureMetadata failureMetadata, ClassValueObject actual) {
         super(failureMetadata, actual);
         this.actual = actual;
     }
 
-    public static Subject.Factory<AutoObjectArrayValueObjectSubject, ObjectArrayValueObject> objectArrayValueObject() {
-        return AutoObjectArrayValueObjectSubject::new
+    public static Subject.Factory<AutoClassValueObjectSubject, ClassValueObject> classValueObject() {
+        return AutoClassValueObjectSubject::new
     }
 
-    public ObjectArraySubject<Object> objects() {
-        return check("getObjects()").that(actual.getObjects());
+    public ClassSubject anyClass() {
+        return check("getAnyClass()").that(actual.getAnyClass());
     }
 
-    public ObjectArraySubject<String> strings() {
-        return check("getStrings()").that(actual.getStrings());
+    public ClassSubject objectClass() {
+        return check("getObjectClass()").that(actual.getObjectClass());
+    }
+
+    public ClassSubject stringClass() {
+        return check("getStringClass()").that(actual.getStringClass());
     }
 }

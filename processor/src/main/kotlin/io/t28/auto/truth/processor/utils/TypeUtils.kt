@@ -17,16 +17,16 @@
 package io.t28.auto.truth.processor.utils
 
 import javax.lang.model.type.ArrayType
+import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
+import kotlin.reflect.KClass
 
 interface TypeUtils {
-    fun isBoxedVoid(type: TypeMirror): Boolean
+    fun isSameType(type1: TypeMirror, type2: TypeMirror): Boolean
 
-    fun isBoxedBoolean(type: TypeMirror): Boolean
-
-    fun isIterable(type: TypeMirror): Boolean
-
-    fun isMap(type: TypeMirror): Boolean
+    fun isAssignableType(type1: TypeMirror, type2: TypeMirror): Boolean
 
     fun getArrayType(componentType: TypeMirror): ArrayType
+
+    fun getDeclaredType(type: KClass<*>): DeclaredType
 }

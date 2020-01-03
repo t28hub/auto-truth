@@ -17,34 +17,25 @@
 package io.t28.auto.truth.processor.generator.method
 
 import com.google.common.truth.MapSubject
-import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
-import io.t28.auto.truth.processor.data.Property
-import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.util.SimpleTypeVisitor8
 
-class MapSubjectGenerator(private val context: Context) : MethodGenerator {
+class MapSubjectGenerator(context: Context) : AbstractSubjectGenerator(context) {
     override fun matches(type: TypeMirror): Boolean {
-        return type.accept(object : SimpleTypeVisitor8<Boolean, Unit>() {
-            override fun visitDeclared(type: DeclaredType, parameter: Unit): Boolean {
-                return context.utils.isMap(type)
-            }
-
-            override fun defaultAction(type: TypeMirror, parameter: Unit) = false
-        }, Unit)
+        return type.accept(MapTypeMatcher, context)
     }
 
-    override fun generate(input: Property): MethodSpec {
-        require(matches(input.type))
-        context.logger.debug(input.element, "Generating a method returns MapSubject")
+    override fun findSubjectType(type: TypeMirror): TypeName {
+        return ClassName.get(MapSubject::class.java)
+    }
 
-        val symbol = input.symbol
-        return MethodSpec.methodBuilder(input.name.decapitalize()).apply {
-            returns(MapSubject::class.java)
-            addModifiers(Modifier.PUBLIC)
-            addStatement("return check(\$S).that(\$L.\$L)", symbol, "actual", symbol)
-        }.build()
+    internal object MapTypeMatcher : SupportedTypeMatcher() {
+        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
+            val mapType = context.utils.getDeclaredType(Map::class)
+            return context.utils.isAssignableType(type, mapType)
+        }
     }
 }

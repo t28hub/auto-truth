@@ -17,21 +17,9 @@
 package io.t28.auto.truth.processor.generator.method
 
 import io.t28.auto.truth.processor.Context
-import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
+import javax.lang.model.util.SimpleTypeVisitor8
 
-abstract class IterableAssertionGenerator(protected val context: Context) : MethodGenerator {
-    override fun matches(type: TypeMirror): Boolean {
-        return type.accept(SingleArgumentIterableTypeMatcher, context)
-    }
-
-    internal object SingleArgumentIterableTypeMatcher : SupportedTypeMatcher() {
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val iterableType = context.utils.getDeclaredType(Iterable::class)
-            if (!context.utils.isAssignableType(type, iterableType)) {
-                return false
-            }
-            return type.typeArguments.size == 1
-        }
-    }
+internal abstract class SupportedTypeMatcher : SimpleTypeVisitor8<Boolean, Context>() {
+    override fun defaultAction(type: TypeMirror, context: Context) = false
 }
