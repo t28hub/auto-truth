@@ -43,34 +43,34 @@ public class AutoPrimitiveArrayValueObjectSubject extends Subject {
     }
 
     public PrimitiveBooleanArraySubject booleans() {
-        return check("getBooleans()").that(this.actual.getBooleans());
+        return check("getBooleans()").that(actual.getBooleans());
     }
 
     public PrimitiveByteArraySubject bytes() {
-        return check("getBytes()").that(this.actual.getBytes());
+        return check("getBytes()").that(actual.getBytes());
     }
 
     public PrimitiveShortArraySubject shorts() {
-        return check("getShorts()").that(this.actual.getShorts());
+        return check("getShorts()").that(actual.getShorts());
     }
 
     public PrimitiveIntArraySubject ints() {
-        return check("getInts()").that(this.actual.getInts());
+        return check("getInts()").that(actual.getInts());
     }
 
     public PrimitiveLongArraySubject longs() {
-        return check("getLongs()").that(this.actual.getLongs());
+        return check("getLongs()").that(actual.getLongs());
     }
 
     public PrimitiveCharArraySubject chars() {
-        return check("getChars()").that(this.actual.getChars());
+        return check("getChars()").that(actual.getChars());
     }
 
     public PrimitiveFloatArraySubject floats() {
-        return check("getFloats()").that(this.actual.getFloats());
+        return check("getFloats()").that(actual.getFloats());
     }
 
     public PrimitiveDoubleArraySubject doubles() {
-        return check("getDoubles()").that(this.actual.getDoubles());
+        return check("getDoubles()").that(actual.getDoubles());
     }
 }

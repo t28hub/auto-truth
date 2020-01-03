@@ -220,6 +220,8 @@ object AutoTruthProcessorSpec : Spek({
                 "User.java" to "AutoUserSubject.java",
                 "VoidValueObject.java" to "AutoVoidValueObjectSubject.java",
                 "BooleanValueObject.java" to "AutoBooleanValueObjectSubject.java",
+                "ClassValueObject.java" to "AutoClassValueObjectSubject.java",
+                "GuavaValueObject.java" to "AutoGuavaValueObjectSubject.java",
                 "PrimitiveValueObject.java" to "AutoPrimitiveValueObjectSubject.java",
                 "PrimitiveArrayValueObject.java" to "AutoPrimitiveArrayValueObjectSubject.java",
                 "IterableValueObject.java" to "AutoIterableValueObjectSubject.java",

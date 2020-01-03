@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,27 @@
 
 package io.t28.auto.truth.processor.generator.method
 
+import com.google.common.collect.Multimap
+import com.google.common.truth.MultimapSubject
+import com.squareup.javapoet.ClassName
+import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
 import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.PrimitiveType
-import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
-abstract class BooleanAssertionGenerator(protected val context: Context) : MethodGenerator {
+class MultimapSubjectGenerator(context: Context) : AbstractSubjectGenerator(context) {
     override fun matches(type: TypeMirror): Boolean {
-        return type.accept(BooleanTypeMatcher, context)
+        return type.accept(MultimapTypeMatcher, context)
     }
 
-    internal object BooleanTypeMatcher : SupportedTypeMatcher() {
-        override fun visitPrimitive(type: PrimitiveType, context: Context): Boolean {
-            return type.kind == TypeKind.BOOLEAN
-        }
+    override fun findSubjectType(type: TypeMirror): TypeName {
+        return ClassName.get(MultimapSubject::class.java)
+    }
 
+    internal object MultimapTypeMatcher : SupportedTypeMatcher() {
         override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val boxedBooleanType = context.utils.getDeclaredType(java.lang.Boolean::class)
-            return context.utils.isAssignableType(type, boxedBooleanType)
+            val multimapType = context.utils.getDeclaredType(Multimap::class)
+            return context.utils.isAssignableType(type, multimapType)
         }
     }
 }
