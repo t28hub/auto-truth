@@ -42,12 +42,12 @@ import javax.lang.model.type.TypeKind.SHORT
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.SimpleTypeVisitor8
 
-class AbstractArraySubjectGenerator(context: Context) : AbstractSubjectGenerator(context) {
+class AbstractArraySubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
     override fun matches(type: TypeMirror): Boolean {
         return type.accept(ArrayTypeMatcher, context)
     }
 
-    override fun findSubjectType(type: TypeMirror): TypeName {
+    override fun subjectClass(type: TypeMirror): TypeName {
         return (type as? ArrayType)
             ?.componentType
             ?.accept(SubjectTypeResolver, Unit)

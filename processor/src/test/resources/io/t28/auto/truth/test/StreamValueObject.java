@@ -14,23 +14,25 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.utils
+package io.t28.auto.truth.test;
 
-import javax.lang.model.type.ArrayType
-import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.TypeMirror
-import kotlin.reflect.KClass
+import io.t28.auto.truth.AutoSubject;
 
-interface TypeUtils {
-    fun isSameType(type1: TypeMirror, type2: TypeMirror): Boolean
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
-    fun isAssignableType(type1: TypeMirror, type2: TypeMirror): Boolean
+@AutoSubject
+public class StreamValueObject {
+    public Stream<String> getStringStream() {
+        return Stream.of("Alice", "Bob", "Charlie");
+    }
 
-    fun getArrayType(componentType: TypeMirror): ArrayType
+    public IntStream getIntStream() {
+        return IntStream.of(1, 2, 3);
+    }
 
-    fun getDeclaredType(type: KClass<*>): DeclaredType
-}
-
-inline fun <reified T : Any> TypeUtils.getDeclaredType(): DeclaredType {
-    return getDeclaredType(T::class)
+    public LongStream getLongStream() {
+        return LongStream.of(23L, 42L);
+    }
 }

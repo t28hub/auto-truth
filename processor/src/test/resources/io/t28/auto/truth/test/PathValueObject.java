@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.utils
+package io.t28.auto.truth.test;
 
-import javax.lang.model.type.ArrayType
-import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.TypeMirror
-import kotlin.reflect.KClass
+import io.t28.auto.truth.AutoSubject;
 
-interface TypeUtils {
-    fun isSameType(type1: TypeMirror, type2: TypeMirror): Boolean
+import java.nio.file.Path;
 
-    fun isAssignableType(type1: TypeMirror, type2: TypeMirror): Boolean
+@AutoSubject
+public class PathValueObject {
+    private final Path path;
 
-    fun getArrayType(componentType: TypeMirror): ArrayType
+    public PathValueObject(Path path) {
+        this.path = path;
+    }
 
-    fun getDeclaredType(type: KClass<*>): DeclaredType
-}
-
-inline fun <reified T : Any> TypeUtils.getDeclaredType(): DeclaredType {
-    return getDeclaredType(T::class)
+    public Path getPath() {
+        return path;
+    }
 }

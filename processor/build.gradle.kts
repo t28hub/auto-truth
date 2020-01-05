@@ -36,9 +36,13 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
 
+    // Truth
+    val truthVersion = "1.0"
+    implementation("com.google.truth:truth:$truthVersion")
+    implementation("com.google.truth.extensions:truth-java8-extension:$truthVersion")
+
     // AutoTruth
     implementation(project(":annotations"))
-    implementation("com.google.truth:truth:1.0")
 
     // AutoService
     val autoServiceVersion = "1.0-rc6"

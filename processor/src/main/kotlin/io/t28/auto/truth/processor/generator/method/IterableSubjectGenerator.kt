@@ -22,15 +22,17 @@ import com.google.common.truth.MultisetSubject
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
+import io.t28.auto.truth.processor.utils.getDeclaredType
+import java.nio.file.Path
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
-class IterableSubjectGenerator(context: Context) : AbstractSubjectGenerator(context) {
+class IterableSubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
     override fun matches(type: TypeMirror): Boolean {
         return type.accept(IterableTypeMatcher, context)
     }
 
-    override fun findSubjectType(type: TypeMirror): TypeName {
+    override fun subjectClass(type: TypeMirror): TypeName {
         val multisetType = context.utils.getDeclaredType(Multiset::class)
         return if (context.utils.isAssignableType(type, multisetType)) {
             ClassName.get(MultisetSubject::class.java)
@@ -41,8 +43,14 @@ class IterableSubjectGenerator(context: Context) : AbstractSubjectGenerator(cont
 
     internal object IterableTypeMatcher : SupportedTypeMatcher() {
         override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val iterableType = context.utils.getDeclaredType(Iterable::class)
-            return context.utils.isAssignableType(type, iterableType)
+            val utils = context.utils
+            val pathType = utils.getDeclaredType<Path>()
+            if (utils.isAssignableType(type, pathType)) {
+                return false
+            }
+
+            val iterableType = utils.getDeclaredType<Iterable<*>>()
+            return utils.isAssignableType(type, iterableType)
         }
     }
 }

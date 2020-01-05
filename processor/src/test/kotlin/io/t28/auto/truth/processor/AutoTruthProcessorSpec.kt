@@ -226,7 +226,10 @@ object AutoTruthProcessorSpec : Spek({
                 "PrimitiveArrayValueObject.java" to "AutoPrimitiveArrayValueObjectSubject.java",
                 "IterableValueObject.java" to "AutoIterableValueObjectSubject.java",
                 "MapValueObject.java" to "AutoMapValueObjectSubject.java",
-                "ObjectArrayValueObject.java" to "AutoObjectArrayValueObjectSubject.java"
+                "ObjectArrayValueObject.java" to "AutoObjectArrayValueObjectSubject.java",
+                "OptionalValueObject.java" to "AutoOptionalValueObjectSubject.java",
+                "PathValueObject.java" to "AutoPathValueObjectSubject.java",
+                "StreamValueObject.java" to "AutoStreamValueObjectSubject.java"
             ).forEach { (value, expected) ->
                 it("should generate Subject class for $value") {
                     // Arrange
