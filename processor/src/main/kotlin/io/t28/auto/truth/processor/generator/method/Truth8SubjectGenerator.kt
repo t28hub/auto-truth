@@ -23,18 +23,22 @@ import io.t28.auto.truth.processor.data.Property
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.TypeMirror
 
-abstract class AbstractSubjectGenerator(protected val context: Context) : MethodGenerator {
-    protected abstract fun findSubjectType(type: TypeMirror): TypeName
+abstract class Truth8SubjectGenerator(protected val context: Context) : MethodGenerator {
+    protected abstract fun subjectClass(type: TypeMirror): TypeName
+
+    protected abstract fun factoryMethodName(type: TypeMirror): String
 
     override fun generate(input: Property): MethodSpec {
         require(matches(input.type))
-        context.logger.debug(input.element, "Generating a method returns Subject for ${input.type}")
+        context.logger.debug(input.element, "Generating a method returns Truth8's Subject for ${input.type}")
 
+        val subjectClass = subjectClass(input.type)
+        val factoryMethod = "${factoryMethodName(input.type)}()"
         val symbol = input.symbol
         return MethodSpec.methodBuilder(input.name.decapitalize()).apply {
-            returns(findSubjectType(input.type))
+            returns(subjectClass)
             addModifiers(Modifier.PUBLIC)
-            addStatement("return check(\$S).that(\$L.\$L)", symbol, "actual", symbol)
+            addStatement("return check(\$S).about(\$T.\$L).that(\$L.\$L)", symbol, subjectClass, factoryMethod, "actual", symbol)
         }.build()
     }
 }

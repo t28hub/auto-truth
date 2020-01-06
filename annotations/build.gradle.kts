@@ -19,5 +19,4 @@ plugins {
 }
 
 dependencies {
-    api("com.google.truth:truth:1.0")
 }

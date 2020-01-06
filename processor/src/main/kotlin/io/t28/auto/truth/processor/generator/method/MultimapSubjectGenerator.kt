@@ -24,12 +24,12 @@ import io.t28.auto.truth.processor.Context
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
-class MultimapSubjectGenerator(context: Context) : AbstractSubjectGenerator(context) {
+class MultimapSubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
     override fun matches(type: TypeMirror): Boolean {
         return type.accept(MultimapTypeMatcher, context)
     }
 
-    override fun findSubjectType(type: TypeMirror): TypeName {
+    override fun subjectClass(type: TypeMirror): TypeName {
         return ClassName.get(MultimapSubject::class.java)
     }
 

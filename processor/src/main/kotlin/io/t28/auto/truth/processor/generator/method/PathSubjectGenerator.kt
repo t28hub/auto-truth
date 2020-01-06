@@ -16,27 +16,31 @@
 
 package io.t28.auto.truth.processor.generator.method
 
-import com.google.common.base.Optional
-import com.google.common.truth.GuavaOptionalSubject
+import com.google.common.truth.PathSubject
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
+import io.t28.auto.truth.processor.utils.getDeclaredType
+import java.nio.file.Path
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
-class GuavaOptionalSubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
+class PathSubjectGenerator(context: Context) : Truth8SubjectGenerator(context) {
     override fun matches(type: TypeMirror): Boolean {
-        return type.accept(GuavaOptionalTypeMatcher, context)
+        return type.accept(PathTypeMatcher, context)
     }
+
+    override fun factoryMethodName(type: TypeMirror) = "paths"
 
     override fun subjectClass(type: TypeMirror): TypeName {
-        return ClassName.get(GuavaOptionalSubject::class.java)
+        return ClassName.get(PathSubject::class.java)
     }
 
-    internal object GuavaOptionalTypeMatcher : SupportedTypeMatcher() {
+    internal object PathTypeMatcher : SupportedTypeMatcher() {
         override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val optionalType = context.utils.getDeclaredType(Optional::class)
-            return context.utils.isAssignableType(type, optionalType)
+            val utils = context.utils
+            val pathType = utils.getDeclaredType<Path>()
+            return utils.isAssignableType(type, pathType)
         }
     }
 }

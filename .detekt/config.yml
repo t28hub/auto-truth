@@ -5,7 +5,7 @@ processors:
   active: true
 
 console-reports:
-  active: false
+  active: true
 
 comments:
   active: false

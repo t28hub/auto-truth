@@ -32,6 +32,9 @@ import io.t28.auto.truth.processor.generator.method.IterableSubjectGenerator
 import io.t28.auto.truth.processor.generator.method.MapSubjectGenerator
 import io.t28.auto.truth.processor.generator.method.MultimapSubjectGenerator
 import io.t28.auto.truth.processor.generator.method.ObjectAssertionGenerator
+import io.t28.auto.truth.processor.generator.method.OptionalSubjectGenerator
+import io.t28.auto.truth.processor.generator.method.PathSubjectGenerator
+import io.t28.auto.truth.processor.generator.method.StreamSubjectGenerator
 import io.t28.auto.truth.processor.generator.method.TableSubjectGenerator
 import io.t28.auto.truth.processor.processor.AutoSubjectProcessor
 import io.t28.auto.truth.processor.processor.ExecutablePropertyProcessor
@@ -81,7 +84,10 @@ class AutoTruthProcessor : AbstractProcessor() {
             MapSubjectGenerator(context),
             MultimapSubjectGenerator(context),
             TableSubjectGenerator(context),
-            ObjectAssertionGenerator(context)
+            ObjectAssertionGenerator(context),
+            OptionalSubjectGenerator(context),
+            StreamSubjectGenerator(context),
+            PathSubjectGenerator(context)
         )
         roundEnv.getAnnotatedElements<AutoSubject>()
             .filterIsInstance<TypeElement>()
