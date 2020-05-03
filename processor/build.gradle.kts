@@ -18,12 +18,12 @@ import org.gradle.internal.jvm.Jvm
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    val kotlinVersion = "1.3.61"
+    val kotlinVersion = "1.3.72"
     kotlin("jvm") version kotlinVersion
     kotlin("kapt") version kotlinVersion
     jacoco
     id("org.jlleitschuh.gradle.ktlint") version "9.1.1"
-    id("io.gitlab.arturbosch.detekt") version "1.3.0"
+    id("io.gitlab.arturbosch.detekt") version "1.8.0"
 }
 
 repositories {
@@ -99,7 +99,7 @@ jacoco {
 }
 
 ktlint {
-    version.set("0.35.0")
+    version.set("0.36.0")
     filter {
         include("src/main/kotlin/**")
         exclude("**/generated/**")
