@@ -32,7 +32,7 @@ public class AutoObjectArrayValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoObjectArrayValueObjectSubject, ObjectArrayValueObject> objectArrayValueObject() {
-        return AutoObjectArrayValueObjectSubject::new
+        return AutoObjectArrayValueObjectSubject::new;
     }
 
     public ObjectArraySubject<Object> objects() {

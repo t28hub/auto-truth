@@ -32,7 +32,7 @@ public class AutoPrimitiveValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoPrimitiveValueObjectSubject, PrimitiveValueObject> primitiveValueObject() {
-        return AutoPrimitiveValueObjectSubject::new
+        return AutoPrimitiveValueObjectSubject::new;
     }
 
     public void isBooleanValue() {

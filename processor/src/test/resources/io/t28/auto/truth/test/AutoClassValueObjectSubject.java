@@ -32,7 +32,7 @@ public class AutoClassValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoClassValueObjectSubject, ClassValueObject> classValueObject() {
-        return AutoClassValueObjectSubject::new
+        return AutoClassValueObjectSubject::new;
     }
 
     public ClassSubject anyClass() {

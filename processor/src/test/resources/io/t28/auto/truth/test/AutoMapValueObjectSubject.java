@@ -32,7 +32,7 @@ public class AutoMapValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoMapValueObjectSubject, MapValueObject> mapValueObject() {
-        return AutoMapValueObjectSubject::new
+        return AutoMapValueObjectSubject::new;
     }
 
     public MapSubject map() {
