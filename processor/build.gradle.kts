@@ -53,7 +53,7 @@ dependencies {
     implementation("com.squareup:javapoet:1.11.1")
 
     // Spek
-    val spekVersion = "2.0.9"
+    val spekVersion = "2.0.10"
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
 
