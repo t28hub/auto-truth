@@ -39,7 +39,7 @@ public class AutoPrimitiveArrayValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoPrimitiveArrayValueObjectSubject, PrimitiveArrayValueObject> primitiveArrayValueObject() {
-        return AutoPrimitiveArrayValueObjectSubject::new
+        return AutoPrimitiveArrayValueObjectSubject::new;
     }
 
     public PrimitiveBooleanArraySubject booleans() {

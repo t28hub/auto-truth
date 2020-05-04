@@ -32,7 +32,7 @@ public class AutoPathValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoPathValueObjectSubject, PathValueObject> pathValueObject() {
-        return AutoPathValueObjectSubject::new
+        return AutoPathValueObjectSubject::new;
     }
 
     public PathSubject path() {

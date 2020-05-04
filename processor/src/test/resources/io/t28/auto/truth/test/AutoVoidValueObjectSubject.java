@@ -31,6 +31,6 @@ public class AutoVoidValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoVoidValueObjectSubject, VoidValueObject> voidValueObject() {
-        return AutoVoidValueObjectSubject::new
+        return AutoVoidValueObjectSubject::new;
     }
 }

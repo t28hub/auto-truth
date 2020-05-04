@@ -32,7 +32,7 @@ public class AutoUserSubject extends Subject {
     }
 
     public static Subject.Factory<AutoUserSubject, User> user() {
-        return AutoUserSubject::new
+        return AutoUserSubject::new;
     }
 
     public void hasId(long expected) {

@@ -36,7 +36,7 @@ public class AutoOptionalValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoOptionalValueObjectSubject, OptionalValueObject> optionalValueObject() {
-        return AutoOptionalValueObjectSubject::new
+        return AutoOptionalValueObjectSubject::new;
     }
 
     public OptionalIntSubject intValue() {

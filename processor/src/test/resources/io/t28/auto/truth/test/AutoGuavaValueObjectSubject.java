@@ -36,7 +36,7 @@ public class AutoGuavaValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoGuavaValueObjectSubject, GuavaValueObject> guavaValueObject() {
-        return AutoGuavaValueObjectSubject::new
+        return AutoGuavaValueObjectSubject::new;
     }
 
     public GuavaOptionalSubject value() {

@@ -32,7 +32,7 @@ public class AutoBooleanValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoBooleanValueObjectSubject, BooleanValueObject> booleanValueObject() {
-        return AutoBooleanValueObjectSubject::new
+        return AutoBooleanValueObjectSubject::new;
     }
 
     public void isBooleanValue() {

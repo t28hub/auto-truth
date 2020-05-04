@@ -33,7 +33,7 @@ public class AutoIterableValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoIterableValueObjectSubject, IterableValueObject> iterableValueObject() {
-        return AutoIterableValueObjectSubject::new
+        return AutoIterableValueObjectSubject::new;
     }
 
     public IterableSubject iterable() {

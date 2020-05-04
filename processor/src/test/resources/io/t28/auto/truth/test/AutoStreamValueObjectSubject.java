@@ -34,7 +34,7 @@ public class AutoStreamValueObjectSubject extends Subject {
     }
 
     public static Subject.Factory<AutoStreamValueObjectSubject, StreamValueObject> streamValueObject() {
-        return AutoStreamValueObjectSubject::new
+        return AutoStreamValueObjectSubject::new;
     }
 
     public StreamSubject stringStream() {
