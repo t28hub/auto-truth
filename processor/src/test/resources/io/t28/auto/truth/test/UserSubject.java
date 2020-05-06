@@ -16,29 +16,13 @@
 
 package io.t28.auto.truth.test;
 
+import com.google.common.truth.FailureMetadata;
+import com.google.common.truth.Subject;
 import io.t28.auto.truth.AutoSubject;
 
-@AutoSubject
-public class ClassValueObject {
-    private final Class<?> anyClass;
-    private final Class<Object> objectClass;
-    private final Class<String> stringClass;
-
-    public ClassValueObject(Class<?> anyClass, Class<Object> objectClass, Class<String> stringClass) {
-        this.anyClass = anyClass;
-        this.objectClass = objectClass;
-        this.stringClass = stringClass;
-    }
-
-    public Class<?> getAnyClass() {
-        return anyClass;
-    }
-
-    public Class<Object> getObjectClass() {
-        return objectClass;
-    }
-
-    public Class<String> getStringClass() {
-        return stringClass;
+@AutoSubject(User.class)
+public class UserSubject extends AutoUserSubject {
+    public UserSubject(FailureMetadata failureMetadata, User actual) {
+        super(failureMetadata, actual);
     }
 }

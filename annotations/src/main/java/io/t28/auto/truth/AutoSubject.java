@@ -24,6 +24,8 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
 public @interface AutoSubject {
+    Class<?> value() default String.class;
+
     String prefix() default "Auto";
 
     String suffix() default "Subject";

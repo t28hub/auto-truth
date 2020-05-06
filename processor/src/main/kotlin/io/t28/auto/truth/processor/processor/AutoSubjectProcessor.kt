@@ -21,6 +21,8 @@ import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
 import io.t28.auto.truth.processor.data.SubjectClass
 import io.t28.auto.truth.processor.extensions.asString
+import io.t28.auto.truth.processor.extensions.asType
+import io.t28.auto.truth.processor.extensions.asTypeElement
 import io.t28.auto.truth.processor.extensions.findAnnotationMirror
 import io.t28.auto.truth.processor.extensions.findFields
 import io.t28.auto.truth.processor.extensions.findMethods
@@ -30,9 +32,10 @@ import io.t28.auto.truth.processor.extensions.hasParameter
 import io.t28.auto.truth.processor.extensions.isPublic
 import io.t28.auto.truth.processor.extensions.isStatic
 import javax.lang.model.element.TypeElement
+import javax.lang.model.type.DeclaredType
 
 class AutoSubjectProcessor(
-    private val context: Context,
+    context: Context,
     private val variablePropertyProcessor: VariablePropertyProcessor,
     private val executablePropertyProcessor: ExecutablePropertyProcessor
 ) : Processor<TypeElement, SubjectClass> {
@@ -46,14 +49,15 @@ class AutoSubjectProcessor(
 
         // TODO: Check prefix and suffix whether the value is valid Java identifier or not
         val packageName = "${element.getPackage().qualifiedName}"
-        val classPrefix = requireNotNull(annotation.getAnnotationValue("prefix")?.asString())
-        val classSuffix = requireNotNull(annotation.getAnnotationValue("suffix")?.asString())
+        val value = requireNotNull(annotation.getAnnotationValue("value")).asType()
+        val classPrefix = requireNotNull(annotation.getAnnotationValue("prefix")).asString()
+        val classSuffix = requireNotNull(annotation.getAnnotationValue("suffix")).asString()
         return SubjectClass(
             packageName = packageName,
             prefix = classPrefix,
             suffix = classSuffix,
-            element = element,
-            type = element.asType(),
+            element = (value as DeclaredType).asTypeElement(),
+            type = value,
             name = "${element.simpleName}",
             properties = element.findProperties()
         )

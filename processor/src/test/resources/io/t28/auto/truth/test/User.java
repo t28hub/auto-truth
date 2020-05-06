@@ -16,9 +16,6 @@
 
 package io.t28.auto.truth.test;
 
-import io.t28.auto.truth.AutoSubject;
-
-@AutoSubject
 public class User {
     private final long id;
     private final String name;

@@ -17,22 +17,34 @@
 package io.t28.auto.truth.processor.extensions
 
 import javax.lang.model.element.AnnotationValue
-import javax.lang.model.util.SimpleAnnotationValueVisitor8
+import javax.lang.model.type.TypeMirror
+import javax.lang.model.util.SimpleAnnotationValueVisitor6
 import kotlin.reflect.KClass
 
-private open class ValueVisitor<T : Any>(private val type: KClass<T>) : SimpleAnnotationValueVisitor8<T, Unit>() {
-    override fun defaultAction(value: Any, parameter: Unit): T {
+private open class ValueVisitor<T : Any>(private val type: KClass<T>) : SimpleAnnotationValueVisitor6<T, Void?>() {
+    override fun defaultAction(value: Any, p: Void?): T {
         throw IllegalArgumentException("Cannot convert value($value) as ${type.simpleName}")
     }
 }
 
-private val StringValueVisitor = object : ValueVisitor<String>(String::class) {
-    override fun visitString(value: String, parameter: Unit): String {
+private val STRING_VALUE_VISITOR = object : ValueVisitor<String>(String::class) {
+    override fun visitString(value: String, p: Void?): String {
+        return value
+    }
+}
+
+private val TYPE_VALUE_VISITOR = object : ValueVisitor<TypeMirror>(TypeMirror::class) {
+    override fun visitType(value: TypeMirror, p: Void?): TypeMirror {
         return value
     }
 }
 
 @Throws(IllegalArgumentException::class)
 fun AnnotationValue.asString(): String {
-    return accept(StringValueVisitor, Unit)
+    return STRING_VALUE_VISITOR.visit(this)
+}
+
+@Throws(IllegalArgumentException::class)
+fun AnnotationValue.asType(): TypeMirror {
+    return TYPE_VALUE_VISITOR.visit(this)
 }

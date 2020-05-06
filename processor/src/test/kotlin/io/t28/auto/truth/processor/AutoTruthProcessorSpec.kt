@@ -19,15 +19,13 @@ package io.t28.auto.truth.processor
 import com.google.common.truth.Truth.assertAbout
 import com.google.common.truth.Truth.assertThat
 import com.google.testing.compile.JavaFileObjects.forResource
-import com.google.testing.compile.JavaFileObjects.forSourceString
 import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
 import javax.lang.model.SourceVersion
 import javax.tools.JavaFileObject
-import javax.tools.StandardLocation.CLASS_OUTPUT
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
-private fun String.readResource(path: String = "io/t28/auto/truth/test"): JavaFileObject {
+private fun String.loadResource(path: String = "io/t28/auto/truth/test"): JavaFileObject {
     return forResource("$path/$this")
 }
 
@@ -71,180 +69,21 @@ object AutoTruthProcessorSpec : Spek({
             }
         }
 
-        describe("prefix") {
-            fun createJavaFile(prefix: String? = null): JavaFileObject {
-                // language=java
-                val template = """
-                    package test;
-                            
-                    import io.t28.auto.truth.AutoSubject;
-                            
-                    ${prefix?.let { """@AutoSubject(prefix = "$it")""" } ?: "@AutoSubject"}
-                    public interface TestValue {
-                        String name();
-                    }
-                """.trimIndent()
-                return forSourceString("test.TestValue", template)
-            }
-
-            it("should generate class with default prefix") {
-                // Arrange
-                val subject = createJavaFile()
-
-                // Act & Assert
-                assertAbout(javaSources())
-                    .that(setOf(subject))
-                    .withCompilerOptions("-Adebug")
-                    .processedWith(AutoTruthProcessor())
-                    .compilesWithoutError()
-                    .and()
-                    .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueSubject.class")
-            }
-
-            it("should generate class with specified prefix") {
-                // Arrange
-                val subject = createJavaFile("MyPrefix")
-
-                // Act & Assert
-                assertAbout(javaSources())
-                    .that(setOf(subject))
-                    .withCompilerOptions("-Adebug")
-                    .processedWith(AutoTruthProcessor())
-                    .compilesWithoutError()
-                    .and()
-                    .generatesFileNamed(CLASS_OUTPUT, "test", "MyPrefixTestValueSubject.class")
-            }
-
-            it("should generate class with no prefix") {
-                // Arrange
-                val subject = createJavaFile("")
-
-                // Act & Assert
-                assertAbout(javaSources())
-                    .that(setOf(subject))
-                    .withCompilerOptions("-Adebug")
-                    .processedWith(AutoTruthProcessor())
-                    .compilesWithoutError()
-                    .and()
-                    .generatesFileNamed(CLASS_OUTPUT, "test", "TestValueSubject.class")
-            }
-
-            it("should fail to compile when prefix contains invalid chars") {
-                // Arrange
-                val subject = createJavaFile("1nvalid")
-
-                // Act & Assert
-                assertAbout(javaSources())
-                    .that(setOf(subject))
-                    .withCompilerOptions("-Adebug")
-                    .processedWith(AutoTruthProcessor())
-                    .failsToCompile()
-                    .withErrorContaining("1nvalidTestValueSubject")
-            }
-        }
-
-        describe("suffix") {
-            fun createJavaFile(suffix: String? = null): JavaFileObject {
-                // language=java
-                val template = """
-                    package test;
-                            
-                    import io.t28.auto.truth.AutoSubject;
-                            
-                    ${suffix?.let { """@AutoSubject(suffix = "$it")""" } ?: "@AutoSubject"}
-                    public interface TestValue {
-                        String name();
-                    }
-                """.trimIndent()
-                return forSourceString("test.TestValue", template)
-            }
-
-            it("should generate class with default suffix") {
-                // Arrange
-                val subject = createJavaFile()
-
-                // Act & Assert
-                assertAbout(javaSources())
-                    .that(setOf(subject))
-                    .withCompilerOptions("-Adebug")
-                    .processedWith(AutoTruthProcessor())
-                    .compilesWithoutError()
-                    .and()
-                    .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueSubject.class")
-            }
-
-            it("should generate class with specified suffix") {
-                // Arrange
-                val subject = createJavaFile("MySubject")
-
-                // Act & Assert
-                assertAbout(javaSources())
-                    .that(setOf(subject))
-                    .withCompilerOptions("-Adebug")
-                    .processedWith(AutoTruthProcessor())
-                    .compilesWithoutError()
-                    .and()
-                    .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValueMySubject.class")
-            }
-
-            it("should generate class with no suffix") {
-                // Arrange
-                val subject = createJavaFile("")
-
-                // Act & Assert
-                assertAbout(javaSources())
-                    .that(setOf(subject))
-                    .withCompilerOptions("-Adebug")
-                    .processedWith(AutoTruthProcessor())
-                    .compilesWithoutError()
-                    .and()
-                    .generatesFileNamed(CLASS_OUTPUT, "test", "AutoTestValue.class")
-            }
-
-            it("should fail to compile when suffix contains invalid chars") {
-                // Arrange
-                val subject = createJavaFile("@Subject")
-
-                // Act & Assert
-                assertAbout(javaSources())
-                    .that(setOf(subject))
-                    .withCompilerOptions("-Adebug")
-                    .processedWith(AutoTruthProcessor())
-                    .failsToCompile()
-                    .withErrorContaining("AutoTestValue@Subject")
-            }
-        }
-
         describe("process") {
-            listOf(
-                "User.java" to "AutoUserSubject.java",
-                "VoidValueObject.java" to "AutoVoidValueObjectSubject.java",
-                "BooleanValueObject.java" to "AutoBooleanValueObjectSubject.java",
-                "ClassValueObject.java" to "AutoClassValueObjectSubject.java",
-                "GuavaValueObject.java" to "AutoGuavaValueObjectSubject.java",
-                "PrimitiveValueObject.java" to "AutoPrimitiveValueObjectSubject.java",
-                "PrimitiveArrayValueObject.java" to "AutoPrimitiveArrayValueObjectSubject.java",
-                "IterableValueObject.java" to "AutoIterableValueObjectSubject.java",
-                "MapValueObject.java" to "AutoMapValueObjectSubject.java",
-                "ObjectArrayValueObject.java" to "AutoObjectArrayValueObjectSubject.java",
-                "OptionalValueObject.java" to "AutoOptionalValueObjectSubject.java",
-                "PathValueObject.java" to "AutoPathValueObjectSubject.java",
-                "StreamValueObject.java" to "AutoStreamValueObjectSubject.java"
-            ).forEach { (value, expected) ->
-                it("should generate Subject class for $value") {
-                    // Arrange
-                    val valueJavaFile = value.readResource()
-                    val expectedJavaFile = expected.readResource()
+            it("should generate Subject class") {
+                // Arrange
+                val valueJavaFile = "User.java".loadResource()
+                val subjectJavaFile = "UserSubject.java".loadResource()
+                val expectedJavaFile = "AutoUserSubject.java".loadResource()
 
-                    // Act & Assert
-                    assertAbout(javaSources())
-                        .that(setOf(valueJavaFile))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
-                        .compilesWithoutError()
-                        .and()
-                        .generatesSources(expectedJavaFile)
-                }
+                // Act & Assert
+                assertAbout(javaSources())
+                    .that(setOf(valueJavaFile, subjectJavaFile))
+                    .withCompilerOptions("-Adebug")
+                    .processedWith(AutoTruthProcessor())
+                    .compilesWithoutError()
+                    .and()
+                    .generatesSources(expectedJavaFile)
             }
         }
     }
