@@ -21,6 +21,50 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
 object StringSpec : Spek({
+    describe("isValidClassPrefix") {
+        arrayOf(
+            "" to true,
+            "$" to true,
+            "_" to true,
+            "1" to false,
+            "@" to false,
+            "Prefix" to true,
+            "Pref1x" to true,
+            "Prefix$" to true,
+            "Prefix@" to false
+        ).forEach { (string, expected) ->
+            it("should return $expected when prefix is $string") {
+                // Act
+                val actual = string.isValidClassPrefix()
+
+                // Assert
+                assertThat(actual).isEqualTo(expected)
+            }
+        }
+    }
+
+    describe("isValidClassSuffix") {
+        arrayOf(
+            "" to true,
+            "$" to true,
+            "_" to true,
+            "1" to false,
+            "@" to false,
+            "Suffix" to true,
+            "Suff1x" to true,
+            "\$uffix" to true,
+            "Suffix@" to false
+        ).forEach { (string, expected) ->
+            it("should return $expected when suffix is $string") {
+                // Act
+                val actual = string.isValidClassPrefix()
+
+                // Assert
+                assertThat(actual).isEqualTo(expected)
+            }
+        }
+    }
+
     describe("safeFormat") {
         arrayOf(
             Fixture("Hello, world", "Hello, %s", arrayOf("world")),
