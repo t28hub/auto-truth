@@ -16,6 +16,7 @@
 
 package io.t28.auto.truth.test;
 
+import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
 import javax.annotation.Generated;
@@ -25,12 +26,36 @@ import javax.annotation.Generated;
 public class AutoUserSubject extends Subject {
     private final User actual;
 
-    AutoUserSubject(FailureMetadata failureMetadata, User actual) {
+    public AutoUserSubject(FailureMetadata failureMetadata, User actual) {
         super(failureMetadata, actual);
         this.actual = actual;
     }
 
-    public static Subject.Factory<AutoUserSubject, User> userSubject() {
+    public static Subject.Factory<AutoUserSubject, User> user() {
         return AutoUserSubject::new;
+    }
+
+    public void hasId(long expected) {
+        check("getId()").that(this.actual.getId()).isEqualTo(expected);
+    }
+
+    public void hasName(String expected) {
+        check("getName()").that(this.actual.getName()).isEqualTo(expected);
+    }
+
+    public void hasAge(int expected) {
+        check("getAge()").that(this.actual.getAge()).isEqualTo(expected);
+    }
+
+    public void isAdmin() {
+        if (!this.actual.isAdmin()) {
+            failWithActual(Fact.simpleFact("expected to be admin"));
+        }
+    }
+
+    public void isNotAdmin() {
+        if (this.actual.isAdmin()) {
+            failWithActual(Fact.simpleFact("expected not to be admin"));
+        }
     }
 }

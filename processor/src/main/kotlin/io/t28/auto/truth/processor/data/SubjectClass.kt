@@ -17,14 +17,14 @@
 package io.t28.auto.truth.processor.data
 
 import javax.lang.model.element.TypeElement
-import javax.lang.model.type.TypeMirror
 
 data class SubjectClass(
     val packageName: String,
     val prefix: String,
     val suffix: String,
     val element: TypeElement,
-    val type: TypeMirror,
-    val name: String,
-    val properties: List<Property>
-)
+    val valueObject: ValueObjectClass
+) {
+    val simpleName: String
+        get() = "$prefix${element.simpleName}$suffix"
+}
