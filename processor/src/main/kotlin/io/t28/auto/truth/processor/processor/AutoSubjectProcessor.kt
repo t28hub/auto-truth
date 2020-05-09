@@ -32,6 +32,8 @@ import io.t28.auto.truth.processor.extensions.getPackage
 import io.t28.auto.truth.processor.extensions.hasParameter
 import io.t28.auto.truth.processor.extensions.isPublic
 import io.t28.auto.truth.processor.extensions.isStatic
+import io.t28.auto.truth.processor.extensions.isValidClassPrefix
+import io.t28.auto.truth.processor.extensions.isValidClassSuffix
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 
@@ -58,9 +60,16 @@ class AutoSubjectProcessor(
         val pojoType = requireNotNull(annotation.getAnnotationValue(VALUE_OBJECT_CLASS)).asType()
         val pojoElement = requireNotNull(pojoType as? DeclaredType).asTypeElement()
 
-        // TODO: Check prefix and suffix whether the value is valid Java identifier or not
         val classPrefix = requireNotNull(annotation.getAnnotationValue(SUBJECT_CLASS_PREFIX)).asString()
+        if (!classPrefix.isValidClassPrefix()) {
+            throw ProcessingException(element, "Prefix given within @AutoTruth is invalid: %s", classPrefix)
+        }
+
         val classSuffix = requireNotNull(annotation.getAnnotationValue(SUBJECT_CLASS_SUFFIX)).asString()
+        if (!classSuffix.isValidClassSuffix()) {
+            throw ProcessingException(element, "Suffix given within @AutoTruth is invalid: %s", classSuffix)
+        }
+
         return SubjectClass(
             packageName = packageName,
             prefix = classPrefix,
