@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth;
+package io.t28.auto.truth.processor.data
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import javax.lang.model.element.TypeElement
+import javax.lang.model.type.TypeMirror
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.CLASS)
-public @interface AutoSubject {
-    Class<?> value() default String.class;
+data class ValueObjectClass(
+    val element: TypeElement,
+    val properties: List<Property>
+) {
+    val type: TypeMirror
+        get() = element.asType()
 
-    String prefix() default "Auto";
-
-    String suffix() default "";
+    val simpleName: String
+        get() = "${element.simpleName}"
 }

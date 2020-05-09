@@ -20,6 +20,7 @@ import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
 import io.t28.auto.truth.processor.data.SubjectClass
+import io.t28.auto.truth.processor.data.ValueObjectClass
 import io.t28.auto.truth.processor.extensions.asString
 import io.t28.auto.truth.processor.extensions.asType
 import io.t28.auto.truth.processor.extensions.asTypeElement
@@ -41,25 +42,34 @@ class AutoSubjectProcessor(
 ) : Processor<TypeElement, SubjectClass> {
     private val logger = context.logger
 
+    companion object {
+        private const val VALUE_OBJECT_CLASS = "value"
+        private const val SUBJECT_CLASS_PREFIX = "prefix"
+        private const val SUBJECT_CLASS_SUFFIX = "suffix"
+    }
+
     override fun process(element: TypeElement): SubjectClass {
         val annotation = element.findAnnotationMirror<AutoSubject>() ?: run {
             logger.error(element, "Required annotation %s is missing", AutoSubject::class.simpleName)
             throw IllegalStateException("Required annotation ${AutoSubject::class.simpleName} does not exist ${element.qualifiedName}")
         }
 
-        // TODO: Check prefix and suffix whether the value is valid Java identifier or not
         val packageName = "${element.getPackage().qualifiedName}"
-        val value = requireNotNull(annotation.getAnnotationValue("value")).asType()
-        val classPrefix = requireNotNull(annotation.getAnnotationValue("prefix")).asString()
-        val classSuffix = requireNotNull(annotation.getAnnotationValue("suffix")).asString()
+        val pojoType = requireNotNull(annotation.getAnnotationValue(VALUE_OBJECT_CLASS)).asType()
+        val pojoElement = requireNotNull(pojoType as? DeclaredType).asTypeElement()
+
+        // TODO: Check prefix and suffix whether the value is valid Java identifier or not
+        val classPrefix = requireNotNull(annotation.getAnnotationValue(SUBJECT_CLASS_PREFIX)).asString()
+        val classSuffix = requireNotNull(annotation.getAnnotationValue(SUBJECT_CLASS_SUFFIX)).asString()
         return SubjectClass(
             packageName = packageName,
             prefix = classPrefix,
             suffix = classSuffix,
-            element = (value as DeclaredType).asTypeElement(),
-            type = value,
-            name = "${element.simpleName}",
-            properties = element.findProperties()
+            element = element,
+            valueObject = ValueObjectClass(
+                element = pojoElement,
+                properties = pojoElement.findProperties()
+            )
         )
     }
 

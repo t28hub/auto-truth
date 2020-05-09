@@ -41,9 +41,9 @@ class SubjectClassGenerator(
     constructor(vararg generators: MethodGenerator) : this(generators.toList())
 
     override fun generate(input: SubjectClass): TypeSpec {
-        val element = input.element
-        val type = TypeName.get(input.type)
-        val className = ClassName.get(input.packageName, "${input.prefix}${element.simpleName}${input.suffix}")
+        val valueObject = input.valueObject
+        val valueObjectType = TypeName.get(valueObject.type)
+        val className = ClassName.get(input.packageName, input.simpleName)
         return TypeSpec.classBuilder(className).apply {
             // Annotations
             addAnnotation(AnnotationSpec.builder(Generated::class.java).apply {
@@ -57,29 +57,30 @@ class SubjectClassGenerator(
             addModifiers(PUBLIC)
 
             // Fields
-            addField(FieldSpec.builder(type, "actual", PRIVATE, FINAL).build())
+            addField(FieldSpec.builder(valueObjectType, "actual", PRIVATE, FINAL).build())
 
             // Constructors
             addMethod(MethodSpec.constructorBuilder().apply {
+                addModifiers(PUBLIC)
                 addParameter(ParameterSpec.builder(FailureMetadata::class.javaObjectType, "failureMetadata").build())
-                addParameter(ParameterSpec.builder(type, "actual").build())
+                addParameter(ParameterSpec.builder(valueObjectType, "actual").build())
                 addStatement("super(\$L, \$L)", "failureMetadata", "actual")
                 addStatement("this.\$L = \$L", "actual", "actual")
             }.build())
 
             // Factory method
-            addMethod(MethodSpec.methodBuilder(input.name.decapitalize()).apply {
-                returns(ParameterizedTypeName.get(ClassName.get(Subject.Factory::class.java), className, type))
+            addMethod(MethodSpec.methodBuilder(valueObject.simpleName.decapitalize()).apply {
+                returns(ParameterizedTypeName.get(ClassName.get(Subject.Factory::class.java), className, valueObjectType))
                 addModifiers(PUBLIC, STATIC)
                 addStatement("return \$T::new", className)
             }.build())
 
             // Assertion methods
-            val methods = input.properties.flatMap { property ->
+            val assertionMethods = valueObject.properties.flatMap { property ->
                 methodGenerators.filter { generator -> generator.matches(property.type) }
                     .map { generator -> generator.generate(property) }
             }
-            addMethods(methods)
+            addMethods(assertionMethods)
         }.build()
     }
 }

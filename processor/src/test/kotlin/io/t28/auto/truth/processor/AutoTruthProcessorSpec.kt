@@ -32,7 +32,7 @@ private fun String.loadResource(path: String = "io/t28/auto/truth/test"): JavaFi
 object AutoTruthProcessorSpec : Spek({
     describe("Processor") {
         describe("getSupportedOptions") {
-            it("should return") {
+            it("should return supported options") {
                 // Act
                 val processor = AutoTruthProcessor()
                 val actual = processor.supportedOptions
