@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.processor
+package io.t28.auto.truth.test;
 
-import javax.lang.model.element.Element
+import com.google.common.truth.FailureMetadata;
+import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 
-interface Processor<I : Element, T : Any> {
-    @Throws(ProcessingException::class)
-    fun process(element: I): T
+@AutoSubject(value = User.class, suffix = "")
+public class EmptySuffixUserSubject extends AutoUserSubject {
+    public EmptySuffixUserSubject(FailureMetadata failureMetadata, User actual) {
+        super(failureMetadata, actual);
+    }
 }

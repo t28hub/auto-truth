@@ -18,6 +18,23 @@ package io.t28.auto.truth.processor.extensions
 
 import java.util.IllegalFormatException
 
+fun String.isValidClassPrefix(): Boolean {
+    if (isEmpty()) {
+        return true
+    }
+    if (!Character.isJavaIdentifierStart(this[0])) {
+        return false
+    }
+    return drop(1).all(Character::isJavaIdentifierPart)
+}
+
+fun String.isValidClassSuffix(): Boolean {
+    if (isEmpty()) {
+        return true
+    }
+    return all(Character::isJavaIdentifierPart)
+}
+
 fun String.safeFormat(vararg args: Any?): String {
     return try {
         format(*args)

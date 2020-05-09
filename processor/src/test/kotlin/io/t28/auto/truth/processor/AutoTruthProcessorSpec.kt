@@ -22,6 +22,7 @@ import com.google.testing.compile.JavaFileObjects.forResource
 import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
 import javax.lang.model.SourceVersion
 import javax.tools.JavaFileObject
+import javax.tools.StandardLocation
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
@@ -70,6 +71,98 @@ object AutoTruthProcessorSpec : Spek({
         }
 
         describe("process") {
+            describe("prefix") {
+                it("should append prefix when custom prefix is given") {
+                    // Arrange
+                    val valueJavaFile = "User.java".loadResource()
+                    val subjectJavaFile = "ValidPrefixUserSubject.java".loadResource()
+
+                    // Act & Assert
+                    assertAbout(javaSources())
+                        .that(setOf(valueJavaFile, subjectJavaFile))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(StandardLocation.CLASS_OUTPUT, "io.t28.auto.truth.test", "Prefix\$ValidPrefixUserSubject.class")
+                }
+
+                it("should not append prefix when custom prefix is empty") {
+                    // Arrange
+                    val valueJavaFile = "User.java".loadResource()
+                    val subjectJavaFile = "EmptyPrefixUserSubject.java".loadResource()
+
+                    // Act & Assert
+                    assertAbout(javaSources())
+                        .that(setOf(valueJavaFile, subjectJavaFile))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(StandardLocation.CLASS_OUTPUT, "io.t28.auto.truth.test", "EmptyPrefixUserSubject$.class")
+                }
+
+                it("should compile with error when given prefix is invalid") {
+                    // Arrange
+                    val valueJavaFile = "User.java".loadResource()
+                    val subjectJavaFile = "InvalidPrefixUserSubject.java".loadResource()
+
+                    // Act & Assert
+                    assertAbout(javaSources())
+                        .that(setOf(valueJavaFile, subjectJavaFile))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .failsToCompile()
+                        .withErrorContaining("Prefix given within @AutoTruth is invalid: 1Prefix")
+                }
+            }
+
+            describe("suffix") {
+                it("should append suffix when custom suffix is given") {
+                    // Arrange
+                    val valueJavaFile = "User.java".loadResource()
+                    val subjectJavaFile = "ValidSuffixUserSubject.java".loadResource()
+
+                    // Act & Assert
+                    assertAbout(javaSources())
+                        .that(setOf(valueJavaFile, subjectJavaFile))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(StandardLocation.CLASS_OUTPUT, "io.t28.auto.truth.test", "AutoValidSuffixUserSubject\$Suffix.class")
+                }
+
+                it("should not append suffix when custom suffix is empty") {
+                    // Arrange
+                    val valueJavaFile = "User.java".loadResource()
+                    val subjectJavaFile = "EmptySuffixUserSubject.java".loadResource()
+
+                    // Act & Assert
+                    assertAbout(javaSources())
+                        .that(setOf(valueJavaFile, subjectJavaFile))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(StandardLocation.CLASS_OUTPUT, "io.t28.auto.truth.test", "AutoEmptySuffixUserSubject.class")
+                }
+
+                it("should compile with error when given suffix is invalid") {
+                    // Arrange
+                    val valueJavaFile = "User.java".loadResource()
+                    val subjectJavaFile = "InvalidSuffixUserSubject.java".loadResource()
+
+                    // Act & Assert
+                    assertAbout(javaSources())
+                        .that(setOf(valueJavaFile, subjectJavaFile))
+                        .withCompilerOptions("-Adebug")
+                        .processedWith(AutoTruthProcessor())
+                        .failsToCompile()
+                        .withErrorContaining("Suffix given within @AutoTruth is invalid: Suffix%")
+                }
+            }
+
             it("should generate Subject class") {
                 // Arrange
                 val valueJavaFile = "User.java".loadResource()

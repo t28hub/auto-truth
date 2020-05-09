@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package io.t28.auto.truth.processor.processor
 
+import io.t28.auto.truth.processor.extensions.safeFormat
 import javax.lang.model.element.Element
 
-interface Processor<I : Element, T : Any> {
-    @Throws(ProcessingException::class)
-    fun process(element: I): T
+class ProcessingException(val element: Element, override val message: String) : Exception(message) {
+    constructor(element: Element, message: String, vararg args: Any?) : this(element, message.safeFormat(*args))
 }

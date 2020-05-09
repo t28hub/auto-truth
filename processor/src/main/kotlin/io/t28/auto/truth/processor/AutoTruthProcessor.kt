@@ -38,6 +38,7 @@ import io.t28.auto.truth.processor.generator.method.StreamSubjectGenerator
 import io.t28.auto.truth.processor.generator.method.TableSubjectGenerator
 import io.t28.auto.truth.processor.processor.AutoSubjectProcessor
 import io.t28.auto.truth.processor.processor.ExecutablePropertyProcessor
+import io.t28.auto.truth.processor.processor.ProcessingException
 import io.t28.auto.truth.processor.processor.VariablePropertyProcessor
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
@@ -101,6 +102,8 @@ class AutoTruthProcessor : AbstractProcessor() {
                         .skipJavaLangImports(true)
                         .indent("    ")
                         .build().writeTo(processingEnv.filer)
+                } catch (e: ProcessingException) {
+                    logger.error(e.element, e.message)
                 } catch (e: Exception) {
                     logger.error(element, "Failed to compile: %s", "${e.message}")
                 }
