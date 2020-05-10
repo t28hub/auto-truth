@@ -20,13 +20,15 @@ import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
 import javax.annotation.Generated;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @Generated("io.t28.auto.truth.processor.AutoTruthProcessor")
 @SuppressWarnings("unchecked")
 public class AutoUserSubject extends Subject {
     private final User actual;
 
-    public AutoUserSubject(FailureMetadata failureMetadata, User actual) {
+    public AutoUserSubject(@Nonnull FailureMetadata failureMetadata, @Nullable User actual) {
         super(failureMetadata, actual);
         this.actual = actual;
     }

@@ -30,6 +30,8 @@ import io.t28.auto.truth.processor.AutoTruthProcessor
 import io.t28.auto.truth.processor.data.SubjectClass
 import io.t28.auto.truth.processor.generator.method.MethodGenerator
 import javax.annotation.Generated
+import javax.annotation.Nonnull
+import javax.annotation.Nullable
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PRIVATE
 import javax.lang.model.element.Modifier.PUBLIC
@@ -62,8 +64,12 @@ class SubjectClassGenerator(
             // Constructors
             addMethod(MethodSpec.constructorBuilder().apply {
                 addModifiers(PUBLIC)
-                addParameter(ParameterSpec.builder(FailureMetadata::class.javaObjectType, "failureMetadata").build())
-                addParameter(ParameterSpec.builder(valueObjectType, "actual").build())
+                addParameter(ParameterSpec.builder(FailureMetadata::class.javaObjectType, "failureMetadata").apply {
+                    addAnnotation(Nonnull::class.java)
+                }.build())
+                addParameter(ParameterSpec.builder(valueObjectType, "actual").apply {
+                    addAnnotation(Nullable::class.java)
+                }.build())
                 addStatement("super(\$L, \$L)", "failureMetadata", "actual")
                 addStatement("this.\$L = \$L", "actual", "actual")
             }.build())
