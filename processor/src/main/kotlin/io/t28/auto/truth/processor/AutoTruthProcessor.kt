@@ -22,8 +22,7 @@ import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.processor.extensions.getAnnotatedElements
 import io.t28.auto.truth.processor.generator.SubjectClassGenerator
 import io.t28.auto.truth.processor.generator.method.AbstractArraySubjectGenerator
-import io.t28.auto.truth.processor.generator.method.BooleanNegativeAssertionGenerator
-import io.t28.auto.truth.processor.generator.method.BooleanPositiveAssertionGenerator
+import io.t28.auto.truth.processor.generator.method.BooleanAssertionGenerator
 import io.t28.auto.truth.processor.generator.method.ClassSubjectGenerator
 import io.t28.auto.truth.processor.generator.method.GuavaOptionalSubjectGenerator
 import io.t28.auto.truth.processor.generator.method.IterableNegativeAssertionGenerator
@@ -75,8 +74,8 @@ class AutoTruthProcessor : AbstractProcessor() {
         val processor = AutoSubjectProcessor(context, VariablePropertyProcessor(context), ExecutablePropertyProcessor(context))
         val generator = SubjectClassGenerator(
             AbstractArraySubjectGenerator(context),
-            BooleanPositiveAssertionGenerator(context),
-            BooleanNegativeAssertionGenerator(context),
+            BooleanAssertionGenerator.positiveAssertion(context),
+            BooleanAssertionGenerator.negativeAssertion(context),
             ClassSubjectGenerator(context),
             GuavaOptionalSubjectGenerator(context),
             IterableSubjectGenerator(context),

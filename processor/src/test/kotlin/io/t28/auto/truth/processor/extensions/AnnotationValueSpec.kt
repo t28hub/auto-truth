@@ -17,18 +17,14 @@
 package io.t28.auto.truth.processor.extensions
 
 import com.google.auto.common.AnnotationMirrors
+import com.google.common.truth.Truth.assertAbout
 import com.google.common.truth.Truth.assertThat
-import com.google.testing.compile.Compilation
-import com.google.testing.compile.Compiler.javac
+import com.google.testing.compile.CompileTester
 import com.google.testing.compile.JavaFileObjects
-import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.ProcessingEnvironment
-import javax.annotation.processing.RoundEnvironment
+import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
+import io.t28.auto.truth.processor.testing.TestProcessor
 import javax.lang.model.element.AnnotationMirror
-import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.util.Elements
-import javax.lang.model.util.Types
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
@@ -56,38 +52,21 @@ private val ANNOTATED_CLASS = JavaFileObjects.forSourceString(ANNOTATED_CLASS_NA
     }
 """.trimIndent())
 
-private class TestProcessor(private val processor: TestProcessor.() -> Boolean) : AbstractProcessor() {
-    lateinit var elements: Elements
-        private set
-
-    lateinit var types: Types
-        private set
-
-    override fun init(processingEnv: ProcessingEnvironment) {
-        elements = processingEnv.elementUtils
-        types = processingEnv.typeUtils
-    }
-
-    override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        return processor()
-    }
-}
-
-private fun compile(invocation: (annotationMirror: AnnotationMirror) -> Unit) {
-    val processor = TestProcessor {
-        val annotatedElement = elements.getTypeElement(ANNOTATED_CLASS_NAME)
-        val annotationMirror = annotatedElement.annotationMirrors.first { mirror ->
-            val annotationType = mirror.annotationType.asTypeElement()
-            annotationType.qualifiedName.contentEquals(ANNOTATION_CLASS_NAME)
-        }
-        invocation(annotationMirror)
-        false
-    }
-
-    val compilation = javac()
-        .withProcessors(processor)
-        .compile(ANNOTATION_CLASS, ANNOTATED_CLASS)
-    require(compilation.status() == Compilation.Status.SUCCESS)
+private fun compile(handler: (annotationMirror: AnnotationMirror) -> Unit): CompileTester {
+    return assertAbout(javaSources())
+        .that(listOf(ANNOTATION_CLASS, ANNOTATED_CLASS))
+        .processedWith(TestProcessor.builder()
+            .annotations(ANNOTATION_CLASS_NAME)
+            .nextHandler { context ->
+                val annotatedElement = context.getTypeElement(ANNOTATED_CLASS_NAME)
+                val annotationMirror = annotatedElement.annotationMirrors.first { mirror ->
+                    val annotationType = mirror.annotationType.asTypeElement()
+                    annotationType.qualifiedName.contentEquals(ANNOTATION_CLASS_NAME)
+                }
+                handler(annotationMirror)
+                false
+            }
+            .build())
 }
 
 object AnnotationValueSpec : Spek({
@@ -101,7 +80,7 @@ object AnnotationValueSpec : Spek({
                     // Assert
                     assertThat(annotationValue.asString())
                         .isEqualTo("foobarbaz")
-                }
+                }.compilesWithoutError()
             }
         }
 
@@ -114,7 +93,7 @@ object AnnotationValueSpec : Spek({
                     // Assert
                     assertThat(annotationValue.asType())
                         .isInstanceOf(TypeMirror::class.java)
-                }
+                }.compilesWithoutError()
             }
         }
     }
