@@ -19,6 +19,8 @@ package io.t28.auto.truth.test;
 import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
+import com.google.common.truth.Truth;
+
 import javax.annotation.Generated;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,11 +30,17 @@ import javax.annotation.Nullable;
 public class AutoUserSubject extends Subject {
     private final User actual;
 
-    public AutoUserSubject(@Nonnull FailureMetadata failureMetadata, @Nullable User actual) {
+    protected AutoUserSubject(@Nonnull FailureMetadata failureMetadata, @Nullable User actual) {
         super(failureMetadata, actual);
         this.actual = actual;
     }
 
+    @Nonnull
+    public static AutoUserSubject assertThat(@Nullable User actual) {
+        return Truth.assertAbout(user()).that(actual);
+    }
+
+    @Nonnull
     public static Subject.Factory<AutoUserSubject, User> user() {
         return AutoUserSubject::new;
     }

@@ -18,6 +18,7 @@ package io.t28.auto.truth.processor.generator
 
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
+import com.google.common.truth.Truth
 import com.squareup.javapoet.AnnotationSpec
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
@@ -34,6 +35,7 @@ import javax.annotation.Nonnull
 import javax.annotation.Nullable
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PRIVATE
+import javax.lang.model.element.Modifier.PROTECTED
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.element.Modifier.STATIC
 
@@ -63,7 +65,7 @@ class SubjectClassGenerator(
 
             // Constructors
             addMethod(MethodSpec.constructorBuilder().apply {
-                addModifiers(PUBLIC)
+                addModifiers(PROTECTED)
                 addParameter(ParameterSpec.builder(FailureMetadata::class.javaObjectType, "failureMetadata").apply {
                     addAnnotation(Nonnull::class.java)
                 }.build())
@@ -74,10 +76,22 @@ class SubjectClassGenerator(
                 addStatement("this.\$L = \$L", "actual", "actual")
             }.build())
 
+            // Entry point method
+            addMethod(MethodSpec.methodBuilder("assertThat").apply {
+                returns(className)
+                addModifiers(PUBLIC, STATIC)
+                addAnnotation(Nonnull::class.java)
+                addParameter(ParameterSpec.builder(valueObjectType, "actual").apply {
+                    addAnnotation(Nullable::class.java)
+                }.build())
+                addStatement("return \$T.assertAbout(\$L()).that(\$L)", Truth::class.java, valueObject.simpleName.decapitalize(), "actual")
+            }.build())
+
             // Factory method
             addMethod(MethodSpec.methodBuilder(valueObject.simpleName.decapitalize()).apply {
                 returns(ParameterizedTypeName.get(ClassName.get(Subject.Factory::class.java), className, valueObjectType))
                 addModifiers(PUBLIC, STATIC)
+                addAnnotation(Nonnull::class.java)
                 addStatement("return \$T::new", className)
             }.build())
 
