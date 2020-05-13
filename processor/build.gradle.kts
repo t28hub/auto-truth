@@ -45,7 +45,7 @@ dependencies {
     implementation(project(":annotations"))
 
     // AutoService
-    val autoServiceVersion = "1.0-rc6"
+    val autoServiceVersion = "1.0-rc7"
     implementation("com.google.auto.service:auto-service-annotations:$autoServiceVersion")
     kapt("com.google.auto.service:auto-service:$autoServiceVersion")
 
