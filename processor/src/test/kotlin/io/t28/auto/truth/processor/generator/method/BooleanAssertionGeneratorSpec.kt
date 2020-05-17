@@ -60,7 +60,7 @@ object BooleanAssertionGeneratorSpec : Spek({
                 compile {
                     // Arrange
                     val typeMirror = it.getPrimitiveType(BOOLEAN)
-                    val generator = BooleanAssertionGenerator.positiveAssertion(Context.get(it.processingEnv))
+                    val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                     // Act
                     val actual = generator.matches(typeMirror)
@@ -74,7 +74,7 @@ object BooleanAssertionGeneratorSpec : Spek({
                 compile {
                     // Arrange
                     val type = it.getDeclaredType("java.lang.Boolean")
-                    val generator = BooleanAssertionGenerator.positiveAssertion(Context.get(it.processingEnv))
+                    val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                     // Act
                     val actual = generator.matches(type)
@@ -88,7 +88,7 @@ object BooleanAssertionGeneratorSpec : Spek({
                 compile {
                     // Arrange
                     val type = it.getDeclaredType("java.lang.Object")
-                    val generator = BooleanAssertionGenerator.positiveAssertion(Context.get(it.processingEnv))
+                    val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                     // Act
                     val actual = generator.matches(type)
@@ -104,7 +104,7 @@ object BooleanAssertionGeneratorSpec : Spek({
                 compile {
                     // Arrange
                     val type = it.getPrimitiveType(BOOLEAN)
-                    val generator = BooleanAssertionGenerator.positiveAssertion(Context.get(it.processingEnv))
+                    val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
                     val property = Property(
                         element = it.getTypeElement("io.t28.auto.truth.test.Dummy"),
                         type = type,
@@ -129,7 +129,7 @@ object BooleanAssertionGeneratorSpec : Spek({
                 compile {
                     // Arrange
                     val type = it.getPrimitiveType(BOOLEAN)
-                    val generator = BooleanAssertionGenerator.positiveAssertion(Context.get(it.processingEnv))
+                    val generator = BooleanAssertionGenerator.NegativeAssertionGenerator(Context.get(it.processingEnv))
                     val property = Property(
                         element = it.getTypeElement("io.t28.auto.truth.test.Dummy"),
                         type = type,
