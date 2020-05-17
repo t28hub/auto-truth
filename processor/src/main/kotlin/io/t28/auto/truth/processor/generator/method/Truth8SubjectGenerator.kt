@@ -21,14 +21,17 @@ import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
 import javax.lang.model.element.Modifier
+import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 abstract class Truth8SubjectGenerator(protected val context: Context) : MethodGenerator {
-    protected abstract fun subjectClass(type: TypeMirror): TypeName
+    final override fun matches(type: TypeMirror): Boolean {
+        return object : SupportedTypeMatcher<Void?>() {
+            override fun visitDeclared(type: DeclaredType, p: Void?): Boolean = matches(type)
+        }.visit(type)
+    }
 
-    protected abstract fun factoryMethodName(type: TypeMirror): String
-
-    override fun generate(input: Property): MethodSpec {
+    final override fun generate(input: Property): MethodSpec {
         require(matches(input.type))
         context.logger.debug(input.element, "Generating a method returns Truth8's Subject for ${input.type}")
 
@@ -41,4 +44,10 @@ abstract class Truth8SubjectGenerator(protected val context: Context) : MethodGe
             addStatement("return check(\$S).about(\$T.\$L).that(\$L.\$L)", symbol, subjectClass, factoryMethod, "actual", symbol)
         }.build()
     }
+
+    protected abstract fun matches(type: DeclaredType): Boolean
+
+    protected abstract fun subjectClass(type: TypeMirror): TypeName
+
+    protected abstract fun factoryMethodName(type: TypeMirror): String
 }

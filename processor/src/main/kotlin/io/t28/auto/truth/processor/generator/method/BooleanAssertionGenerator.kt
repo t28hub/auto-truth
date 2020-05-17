@@ -33,7 +33,16 @@ class BooleanAssertionGenerator internal constructor(
     private val codeFactory: (Property) -> CodeBlock
 ) : MethodGenerator {
     override fun matches(type: TypeMirror): Boolean {
-        return type.accept(BooleanTypeMatcher, context)
+        return object : SupportedTypeMatcher<Void?>() {
+            override fun visitPrimitive(type: PrimitiveType, p: Void?): Boolean {
+                return type.kind == TypeKind.BOOLEAN
+            }
+
+            override fun visitDeclared(type: DeclaredType, p: Void?): Boolean {
+                val boxedBooleanType = context.utils.getDeclaredType(java.lang.Boolean::class)
+                return context.utils.isAssignableType(type, boxedBooleanType)
+            }
+        }.visit(type)
     }
 
     override fun generate(input: Property): MethodSpec {
@@ -74,17 +83,6 @@ class BooleanAssertionGenerator internal constructor(
                     }.build()
                 }
             )
-        }
-    }
-
-    internal object BooleanTypeMatcher : SupportedTypeMatcher() {
-        override fun visitPrimitive(type: PrimitiveType, context: Context): Boolean {
-            return type.kind == TypeKind.BOOLEAN
-        }
-
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val boxedBooleanType = context.utils.getDeclaredType(java.lang.Boolean::class)
-            return context.utils.isAssignableType(type, boxedBooleanType)
         }
     }
 }

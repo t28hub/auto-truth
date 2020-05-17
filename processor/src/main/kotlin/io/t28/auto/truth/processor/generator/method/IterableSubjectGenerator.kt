@@ -28,8 +28,15 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 class IterableSubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
-    override fun matches(type: TypeMirror): Boolean {
-        return type.accept(IterableTypeMatcher, context)
+    override fun matches(type: DeclaredType): Boolean {
+        val utils = context.utils
+        val pathType = utils.getDeclaredType<Path>()
+        if (utils.isAssignableType(type, pathType)) {
+            return false
+        }
+
+        val iterableType = utils.getDeclaredType<Iterable<*>>()
+        return utils.isAssignableType(type, iterableType)
     }
 
     override fun subjectClass(type: TypeMirror): TypeName {
@@ -38,19 +45,6 @@ class IterableSubjectGenerator(context: Context) : TruthSubjectGenerator(context
             ClassName.get(MultisetSubject::class.java)
         } else {
             ClassName.get(IterableSubject::class.java)
-        }
-    }
-
-    internal object IterableTypeMatcher : SupportedTypeMatcher() {
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val utils = context.utils
-            val pathType = utils.getDeclaredType<Path>()
-            if (utils.isAssignableType(type, pathType)) {
-                return false
-            }
-
-            val iterableType = utils.getDeclaredType<Iterable<*>>()
-            return utils.isAssignableType(type, iterableType)
         }
     }
 }
