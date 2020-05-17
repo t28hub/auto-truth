@@ -21,12 +21,20 @@ import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
 import javax.lang.model.element.Modifier
+import javax.lang.model.type.ArrayType
+import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 abstract class TruthSubjectGenerator(protected val context: Context) : MethodGenerator {
-    protected abstract fun subjectClass(type: TypeMirror): TypeName
+    final override fun matches(type: TypeMirror): Boolean {
+        return object : SupportedTypeMatcher<Void?>() {
+            override fun visitDeclared(type: DeclaredType, p: Void?): Boolean = matches(type)
 
-    override fun generate(input: Property): MethodSpec {
+            override fun visitArray(type: ArrayType, p: Void?): Boolean = matches(type)
+        }.visit(type)
+    }
+
+    final override fun generate(input: Property): MethodSpec {
         require(matches(input.type))
         context.logger.debug(input.element, "Generating a method returns Subject for ${input.type}")
 
@@ -38,4 +46,10 @@ abstract class TruthSubjectGenerator(protected val context: Context) : MethodGen
             addStatement("return check(\$S).that(\$L.\$L)", symbol, "actual", symbol)
         }.build()
     }
+
+    protected open fun matches(type: DeclaredType): Boolean = false
+
+    protected open fun matches(type: ArrayType): Boolean = false
+
+    protected abstract fun subjectClass(type: TypeMirror): TypeName
 }

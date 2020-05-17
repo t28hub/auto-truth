@@ -25,18 +25,12 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 class TableSubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
-    override fun matches(type: TypeMirror): Boolean {
-        return type.accept(TableTypeMatcher, context)
+    override fun matches(type: DeclaredType): Boolean {
+        val tableType = context.utils.getDeclaredType(Table::class)
+        return context.utils.isAssignableType(type, tableType)
     }
 
     override fun subjectClass(type: TypeMirror): TypeName {
         return ClassName.get(TableSubject::class.java)
-    }
-
-    internal object TableTypeMatcher : SupportedTypeMatcher() {
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val tableType = context.utils.getDeclaredType(Table::class)
-            return context.utils.isAssignableType(type, tableType)
-        }
     }
 }

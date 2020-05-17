@@ -22,16 +22,14 @@ import javax.lang.model.type.TypeMirror
 
 abstract class IterableAssertionGenerator(protected val context: Context) : MethodGenerator {
     override fun matches(type: TypeMirror): Boolean {
-        return type.accept(SingleArgumentIterableTypeMatcher, context)
-    }
-
-    internal object SingleArgumentIterableTypeMatcher : SupportedTypeMatcher() {
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val iterableType = context.utils.getDeclaredType(Iterable::class)
-            if (!context.utils.isAssignableType(type, iterableType)) {
-                return false
+        return object : SupportedTypeMatcher<Void?>() {
+            override fun visitDeclared(type: DeclaredType, p: Void?): Boolean {
+                val iterableType = context.utils.getDeclaredType(Iterable::class)
+                if (!context.utils.isAssignableType(type, iterableType)) {
+                    return false
+                }
+                return type.typeArguments.size == 1
             }
-            return type.typeArguments.size == 1
-        }
+        }.visit(type)
     }
 }

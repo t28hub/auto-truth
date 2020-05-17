@@ -25,18 +25,12 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 class MultimapSubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
-    override fun matches(type: TypeMirror): Boolean {
-        return type.accept(MultimapTypeMatcher, context)
+    override fun matches(type: DeclaredType): Boolean {
+        val multimapType = context.utils.getDeclaredType(Multimap::class)
+        return context.utils.isAssignableType(type, multimapType)
     }
 
     override fun subjectClass(type: TypeMirror): TypeName {
         return ClassName.get(MultimapSubject::class.java)
-    }
-
-    internal object MultimapTypeMatcher : SupportedTypeMatcher() {
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val multimapType = context.utils.getDeclaredType(Multimap::class)
-            return context.utils.isAssignableType(type, multimapType)
-        }
     }
 }

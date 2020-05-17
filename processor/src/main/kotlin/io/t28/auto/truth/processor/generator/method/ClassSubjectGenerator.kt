@@ -24,18 +24,12 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 class ClassSubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
-    override fun matches(type: TypeMirror): Boolean {
-        return type.accept(ClassTypeMatcher, context)
+    override fun matches(type: DeclaredType): Boolean {
+        val classType = context.utils.getDeclaredType(Class::class)
+        return context.utils.isAssignableType(type, classType)
     }
 
     override fun subjectClass(type: TypeMirror): TypeName {
         return ClassName.get(ClassSubject::class.java)
-    }
-
-    internal object ClassTypeMatcher : SupportedTypeMatcher() {
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val classType = context.utils.getDeclaredType(Class::class)
-            return context.utils.isAssignableType(type, classType)
-        }
     }
 }

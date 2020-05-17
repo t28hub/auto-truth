@@ -30,9 +30,18 @@ import java.util.stream.Stream
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
+private val SUPPORTED_CLASSES = arrayOf(
+    Stream::class,
+    IntStream::class,
+    LongStream::class
+)
+
 class StreamSubjectGenerator(context: Context) : Truth8SubjectGenerator(context) {
-    override fun matches(type: TypeMirror): Boolean {
-        return type.accept(StreamTypeMatcher, context)
+    override fun matches(type: DeclaredType): Boolean {
+        val utils = context.utils
+        return SUPPORTED_CLASSES
+            .map { utils.getDeclaredType(it) }
+            .any { utils.isAssignableType(type, it) }
     }
 
     override fun factoryMethodName(type: TypeMirror): String {
@@ -55,7 +64,7 @@ class StreamSubjectGenerator(context: Context) : Truth8SubjectGenerator(context)
         })
     }
 
-    internal fun <R : Any> TypeMirror.accept(visitor: StreamTypeVisitor<R>): R {
+    private fun <R : Any> TypeMirror.accept(visitor: StreamTypeVisitor<R>): R {
         val utils = context.utils
         return when {
             utils.isAssignableType(this, utils.getDeclaredType<Stream<*>>()) -> {
@@ -79,20 +88,5 @@ class StreamSubjectGenerator(context: Context) : Truth8SubjectGenerator(context)
         fun visitIntStream(type: TypeMirror): R
 
         fun visitLongStream(type: TypeMirror): R
-    }
-
-    internal object StreamTypeMatcher : SupportedTypeMatcher() {
-        private val supportedClasses = arrayOf(
-            Stream::class,
-            IntStream::class,
-            LongStream::class
-        )
-
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val utils = context.utils
-            return supportedClasses
-                .map { utils.getDeclaredType(it) }
-                .any { utils.isAssignableType(type, it) }
-        }
     }
 }

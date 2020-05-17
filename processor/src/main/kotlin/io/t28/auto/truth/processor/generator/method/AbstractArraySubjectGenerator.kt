@@ -43,8 +43,8 @@ import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.SimpleTypeVisitor8
 
 class AbstractArraySubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
-    override fun matches(type: TypeMirror): Boolean {
-        return type.accept(ArrayTypeMatcher, context)
+    override fun matches(type: ArrayType): Boolean {
+        return true
     }
 
     override fun subjectClass(type: TypeMirror): TypeName {
@@ -52,10 +52,6 @@ class AbstractArraySubjectGenerator(context: Context) : TruthSubjectGenerator(co
             ?.componentType
             ?.accept(SubjectTypeResolver, Unit)
             ?: throw IllegalArgumentException("Supported type is only ArrayType, but not: $type")
-    }
-
-    internal object ArrayTypeMatcher : SupportedTypeMatcher() {
-        override fun visitArray(type: ArrayType, context: Context) = true
     }
 
     internal object SubjectTypeResolver : SimpleTypeVisitor8<TypeName, Unit>() {

@@ -26,21 +26,15 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 class PathSubjectGenerator(context: Context) : Truth8SubjectGenerator(context) {
-    override fun matches(type: TypeMirror): Boolean {
-        return type.accept(PathTypeMatcher, context)
+    override fun matches(type: DeclaredType): Boolean {
+        val utils = context.utils
+        val pathType = utils.getDeclaredType<Path>()
+        return utils.isAssignableType(type, pathType)
     }
 
     override fun factoryMethodName(type: TypeMirror) = "paths"
 
     override fun subjectClass(type: TypeMirror): TypeName {
         return ClassName.get(PathSubject::class.java)
-    }
-
-    internal object PathTypeMatcher : SupportedTypeMatcher() {
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val utils = context.utils
-            val pathType = utils.getDeclaredType<Path>()
-            return utils.isAssignableType(type, pathType)
-        }
     }
 }

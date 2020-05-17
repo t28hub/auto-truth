@@ -32,9 +32,19 @@ import java.util.OptionalLong
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
+private val SUPPORTED_CLASSES = arrayOf(
+    Optional::class,
+    OptionalInt::class,
+    OptionalLong::class,
+    OptionalDouble::class
+)
+
 class OptionalSubjectGenerator(context: Context) : Truth8SubjectGenerator(context) {
-    override fun matches(type: TypeMirror): Boolean {
-        return type.accept(GuavaOptionalTypeMatcher, context)
+    override fun matches(type: DeclaredType): Boolean {
+        val utils = context.utils
+        return SUPPORTED_CLASSES
+            .map { utils.getDeclaredType(it) }
+            .any { utils.isAssignableType(type, it) }
     }
 
     override fun factoryMethodName(type: TypeMirror): String {
@@ -61,7 +71,7 @@ class OptionalSubjectGenerator(context: Context) : Truth8SubjectGenerator(contex
         })
     }
 
-    internal fun <R : Any> TypeMirror.accept(visitor: OptionalTypeVisitor<R>): R {
+    private fun <R : Any> TypeMirror.accept(visitor: OptionalTypeVisitor<R>): R {
         val utils = context.utils
         return when {
             utils.isAssignableType(this, utils.getDeclaredType<Optional<*>>()) -> {
@@ -90,21 +100,5 @@ class OptionalSubjectGenerator(context: Context) : Truth8SubjectGenerator(contex
         fun visitOptionalLong(type: TypeMirror): R
 
         fun visitOptionalDouble(type: TypeMirror): R
-    }
-
-    internal object GuavaOptionalTypeMatcher : SupportedTypeMatcher() {
-        private val supportedClasses = arrayOf(
-            Optional::class,
-            OptionalInt::class,
-            OptionalLong::class,
-            OptionalDouble::class
-        )
-
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val utils = context.utils
-            return supportedClasses
-                .map { utils.getDeclaredType(it) }
-                .any { utils.isAssignableType(type, it) }
-        }
     }
 }

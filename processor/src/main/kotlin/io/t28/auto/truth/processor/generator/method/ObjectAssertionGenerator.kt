@@ -30,7 +30,7 @@ import javax.lang.model.type.TypeMirror
 
 class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
     override fun matches(type: TypeMirror): Boolean {
-        return type.accept(SupportedObjectTypeMatcher, context)
+        return SupportedObjectTypeMatcher.visit(type, context)
     }
 
     override fun generate(input: Property): MethodSpec {
@@ -44,9 +44,9 @@ class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
         }.build()
     }
 
-    internal object SupportedObjectTypeMatcher : SupportedTypeMatcher() {
+    internal object SupportedObjectTypeMatcher : SupportedTypeMatcher<Context>() {
         // Following classes are handled by other generators
-        private val ignoredClasses = arrayOf(
+        private val IGNORED_CLASSES = arrayOf(
             java.lang.Void::class,
             java.lang.Boolean::class,
             java.lang.Class::class,
@@ -72,7 +72,7 @@ class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
 
         override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
             val utils = context.utils
-            return ignoredClasses
+            return IGNORED_CLASSES
                 .map { utils.getDeclaredType(it) }
                 .all { !utils.isAssignableType(type, it) }
         }

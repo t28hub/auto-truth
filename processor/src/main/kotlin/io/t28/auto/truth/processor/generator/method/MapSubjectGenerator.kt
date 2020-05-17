@@ -24,18 +24,12 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 class MapSubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
-    override fun matches(type: TypeMirror): Boolean {
-        return type.accept(MapTypeMatcher, context)
+    override fun matches(type: DeclaredType): Boolean {
+        val mapType = context.utils.getDeclaredType(Map::class)
+        return context.utils.isAssignableType(type, mapType)
     }
 
     override fun subjectClass(type: TypeMirror): TypeName {
         return ClassName.get(MapSubject::class.java)
-    }
-
-    internal object MapTypeMatcher : SupportedTypeMatcher() {
-        override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val mapType = context.utils.getDeclaredType(Map::class)
-            return context.utils.isAssignableType(type, mapType)
-        }
     }
 }
