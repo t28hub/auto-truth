@@ -27,12 +27,8 @@ import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
 import javax.lang.model.type.TypeMirror
 
-class BooleanAssertionGenerator internal constructor(
-    private val context: Context,
-    private val nameFactory: (Property) -> String,
-    private val codeFactory: (Property) -> CodeBlock
-) : MethodGenerator {
-    override fun matches(type: TypeMirror): Boolean {
+sealed class BooleanAssertionGenerator(protected val context: Context) : MethodGenerator {
+    final override fun matches(type: TypeMirror): Boolean {
         return object : SupportedTypeMatcher<Void?>() {
             override fun visitPrimitive(type: PrimitiveType, p: Void?): Boolean {
                 return type.kind == TypeKind.BOOLEAN
@@ -45,44 +41,46 @@ class BooleanAssertionGenerator internal constructor(
         }.visit(type)
     }
 
-    override fun generate(input: Property): MethodSpec {
+    final override fun generate(input: Property): MethodSpec {
         require(matches(input.type))
         context.logger.debug(input.element, "Generating an assertion method for boolean and Boolean")
-        return MethodSpec.methodBuilder(nameFactory(input)).apply {
+        return MethodSpec.methodBuilder(generateName(input)).apply {
             addModifiers(Modifier.PUBLIC)
-            addCode(codeFactory(input))
+            addCode(generateCode(input))
         }.build()
     }
 
-    companion object {
-        fun positiveAssertion(context: Context): BooleanAssertionGenerator {
-            return BooleanAssertionGenerator(
-                context,
-                { "is${it.name.capitalize()}" },
-                {
-                    CodeBlock.builder().apply {
-                        beginControlFlow("if (!this.\$L.\$L)", "actual", it.symbol).apply {
-                            addStatement("failWithActual(\$T.simpleFact(\$S))", Fact::class.java, "expected to be ${it.name}")
-                        }
-                        endControlFlow()
-                    }.build()
-                }
-            )
+    protected abstract fun generateName(input: Property): String
+
+    protected abstract fun generateCode(input: Property): CodeBlock
+
+    class PositiveAssertionGenerator(context: Context) : BooleanAssertionGenerator(context) {
+        override fun generateName(input: Property): String {
+            return "is${input.name.capitalize()}"
         }
 
-        fun negativeAssertion(context: Context): BooleanAssertionGenerator {
-            return BooleanAssertionGenerator(
-                context,
-                { "isNot${it.name.capitalize()}" },
-                {
-                    CodeBlock.builder().apply {
-                        beginControlFlow("if (this.\$L.\$L)", "actual", it.symbol).apply {
-                            addStatement("failWithActual(\$T.simpleFact(\$S))", Fact::class.java, "expected not to be ${it.name}")
-                        }
-                        endControlFlow()
-                    }.build()
+        override fun generateCode(input: Property): CodeBlock {
+            return CodeBlock.builder().apply {
+                beginControlFlow("if (!this.\$L.\$L)", "actual", input.symbol).apply {
+                    addStatement("failWithActual(\$T.simpleFact(\$S))", Fact::class.java, "expected to be ${input.name}")
                 }
-            )
+                endControlFlow()
+            }.build()
+        }
+    }
+
+    class NegativeAssertionGenerator(context: Context) : BooleanAssertionGenerator(context) {
+        override fun generateName(input: Property): String {
+            return "isNot${input.name.capitalize()}"
+        }
+
+        override fun generateCode(input: Property): CodeBlock {
+            return CodeBlock.builder().apply {
+                beginControlFlow("if (this.\$L.\$L)", "actual", input.symbol).apply {
+                    addStatement("failWithActual(\$T.simpleFact(\$S))", Fact::class.java, "expected not to be ${input.name}")
+                }
+                endControlFlow()
+            }.build()
         }
     }
 }
