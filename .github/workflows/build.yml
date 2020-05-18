@@ -86,9 +86,13 @@ jobs:
           path: ./processor/build/reports/tests/test
         if: ${{ always() }}
       - name: Measure code coverage
-        uses: paambaati/codeclimate-action@v2.6.0
-        with:
-          coverageCommand: ./gradlew :processor:jacocoTestReport --stacktrace
+        run: ./gradlew :processor:jacocoTestReport --stacktrace
+        timeout-minutes: 3
+      - name: Analyze code quality
+        run: ./gradlew :processor:sonarqube --stacktrace
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_ACCESS_TOKEN }}
         timeout-minutes: 3
       - name: Archive code coverage report
         uses: actions/upload-artifact@v1
