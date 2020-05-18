@@ -52,7 +52,7 @@ private val ANNOTATED_CLASS = JavaFileObjects.forSourceString(ANNOTATED_CLASS_NA
     }
 """.trimIndent())
 
-private fun compile(handler: (annotationMirror: AnnotationMirror) -> Unit): CompileTester {
+private fun process(handler: (annotationMirror: AnnotationMirror) -> Unit): CompileTester {
     return assertAbout(javaSources())
         .that(listOf(ANNOTATION_CLASS, ANNOTATED_CLASS))
         .processedWith(TestProcessor.builder()
@@ -73,7 +73,7 @@ object AnnotationValueSpec : Spek({
     describe("AnnotationValue") {
         describe("asString") {
             it("should return value as String") {
-                compile { annotationMirror ->
+                process { annotationMirror ->
                     // Act
                     val annotationValue = AnnotationMirrors.getAnnotationValue(annotationMirror, "stringValue")
 
@@ -86,7 +86,7 @@ object AnnotationValueSpec : Spek({
 
         describe("asType") {
             it("should return value as Type") {
-                compile { annotationMirror ->
+                process { annotationMirror ->
                     // Act
                     val annotationValue = AnnotationMirrors.getAnnotationValue(annotationMirror, "classValue")
 

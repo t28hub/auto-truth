@@ -17,21 +17,22 @@
 package io.t28.auto.truth.processor.extensions
 
 import com.google.common.truth.Truth.assertThat
+import io.t28.auto.truth.processor.util.fixture
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
 object StringSpec : Spek({
     describe("isValidClassPrefix") {
         arrayOf(
-            "" to true,
-            "$" to true,
-            "_" to true,
-            "1" to false,
-            "@" to false,
-            "Prefix" to true,
-            "Pref1x" to true,
-            "Prefix$" to true,
-            "Prefix@" to false
+            fixture("", true),
+            fixture("$", true),
+            fixture("_", true),
+            fixture("1", false),
+            fixture("@", false),
+            fixture("Prefix", true),
+            fixture("Pref1x", true),
+            fixture("Prefix$", true),
+            fixture("Prefix@", false)
         ).forEach { (string, expected) ->
             it("should return $expected when prefix is $string") {
                 // Act
@@ -45,15 +46,15 @@ object StringSpec : Spek({
 
     describe("isValidClassSuffix") {
         arrayOf(
-            "" to true,
-            "$" to true,
-            "_" to true,
-            "1" to false,
-            "@" to false,
-            "Suffix" to true,
-            "Suff1x" to true,
-            "\$uffix" to true,
-            "Suffix@" to false
+            fixture("", true),
+            fixture("$", true),
+            fixture("_", true),
+            fixture("1", false),
+            fixture("@", false),
+            fixture("Suffix", true),
+            fixture("Suff1x", true),
+            fixture("\$uffix", true),
+            fixture("Suffix@", false)
         ).forEach { (string, expected) ->
             it("should return $expected when suffix is $string") {
                 // Act
@@ -67,9 +68,9 @@ object StringSpec : Spek({
 
     describe("safeFormat") {
         arrayOf(
-            Fixture("Hello, world", "Hello, %s", arrayOf("world")),
-            Fixture("Hello, %d", "Hello, %d", arrayOf("world")),
-            Fixture("Hello", "Hello")
+            fixture("Hello, world", "Hello, %s", arrayOf("world")),
+            fixture("Hello, %d", "Hello, %d", arrayOf("world")),
+            fixture("Hello", "Hello", emptyArray())
         ).forEach { (expected, format, args) ->
             it("should return $expected from format=$format and args=${args.joinToString(",")}") {
                 // Act
@@ -80,11 +81,4 @@ object StringSpec : Spek({
             }
         }
     }
-}) {
-    @Suppress("ArrayInDataClass")
-    data class Fixture(
-        val expected: String,
-        val format: String,
-        val args: Array<Any> = emptyArray()
-    )
-}
+})
