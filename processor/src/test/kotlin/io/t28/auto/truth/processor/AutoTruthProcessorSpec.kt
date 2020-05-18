@@ -18,16 +18,31 @@ package io.t28.auto.truth.processor
 
 import com.google.common.truth.Truth.assertAbout
 import com.google.common.truth.Truth.assertThat
+import com.google.testing.compile.CompileTester
 import com.google.testing.compile.JavaFileObjects.forResource
 import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
+import io.t28.auto.truth.processor.util.fixture
 import javax.lang.model.SourceVersion
 import javax.tools.JavaFileObject
-import javax.tools.StandardLocation
+import javax.tools.StandardLocation.CLASS_OUTPUT
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
 private fun String.loadResource(path: String = "io/t28/auto/truth/test"): JavaFileObject {
     return forResource("$path/$this")
+}
+
+private fun process(vararg fileNames: String): CompileTester {
+    return process(*fileNames.map { name ->
+        name.loadResource()
+    }.toTypedArray())
+}
+
+private fun process(vararg fileObjects: JavaFileObject): CompileTester {
+    return assertAbout(javaSources())
+        .that(setOf(*fileObjects))
+        .withCompilerOptions("-Adebug")
+        .processedWith(AutoTruthProcessor())
 }
 
 object AutoTruthProcessorSpec : Spek({
@@ -73,45 +88,24 @@ object AutoTruthProcessorSpec : Spek({
         describe("process") {
             describe("prefix") {
                 it("should append prefix when custom prefix is given") {
-                    // Arrange
-                    val valueJavaFile = "User.java".loadResource()
-                    val subjectJavaFile = "ValidPrefixUserSubject.java".loadResource()
-
                     // Act & Assert
-                    assertAbout(javaSources())
-                        .that(setOf(valueJavaFile, subjectJavaFile))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
+                    process("User.java", "ValidPrefixUserSubject.java")
                         .compilesWithoutError()
                         .and()
-                        .generatesFileNamed(StandardLocation.CLASS_OUTPUT, "io.t28.auto.truth.test", "Prefix\$ValidPrefixUserSubject.class")
+                        .generatesFileNamed(CLASS_OUTPUT, "io.t28.auto.truth.test", "Prefix\$ValidPrefixUserSubject.class")
                 }
 
                 it("should not append prefix when custom prefix is empty") {
-                    // Arrange
-                    val valueJavaFile = "User.java".loadResource()
-                    val subjectJavaFile = "EmptyPrefixUserSubject.java".loadResource()
-
                     // Act & Assert
-                    assertAbout(javaSources())
-                        .that(setOf(valueJavaFile, subjectJavaFile))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
+                    process("User.java", "EmptyPrefixUserSubject.java")
                         .compilesWithoutError()
                         .and()
-                        .generatesFileNamed(StandardLocation.CLASS_OUTPUT, "io.t28.auto.truth.test", "EmptyPrefixUserSubject$.class")
+                        .generatesFileNamed(CLASS_OUTPUT, "io.t28.auto.truth.test", "EmptyPrefixUserSubject$.class")
                 }
 
                 it("should compile with error when given prefix is invalid") {
-                    // Arrange
-                    val valueJavaFile = "User.java".loadResource()
-                    val subjectJavaFile = "InvalidPrefixUserSubject.java".loadResource()
-
                     // Act & Assert
-                    assertAbout(javaSources())
-                        .that(setOf(valueJavaFile, subjectJavaFile))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
+                    process("User.java", "InvalidPrefixUserSubject.java")
                         .failsToCompile()
                         .withErrorContaining("Prefix given within @AutoTruth is invalid: 1Prefix")
                 }
@@ -119,45 +113,24 @@ object AutoTruthProcessorSpec : Spek({
 
             describe("suffix") {
                 it("should append suffix when custom suffix is given") {
-                    // Arrange
-                    val valueJavaFile = "User.java".loadResource()
-                    val subjectJavaFile = "ValidSuffixUserSubject.java".loadResource()
-
                     // Act & Assert
-                    assertAbout(javaSources())
-                        .that(setOf(valueJavaFile, subjectJavaFile))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
+                    process("User.java", "ValidSuffixUserSubject.java")
                         .compilesWithoutError()
                         .and()
-                        .generatesFileNamed(StandardLocation.CLASS_OUTPUT, "io.t28.auto.truth.test", "AutoValidSuffixUserSubject\$Suffix.class")
+                        .generatesFileNamed(CLASS_OUTPUT, "io.t28.auto.truth.test", "AutoValidSuffixUserSubject\$Suffix.class")
                 }
 
                 it("should not append suffix when custom suffix is empty") {
-                    // Arrange
-                    val valueJavaFile = "User.java".loadResource()
-                    val subjectJavaFile = "EmptySuffixUserSubject.java".loadResource()
-
                     // Act & Assert
-                    assertAbout(javaSources())
-                        .that(setOf(valueJavaFile, subjectJavaFile))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
+                    process("User.java", "EmptySuffixUserSubject.java")
                         .compilesWithoutError()
                         .and()
-                        .generatesFileNamed(StandardLocation.CLASS_OUTPUT, "io.t28.auto.truth.test", "AutoEmptySuffixUserSubject.class")
+                        .generatesFileNamed(CLASS_OUTPUT, "io.t28.auto.truth.test", "AutoEmptySuffixUserSubject.class")
                 }
 
                 it("should compile with error when given suffix is invalid") {
-                    // Arrange
-                    val valueJavaFile = "User.java".loadResource()
-                    val subjectJavaFile = "InvalidSuffixUserSubject.java".loadResource()
-
                     // Act & Assert
-                    assertAbout(javaSources())
-                        .that(setOf(valueJavaFile, subjectJavaFile))
-                        .withCompilerOptions("-Adebug")
-                        .processedWith(AutoTruthProcessor())
+                    process("User.java", "InvalidSuffixUserSubject.java")
                         .failsToCompile()
                         .withErrorContaining("Suffix given within @AutoTruth is invalid: Suffix%")
                 }
@@ -165,18 +138,30 @@ object AutoTruthProcessorSpec : Spek({
 
             it("should generate Subject class") {
                 // Arrange
-                val valueJavaFile = "User.java".loadResource()
-                val subjectJavaFile = "UserSubject.java".loadResource()
                 val expectedJavaFile = "AutoUserSubject.java".loadResource()
 
                 // Act & Assert
-                assertAbout(javaSources())
-                    .that(setOf(valueJavaFile, subjectJavaFile))
-                    .withCompilerOptions("-Adebug")
-                    .processedWith(AutoTruthProcessor())
+                process("User.java", "UserSubject.java")
                     .compilesWithoutError()
                     .and()
                     .generatesSources(expectedJavaFile)
+            }
+
+            arrayOf(
+                fixture("array", "ArrayProperties.java", "ArrayPropertiesSubject.java", "AutoArrayPropertiesSubject.class"),
+                fixture("iterable", "IterableProperties.java", "IterablePropertiesSubject.java", "AutoIterablePropertiesSubject.class"),
+                fixture("map", "MapProperties.java", "MapPropertiesSubject.java", "AutoMapPropertiesSubject.class"),
+                fixture("optional", "OptionalProperties.java", "OptionalPropertiesSubject.java", "AutoOptionalPropertiesSubject.class"),
+                fixture("stream", "StreamProperties.java", "StreamPropertiesSubject.java", "AutoStreamPropertiesSubject.class"),
+                fixture("guava", "GuavaProperties.java", "GuavaPropertiesSubject.java", "AutoGuavaPropertiesSubject.class")
+            ).forEach { (simpleName, valueObject, subject, expected) ->
+                it("should compile $simpleName properties") {
+                    // Act & Assert
+                    process(valueObject, subject)
+                        .compilesWithoutError()
+                        .and()
+                        .generatesFileNamed(CLASS_OUTPUT, "io.t28.auto.truth.test", expected)
+                }
             }
         }
     }
