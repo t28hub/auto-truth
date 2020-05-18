@@ -24,6 +24,7 @@ plugins {
     jacoco
     id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
     id("io.gitlab.arturbosch.detekt") version "1.9.1"
+    id("org.sonarqube") version "2.8"
 }
 
 repositories {
@@ -117,5 +118,17 @@ detekt {
             enabled = true
             destination = file("$buildDir/reports/detekt/index.html")
         }
+    }
+}
+
+val sonarAccessToken: String by project
+sonarqube {
+    properties {
+        property("sonar.organization", "t28hub")
+        property("sonar.host.url", "https://sonarcloud.io")
+
+        property("sonar.projectKey", "io.t28.auto.truth")
+        property("sonar.projectName", "auto-truth")
+        property("sonar.jacoco.reportPaths", "build/jacoco/test.exec")
     }
 }
