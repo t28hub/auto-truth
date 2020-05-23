@@ -20,10 +20,14 @@ import com.google.common.truth.FailureMetadata
 import com.google.common.truth.IterableSubject
 import com.google.common.truth.Subject
 import com.google.common.truth.Truth.assertAbout
-import com.squareup.javapoet.MethodSpec
+import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.TypeName
 
-class MethodSpecSubject private constructor(failureMetadata: FailureMetadata, private val actual: MethodSpec?) : Subject(failureMetadata, actual) {
+class FieldSpecSubject private constructor(failureMetadata: FailureMetadata, private val actual: FieldSpec?) : Subject(failureMetadata, actual) {
+    fun hasType(expected: TypeName) {
+        check("type").that(actual?.type).isEqualTo(expected)
+    }
+
     fun hasName(expected: String) {
         check("name").that(actual?.name).isEqualTo(expected)
     }
@@ -32,21 +36,13 @@ class MethodSpecSubject private constructor(failureMetadata: FailureMetadata, pr
         return check("modifiers").that(actual?.modifiers)
     }
 
-    fun hasReturnType(expected: TypeName) {
-        check("returnType").that(actual?.returnType).isEqualTo(expected)
-    }
-
-    fun parameters(): IterableSubject {
-        return check("parameters").that(actual?.parameters)
-    }
-
     companion object {
-        fun assertThat(spec: MethodSpec?): MethodSpecSubject {
-            return assertAbout(methodSpec()).that(spec)
+        fun assertThat(spec: FieldSpec?): FieldSpecSubject {
+            return assertAbout(fieldSpec()).that(spec)
         }
 
-        fun methodSpec(): Factory<MethodSpecSubject, MethodSpec> {
-            return Factory<MethodSpecSubject, MethodSpec> { metadata, spec -> MethodSpecSubject(metadata, spec) }
+        fun fieldSpec(): Factory<FieldSpecSubject, FieldSpec> {
+            return Factory<FieldSpecSubject, FieldSpec> { metadata, spec -> FieldSpecSubject(metadata, spec) }
         }
     }
 }
