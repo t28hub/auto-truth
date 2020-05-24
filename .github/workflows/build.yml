@@ -1,4 +1,5 @@
-name: Auto Truth
+name: Build auto-truth modules
+
 on:
   push:
     branches:
@@ -12,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
-      - name: Set up JDK
+      - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
           java-version: 11
@@ -24,7 +25,6 @@ jobs:
           restore-keys: gradle-${{ runner.os }}
       - name: Check code style and run lint
         run: ./gradlew :processor:ktlintCheck :processor:detektMain --stacktrace
-        timeout-minutes: 3
       - name: Archive ktlint report
         uses: actions/upload-artifact@v1
         with:
@@ -55,10 +55,8 @@ jobs:
           restore-keys: gradle-${{ runner.os }}
       - name: Build 'annotations' module
         run: ./gradlew :annotations:build --stacktrace
-        timeout-minutes: 3
       - name: Build 'processor' module
         run: ./gradlew :processor:build --stacktrace
-        timeout-minutes: 3
 
   test:
     runs-on: ubuntu-latest
@@ -87,13 +85,11 @@ jobs:
         if: ${{ always() }}
       - name: Measure code coverage
         run: ./gradlew :processor:jacocoTestReport --stacktrace
-        timeout-minutes: 3
       - name: Analyze code quality
         run: ./gradlew :processor:sonarqube --stacktrace
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_ACCESS_TOKEN }}
-        timeout-minutes: 3
       - name: Archive code coverage report
         uses: actions/upload-artifact@v1
         with:

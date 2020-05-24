@@ -8,11 +8,11 @@ cli:
   project: auto-truth
 analyze:
   modules:
-  - name: annotations
+  - name: auto-truth
     type: gradle
-    target: 'annotations:'
+    target: ':'
     path: .
-  - name: processor
-    type: gradle
-    target: 'processor:'
-    path: .
+    options:
+      online: true
+      timeout: '5m'
+      all-submodules: true
