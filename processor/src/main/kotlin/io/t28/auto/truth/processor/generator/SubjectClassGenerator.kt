@@ -45,62 +45,82 @@ class SubjectClassGenerator(
     constructor(vararg generators: MethodGenerator) : this(generators.toList())
 
     override fun generate(input: SubjectClass): TypeSpec {
+        val className = ClassName.get(input.packageName, input.simpleName)
+        return TypeSpec.classBuilder(className).apply {
+            addAnnotations(generateAnnotations())
+            superclass(Subject::class.java)
+            addModifiers(PUBLIC)
+            addFields(generateFields(input))
+            addMethod(generateConstructor(input))
+            addMethod(generateAssertThat(input))
+            addMethod(generateFactory(input))
+            addMethods(generateAssertions(input))
+        }.build()
+    }
+
+    private fun generateAnnotations(): List<AnnotationSpec> {
+        return listOf(
+            AnnotationSpec.builder(Generated::class.java)
+                .addMember("value", "\$S", AutoTruthProcessor::class.java.canonicalName)
+                .build(),
+            AnnotationSpec.builder(SuppressWarnings::class.java)
+                .addMember("value", "\$S", "unchecked")
+                .build()
+        )
+    }
+
+    private fun generateFields(input: SubjectClass): List<FieldSpec> {
+        return listOf(
+            FieldSpec.builder(TypeName.get(input.valueObject.type), "actual", PRIVATE, FINAL).build()
+        )
+    }
+
+    private fun generateConstructor(input: SubjectClass): MethodSpec {
+        return MethodSpec.constructorBuilder().apply {
+            addModifiers(PROTECTED)
+            addParameter(ParameterSpec.builder(FailureMetadata::class.javaObjectType, "failureMetadata").apply {
+                addAnnotation(Nonnull::class.java)
+            }.build())
+            addParameter(ParameterSpec.builder(TypeName.get(input.valueObject.type), "actual").apply {
+                addAnnotation(Nullable::class.java)
+            }.build())
+            addStatement("super(\$L, \$L)", "failureMetadata", "actual")
+            addStatement("this.\$L = \$L", "actual", "actual")
+        }.build()
+    }
+
+    private fun generateAssertThat(input: SubjectClass): MethodSpec {
         val valueObject = input.valueObject
         val valueObjectType = TypeName.get(valueObject.type)
         val className = ClassName.get(input.packageName, input.simpleName)
-        return TypeSpec.classBuilder(className).apply {
-            // Annotations
-            addAnnotation(AnnotationSpec.builder(Generated::class.java).apply {
-                addMember("value", "\$S", AutoTruthProcessor::class.java.canonicalName)
+        return MethodSpec.methodBuilder("assertThat").apply {
+            returns(className)
+            addModifiers(PUBLIC, STATIC)
+            addAnnotation(Nonnull::class.java)
+            addParameter(ParameterSpec.builder(valueObjectType, "actual").apply {
+                addAnnotation(Nullable::class.java)
             }.build())
-            addAnnotation(AnnotationSpec.builder(SuppressWarnings::class.java).apply {
-                addMember("value", "\$S", "unchecked")
-            }.build())
-
-            superclass(Subject::class.java)
-            addModifiers(PUBLIC)
-
-            // Fields
-            addField(FieldSpec.builder(valueObjectType, "actual", PRIVATE, FINAL).build())
-
-            // Constructors
-            addMethod(MethodSpec.constructorBuilder().apply {
-                addModifiers(PROTECTED)
-                addParameter(ParameterSpec.builder(FailureMetadata::class.javaObjectType, "failureMetadata").apply {
-                    addAnnotation(Nonnull::class.java)
-                }.build())
-                addParameter(ParameterSpec.builder(valueObjectType, "actual").apply {
-                    addAnnotation(Nullable::class.java)
-                }.build())
-                addStatement("super(\$L, \$L)", "failureMetadata", "actual")
-                addStatement("this.\$L = \$L", "actual", "actual")
-            }.build())
-
-            // Entry point method
-            addMethod(MethodSpec.methodBuilder("assertThat").apply {
-                returns(className)
-                addModifiers(PUBLIC, STATIC)
-                addAnnotation(Nonnull::class.java)
-                addParameter(ParameterSpec.builder(valueObjectType, "actual").apply {
-                    addAnnotation(Nullable::class.java)
-                }.build())
-                addStatement("return \$T.assertAbout(\$L()).that(\$L)", Truth::class.java, valueObject.simpleName.decapitalize(), "actual")
-            }.build())
-
-            // Factory method
-            addMethod(MethodSpec.methodBuilder(valueObject.simpleName.decapitalize()).apply {
-                returns(ParameterizedTypeName.get(ClassName.get(Subject.Factory::class.java), className, valueObjectType))
-                addModifiers(PUBLIC, STATIC)
-                addAnnotation(Nonnull::class.java)
-                addStatement("return \$T::new", className)
-            }.build())
-
-            // Assertion methods
-            val assertionMethods = valueObject.properties.flatMap { property ->
-                methodGenerators.filter { generator -> generator.matches(property.type) }
-                    .map { generator -> generator.generate(property) }
-            }
-            addMethods(assertionMethods)
+            addStatement("return \$T.assertAbout(\$L()).that(\$L)", Truth::class.java, valueObject.simpleName.decapitalize(), "actual")
         }.build()
+    }
+
+    private fun generateFactory(input: SubjectClass): MethodSpec {
+        val valueObject = input.valueObject
+        val valueObjectType = TypeName.get(valueObject.type)
+        val className = ClassName.get(input.packageName, input.simpleName)
+        return MethodSpec.methodBuilder(valueObject.simpleName.decapitalize()).apply {
+            returns(ParameterizedTypeName.get(ClassName.get(Subject.Factory::class.java), className, valueObjectType))
+            addModifiers(PUBLIC, STATIC)
+            addAnnotation(Nonnull::class.java)
+            addStatement("return \$T::new", className)
+        }.build()
+    }
+
+    private fun generateAssertions(input: SubjectClass): List<MethodSpec> {
+        val valueObject = input.valueObject
+        return valueObject.properties.flatMap { property ->
+            methodGenerators.filter { generator -> generator.matches(property.type) }
+                .map { generator -> generator.generate(property) }
+        }
     }
 }
