@@ -1,0 +1,29 @@
+name: Fossa license scan
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  license:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v2
+      - uses: gradle/wrapper-validation-action@v1
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Install fossa-cli
+        run: "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash"
+      - name: Analyze dependencies
+        run: fossa analyze --config .fossa.yml --branch "$GITHUB_REF"
+        env:
+          FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
+      - name: Test dependencies
+        run: fossa test --config .fossa.yml --branch "$GITHUB_REF"
+        env:
+          FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
