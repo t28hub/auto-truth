@@ -24,7 +24,7 @@ plugins {
     jacoco
     id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
     id("io.gitlab.arturbosch.detekt") version "1.9.1"
-    id("org.sonarqube") version "2.8"
+    id("org.sonarqube") version "3.0"
 }
 
 repositories {
