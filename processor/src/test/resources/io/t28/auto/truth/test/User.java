@@ -21,12 +21,14 @@ public class User {
     private final String name;
     private final int age;
     private final boolean isAdmin;
+    private final Type type;
 
-    public User(long id, String name, int age, boolean isAdmin) {
+    public User(long id, String name, int age, boolean isAdmin, Type type) {
         this.id = id;
         this.name = name;
         this.age = age;
         this.isAdmin = isAdmin;
+        this.type = type;
     }
 
     public long getId() {
@@ -43,5 +45,13 @@ public class User {
 
     public boolean isAdmin() {
         return isAdmin;
+    }
+
+    public User.Type getType() {
+        return type;
+    }
+
+    public static enum Type {
+        GUEST, OWNER
     }
 }

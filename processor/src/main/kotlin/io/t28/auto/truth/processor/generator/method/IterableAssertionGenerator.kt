@@ -25,10 +25,9 @@ import io.t28.auto.truth.processor.data.Property
 import java.util.Arrays
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.TypeMirror
 
 sealed class IterableAssertionGenerator(protected val context: Context) : MethodGenerator {
-    override fun matches(type: TypeMirror): Boolean {
+    override fun matches(property: Property): Boolean {
         return object : SupportedTypeMatcher<Void?>() {
             override fun visitDeclared(type: DeclaredType, p: Void?): Boolean {
                 val iterableType = context.utils.getDeclaredType(Iterable::class)
@@ -37,11 +36,11 @@ sealed class IterableAssertionGenerator(protected val context: Context) : Method
                 }
                 return type.typeArguments.size == 1
             }
-        }.visit(type)
+        }.visit(property.type)
     }
 
     final override fun generate(input: Property): MethodSpec {
-        require(matches(input.type))
+        require(matches(input))
         context.logger.debug(input.element, "Generating an assertion method for Iterable<T>")
 
         val type = input.type as DeclaredType

@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.generator.method
+package io.t28.auto.truth.test;
 
-import com.squareup.javapoet.MethodSpec
-import io.t28.auto.truth.processor.data.Property
-import io.t28.auto.truth.processor.generator.Generator
+import io.t28.auto.truth.AutoSubject;
 
-interface MethodGenerator : Generator<Property, MethodSpec> {
-    fun matches(property: Property): Boolean
+@AutoSubject(EnumTypes.class)
+public class EnumTypesSubject {
 }

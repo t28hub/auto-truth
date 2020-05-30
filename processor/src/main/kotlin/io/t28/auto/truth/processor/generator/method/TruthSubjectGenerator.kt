@@ -26,16 +26,16 @@ import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 abstract class TruthSubjectGenerator(protected val context: Context) : MethodGenerator {
-    final override fun matches(type: TypeMirror): Boolean {
+    final override fun matches(property: Property): Boolean {
         return object : SupportedTypeMatcher<Void?>() {
             override fun visitDeclared(type: DeclaredType, p: Void?): Boolean = matches(type)
 
             override fun visitArray(type: ArrayType, p: Void?): Boolean = matches(type)
-        }.visit(type)
+        }.visit(property.type)
     }
 
     final override fun generate(input: Property): MethodSpec {
-        require(matches(input.type))
+        require(matches(input))
         context.logger.debug(input.element, "Generating a method returns Subject for ${input.type}")
 
         val subjectClass = subjectClass(input.type)

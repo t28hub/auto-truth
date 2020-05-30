@@ -25,6 +25,7 @@ import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
+import io.t28.auto.truth.processor.extensions.findEnumConstants
 import io.t28.auto.truth.processor.extensions.findMethods
 import io.t28.auto.truth.processor.testing.MethodSpecSubject.Companion.assertThat
 import io.t28.auto.truth.processor.testing.TestContext
@@ -36,24 +37,22 @@ import org.spekframework.spek2.style.specification.describe
 private fun compile(handler: (TestContext) -> Unit): CompileTester {
     return assertAbout(javaSources())
         .that(listOf(
-            forSourceString("io.t28.auto.truth.test.DummySubject", """
+            forSourceString("io.t28.auto.truth.test.EnumTypeSubject", """
                 package io.t28.auto.truth.test;
             
                 import io.t28.auto.truth.AutoSubject;
             
-                @AutoSubject(value = Dummy.class)
-                public class DummySubject {
+                @AutoSubject(value = EnumType.class)
+                public class EnumTypeSubject {
                 }
             """.trimIndent()),
-            forSourceString("io.t28.auto.truth.test.Dummy", """
+            forSourceString("io.t28.auto.truth.test.EnumType", """
                 package io.t28.auto.truth.test;
                 
-                public abstract class Dummy {
-                    public abstract boolean booleanValue();
-                    
-                    public abstract Boolean boxedBooleanValue();
-                    
-                    public abstract String nonBooleanValue();
+                public enum EnumType {
+                    FOO_BAR,
+                    BAR_BAZ,
+                    BAX_QUX;
                 }
             """.trimIndent())
         ))
@@ -66,54 +65,37 @@ private fun compile(handler: (TestContext) -> Unit): CompileTester {
             .build())
 }
 
-object BooleanAssertionGeneratorSpec : Spek({
-    describe("BooleanAssertionGenerator") {
+object EnumAssertionGeneratorSpec : Spek({
+    describe("EnumAssertionGenerator") {
         describe("matches") {
-            it("should return true when type is boolean") {
+            it("should return true when given type is EnumConstant") {
                 compile {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.Dummy")
-                    val booleanProperty = element.findMethods { method ->
-                        method.simpleName.contentEquals("booleanValue")
-                    }.map { method -> Property.get(method) }.first()
-                    val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
+                    val element = it.getTypeElement("io.t28.auto.truth.test.EnumType")
+                    val property = element.findEnumConstants { constant ->
+                        constant.simpleName.contentEquals("FOO_BAR")
+                    }.map { constant -> Property.get(constant) }.first()
+                    val generator = EnumAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                     // Act
-                    val actual = generator.matches(booleanProperty)
+                    val actual = generator.matches(property)
 
                     // Assert
                     assertThat(actual).isTrue()
                 }.compilesWithoutError()
             }
 
-            it("should return true when type is boxed boolean") {
+            it("should return false when given type is not EnumConstant") {
                 compile {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.Dummy")
-                    val boxedBooleanProperty = element.findMethods { method ->
-                        method.simpleName.contentEquals("boxedBooleanValue")
+                    val element = it.getTypeElement("io.t28.auto.truth.test.EnumType")
+                    val property = element.findMethods { method ->
+                        method.simpleName.contentEquals("values")
                     }.map { method -> Property.get(method) }.first()
-                    val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
+                    val generator = EnumAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                     // Act
-                    val actual = generator.matches(boxedBooleanProperty)
-
-                    // Assert
-                    assertThat(actual).isTrue()
-                }.compilesWithoutError()
-            }
-
-            it("should return false when type is non-boolean") {
-                compile {
-                    // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.Dummy")
-                    val nonBooleanProperty = element.findMethods { method ->
-                        method.simpleName.contentEquals("nonBooleanValue")
-                    }.map { method -> Property.get(method) }.first()
-                    val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
-
-                    // Act
-                    val actual = generator.matches(nonBooleanProperty)
+                    val actual = generator.matches(property)
 
                     // Assert
                     assertThat(actual).isFalse()
@@ -125,45 +107,45 @@ object BooleanAssertionGeneratorSpec : Spek({
             it("should generate positive assertion method") {
                 compile {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.Dummy")
-                    val booleanProperty = element.findMethods { method ->
-                        method.simpleName.contentEquals("booleanValue")
-                    }.map { method -> Property.get(method) }.first()
-                    val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
+                    val element = it.getTypeElement("io.t28.auto.truth.test.EnumType")
+                    val property = element.findEnumConstants { constant ->
+                        constant.simpleName.contentEquals("FOO_BAR")
+                    }.map { constant -> Property.get(constant) }.first()
+                    val generator = EnumAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                     // Act
-                    val actual = generator.generate(booleanProperty)
+                    val actual = generator.generate(property)
 
                     // Assert
                     assertThat(actual).apply {
-                        hasName("isBooleanValue")
+                        hasName("isFooBar")
                         modifiers().contains(PUBLIC)
                         hasReturnType(TypeName.VOID)
                         parameters().isEmpty()
                     }
-                }
+                }.compilesWithoutError()
             }
 
             it("should generate negative assertion method") {
                 compile {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.Dummy")
-                    val booleanProperty = element.findMethods { method ->
-                        method.simpleName.contentEquals("booleanValue")
-                    }.map { method -> Property.get(method) }.first()
-                    val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
+                    val element = it.getTypeElement("io.t28.auto.truth.test.EnumType")
+                    val property = element.findEnumConstants { constant ->
+                        constant.simpleName.contentEquals("FOO_BAR")
+                    }.map { constant -> Property.get(constant) }.first()
+                    val generator = EnumAssertionGenerator.NegativeAssertionGenerator(Context.get(it.processingEnv))
 
                     // Act
-                    val actual = generator.generate(booleanProperty)
+                    val actual = generator.generate(property)
 
                     // Assert
                     assertThat(actual).apply {
-                        hasName("isNotBooleanValue")
+                        hasName("isNotFooBar")
                         modifiers().contains(PUBLIC)
                         hasReturnType(TypeName.VOID)
                         parameters().isEmpty()
                     }
-                }
+                }.compilesWithoutError()
             }
         }
     }
