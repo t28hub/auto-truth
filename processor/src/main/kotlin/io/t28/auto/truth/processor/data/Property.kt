@@ -70,7 +70,7 @@ sealed class Property(open val element: Element) {
         }
     }
 
-    data class Field(override val element: VariableElement) : Property(element) {
+    data class Field internal constructor(override val element: VariableElement) : Property(element) {
         override val type: TypeMirror
             get() = element.asType()
 
@@ -85,7 +85,7 @@ sealed class Property(open val element: Element) {
         }
     }
 
-    data class Getter(override val element: ExecutableElement) : Property(element) {
+    data class Getter internal constructor(override val element: ExecutableElement) : Property(element) {
         override val type: TypeMirror
             get() = element.returnType
 
@@ -100,7 +100,7 @@ sealed class Property(open val element: Element) {
         }
     }
 
-    data class EnumConstant(override val element: VariableElement) : Property(element) {
+    data class EnumConstant internal constructor(override val element: VariableElement) : Property(element) {
         override val type: TypeMirror
             get() = element.asType()
 

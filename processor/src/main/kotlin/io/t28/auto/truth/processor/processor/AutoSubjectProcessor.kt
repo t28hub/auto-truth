@@ -18,21 +18,14 @@ package io.t28.auto.truth.processor.processor
 
 import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.processor.Context
-import io.t28.auto.truth.processor.data.Property
 import io.t28.auto.truth.processor.data.SubjectClass
 import io.t28.auto.truth.processor.data.ValueObjectClass
 import io.t28.auto.truth.processor.extensions.asString
 import io.t28.auto.truth.processor.extensions.asType
 import io.t28.auto.truth.processor.extensions.asTypeElement
 import io.t28.auto.truth.processor.extensions.findAnnotationMirror
-import io.t28.auto.truth.processor.extensions.findEnumConstants
-import io.t28.auto.truth.processor.extensions.findFields
-import io.t28.auto.truth.processor.extensions.findMethods
 import io.t28.auto.truth.processor.extensions.getAnnotationValue
 import io.t28.auto.truth.processor.extensions.getPackage
-import io.t28.auto.truth.processor.extensions.hasParameter
-import io.t28.auto.truth.processor.extensions.isPublic
-import io.t28.auto.truth.processor.extensions.isStatic
 import io.t28.auto.truth.processor.extensions.isValidClassPrefix
 import io.t28.auto.truth.processor.extensions.isValidClassSuffix
 import javax.lang.model.element.TypeElement
@@ -72,24 +65,7 @@ class AutoSubjectProcessor(context: Context) : Processor<TypeElement, SubjectCla
             prefix = classPrefix,
             suffix = classSuffix,
             element = element,
-            valueObject = ValueObjectClass(
-                element = valueObjectElement,
-                properties = valueObjectElement.findProperties(),
-                enumConstants = valueObjectElement.findEnumConstants().map { Property.EnumConstant(it) }
-            )
+            valueObject = ValueObjectClass(valueObjectElement)
         )
-    }
-
-    private fun TypeElement.findProperties(): List<Property> {
-        // Find public and non-static properties
-        val fieldProperties = findFields {
-            it.isPublic and !it.isStatic
-        }.map { Property.Field(it) }
-
-        // Find public and non-static getter methods
-        val getterProperties = findMethods {
-            it.isPublic and !it.isStatic and !it.hasParameter
-        }.map { Property.Getter(it) }
-        return fieldProperties + getterProperties
     }
 }
