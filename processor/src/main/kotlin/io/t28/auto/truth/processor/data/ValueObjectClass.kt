@@ -16,17 +16,39 @@
 
 package io.t28.auto.truth.processor.data
 
+import io.t28.auto.truth.processor.extensions.findEnumConstants
+import io.t28.auto.truth.processor.extensions.findFields
+import io.t28.auto.truth.processor.extensions.findMethods
+import io.t28.auto.truth.processor.extensions.hasParameter
+import io.t28.auto.truth.processor.extensions.isPublic
+import io.t28.auto.truth.processor.extensions.isStatic
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.TypeMirror
 
-data class ValueObjectClass(
-    val element: TypeElement,
-    val properties: List<Property>,
-    val enumConstants: List<Property>
-) {
+data class ValueObjectClass(val element: TypeElement) {
     val type: TypeMirror
         get() = element.asType()
 
     val simpleName: String
         get() = "${element.simpleName}"
+
+    val properties: List<Property>
+        get() {
+            // Find public and non-static properties
+            val fieldProperties = element.findFields {
+                it.isPublic and !it.isStatic
+            }.map { Property.get(it) }
+
+            // Find public and non-static getter methods
+            val getterProperties = element.findMethods {
+                it.isPublic and !it.isStatic and !it.hasParameter
+            }.map { Property.get(it) }
+            return fieldProperties + getterProperties
+        }
+
+    val enumConstants: List<Property>
+        get() {
+            return element.findEnumConstants()
+                .map { Property.get(it) }
+        }
 }
