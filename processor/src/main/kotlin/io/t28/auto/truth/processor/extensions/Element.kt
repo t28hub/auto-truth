@@ -18,6 +18,8 @@ package io.t28.auto.truth.processor.extensions
 
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind.ENUM
+import javax.lang.model.element.ElementKind.ENUM_CONSTANT
 import javax.lang.model.element.ElementKind.FIELD
 import javax.lang.model.element.ElementKind.PACKAGE
 import javax.lang.model.element.ExecutableElement
@@ -31,13 +33,16 @@ import javax.lang.model.util.ElementFilter.methodsIn
 import javax.lang.model.util.ElementFilter.packagesIn
 
 val Element.isPublic: Boolean
-    get() = this.modifiers.contains(PUBLIC)
+    get() = modifiers.contains(PUBLIC)
 
 val Element.isStatic: Boolean
-    get() = this.modifiers.contains(STATIC)
+    get() = modifiers.contains(STATIC)
 
 val ExecutableElement.hasParameter: Boolean
-    get() = this.parameters.isNotEmpty()
+    get() = parameters.isNotEmpty()
+
+val Element.isEnum: Boolean
+    get() = kind == ENUM
 
 fun Element.getPackage(): PackageElement {
     var enclosing = this
@@ -53,6 +58,12 @@ inline fun <reified T : Annotation> Element.findAnnotationMirror(): AnnotationMi
         val annotationTypeElement = it.annotationType.asTypeElement()
         annotationTypeElement.qualifiedName.contentEquals(annotationName)
     }
+}
+
+fun TypeElement.findEnumConstants(predicate: (VariableElement) -> Boolean = { true }): List<VariableElement> {
+    return fieldsIn(enclosedElements)
+        .filter { it.kind == ENUM_CONSTANT }
+        .filter(predicate)
 }
 
 fun TypeElement.findFields(predicate: (VariableElement) -> Boolean): List<VariableElement> {

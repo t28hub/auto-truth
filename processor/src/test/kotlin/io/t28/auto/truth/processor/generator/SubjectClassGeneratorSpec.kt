@@ -65,7 +65,8 @@ object SubjectClassGeneratorSpec : Spek({
                         element = context.getTypeElement("io.t28.auto.truth.test.UserSubject"),
                         valueObject = ValueObjectClass(
                             element = context.getTypeElement("io.t28.auto.truth.test.User"),
-                            properties = emptyList()
+                            properties = emptyList(),
+                            enumConstants = emptyList()
                         )
                     )
 

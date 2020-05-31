@@ -138,13 +138,14 @@ object AutoTruthProcessorSpec : Spek({
 
             it("should generate Subject class") {
                 // Arrange
-                val expectedJavaFile = "AutoUserSubject.java".loadResource()
+                val userSubjectFile = "AutoUserSubject.java".loadResource()
+                val userTypeSubjectFile = "AutoUserTypeSubject.java".loadResource()
 
                 // Act & Assert
-                process("User.java", "UserSubject.java")
+                process("User.java", "UserSubject.java", "UserTypeSubject.java")
                     .compilesWithoutError()
                     .and()
-                    .generatesSources(expectedJavaFile)
+                    .generatesSources(userSubjectFile, userTypeSubjectFile)
             }
 
             arrayOf(
@@ -153,7 +154,8 @@ object AutoTruthProcessorSpec : Spek({
                 fixture("map", "MapProperties.java", "MapPropertiesSubject.java", "AutoMapPropertiesSubject.class"),
                 fixture("optional", "OptionalProperties.java", "OptionalPropertiesSubject.java", "AutoOptionalPropertiesSubject.class"),
                 fixture("stream", "StreamProperties.java", "StreamPropertiesSubject.java", "AutoStreamPropertiesSubject.class"),
-                fixture("guava", "GuavaProperties.java", "GuavaPropertiesSubject.java", "AutoGuavaPropertiesSubject.class")
+                fixture("guava", "GuavaProperties.java", "GuavaPropertiesSubject.java", "AutoGuavaPropertiesSubject.class"),
+                fixture("enum", "EnumTypes.java", "EnumTypesSubject.java", "AutoEnumTypesSubject.class")
             ).forEach { (simpleName, valueObject, subject, expected) ->
                 it("should compile $simpleName properties") {
                     // Act & Assert

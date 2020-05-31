@@ -24,6 +24,7 @@ import io.t28.auto.truth.processor.generator.SubjectClassGenerator
 import io.t28.auto.truth.processor.generator.method.AbstractArraySubjectGenerator
 import io.t28.auto.truth.processor.generator.method.BooleanAssertionGenerator
 import io.t28.auto.truth.processor.generator.method.ClassSubjectGenerator
+import io.t28.auto.truth.processor.generator.method.EnumAssertionGenerator
 import io.t28.auto.truth.processor.generator.method.GuavaOptionalSubjectGenerator
 import io.t28.auto.truth.processor.generator.method.IterableAssertionGenerator
 import io.t28.auto.truth.processor.generator.method.IterableSubjectGenerator
@@ -35,9 +36,7 @@ import io.t28.auto.truth.processor.generator.method.PathSubjectGenerator
 import io.t28.auto.truth.processor.generator.method.StreamSubjectGenerator
 import io.t28.auto.truth.processor.generator.method.TableSubjectGenerator
 import io.t28.auto.truth.processor.processor.AutoSubjectProcessor
-import io.t28.auto.truth.processor.processor.ExecutablePropertyProcessor
 import io.t28.auto.truth.processor.processor.ProcessingException
-import io.t28.auto.truth.processor.processor.VariablePropertyProcessor
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.Processor
@@ -70,7 +69,7 @@ class AutoTruthProcessor : AbstractProcessor() {
         }
 
         val logger = context.logger
-        val processor = AutoSubjectProcessor(context, VariablePropertyProcessor(context), ExecutablePropertyProcessor(context))
+        val processor = AutoSubjectProcessor(context)
         val generator = SubjectClassGenerator(
             AbstractArraySubjectGenerator(context),
             BooleanAssertionGenerator.PositiveAssertionGenerator(context),
@@ -83,6 +82,8 @@ class AutoTruthProcessor : AbstractProcessor() {
             MapSubjectGenerator(context),
             MultimapSubjectGenerator(context),
             TableSubjectGenerator(context),
+            EnumAssertionGenerator.PositiveAssertionGenerator(context),
+            EnumAssertionGenerator.NegativeAssertionGenerator(context),
             ObjectAssertionGenerator(context),
             OptionalSubjectGenerator(context),
             StreamSubjectGenerator(context),

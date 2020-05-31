@@ -25,6 +25,7 @@ import io.t28.auto.truth.processor.extensions.asString
 import io.t28.auto.truth.processor.extensions.asType
 import io.t28.auto.truth.processor.extensions.asTypeElement
 import io.t28.auto.truth.processor.extensions.findAnnotationMirror
+import io.t28.auto.truth.processor.extensions.findEnumConstants
 import io.t28.auto.truth.processor.extensions.findFields
 import io.t28.auto.truth.processor.extensions.findMethods
 import io.t28.auto.truth.processor.extensions.getAnnotationValue
@@ -37,11 +38,7 @@ import io.t28.auto.truth.processor.extensions.isValidClassSuffix
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
 
-class AutoSubjectProcessor(
-    context: Context,
-    private val variablePropertyProcessor: VariablePropertyProcessor,
-    private val executablePropertyProcessor: ExecutablePropertyProcessor
-) : Processor<TypeElement, SubjectClass> {
+class AutoSubjectProcessor(context: Context) : Processor<TypeElement, SubjectClass> {
     private val logger = context.logger
 
     companion object {
@@ -57,8 +54,8 @@ class AutoSubjectProcessor(
         }
 
         val packageName = "${element.getPackage().qualifiedName}"
-        val pojoType = requireNotNull(annotation.getAnnotationValue(VALUE_OBJECT_CLASS)).asType()
-        val pojoElement = requireNotNull(pojoType as? DeclaredType).asTypeElement()
+        val valueObjectType = requireNotNull(annotation.getAnnotationValue(VALUE_OBJECT_CLASS)).asType()
+        val valueObjectElement = requireNotNull(valueObjectType as? DeclaredType).asTypeElement()
 
         val classPrefix = requireNotNull(annotation.getAnnotationValue(SUBJECT_CLASS_PREFIX)).asString()
         if (!classPrefix.isValidClassPrefix()) {
@@ -76,8 +73,9 @@ class AutoSubjectProcessor(
             suffix = classSuffix,
             element = element,
             valueObject = ValueObjectClass(
-                element = pojoElement,
-                properties = pojoElement.findProperties()
+                element = valueObjectElement,
+                properties = valueObjectElement.findProperties(),
+                enumConstants = valueObjectElement.findEnumConstants().map { Property.EnumConstant(it) }
             )
         )
     }
@@ -86,12 +84,12 @@ class AutoSubjectProcessor(
         // Find public and non-static properties
         val fieldProperties = findFields {
             it.isPublic and !it.isStatic
-        }.map { variablePropertyProcessor.process(it) }
+        }.map { Property.Field(it) }
 
         // Find public and non-static getter methods
         val getterProperties = findMethods {
             it.isPublic and !it.isStatic and !it.hasParameter
-        }.map { executablePropertyProcessor.process(it) }
+        }.map { Property.Getter(it) }
         return fieldProperties + getterProperties
     }
 }

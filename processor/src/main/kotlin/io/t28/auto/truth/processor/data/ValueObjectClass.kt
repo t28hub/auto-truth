@@ -21,7 +21,8 @@ import javax.lang.model.type.TypeMirror
 
 data class ValueObjectClass(
     val element: TypeElement,
-    val properties: List<Property>
+    val properties: List<Property>,
+    val enumConstants: List<Property>
 ) {
     val type: TypeMirror
         get() = element.asType()

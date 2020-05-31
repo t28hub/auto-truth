@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.generator.method
+package io.t28.auto.truth.test;
 
-import com.squareup.javapoet.MethodSpec
-import io.t28.auto.truth.processor.data.Property
-import io.t28.auto.truth.processor.generator.Generator
+import com.google.common.truth.FailureMetadata;
+import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 
-interface MethodGenerator : Generator<Property, MethodSpec> {
-    fun matches(property: Property): Boolean
+@AutoSubject(User.Type.class)
+public class UserTypeSubject extends AutoUserTypeSubject {
+    public UserTypeSubject(FailureMetadata failureMetadata, User.Type actual) {
+        super(failureMetadata, actual);
+    }
 }
