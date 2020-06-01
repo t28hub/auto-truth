@@ -66,13 +66,13 @@ fun TypeElement.findEnumConstants(predicate: (VariableElement) -> Boolean = { tr
         .filter(predicate)
 }
 
-fun TypeElement.findFields(predicate: (VariableElement) -> Boolean): List<VariableElement> {
+fun TypeElement.findFields(predicate: (VariableElement) -> Boolean = { true }): List<VariableElement> {
     return fieldsIn(enclosedElements)
         .filter { it.kind == FIELD }
         .filter(predicate)
 }
 
-fun TypeElement.findMethods(predicate: (ExecutableElement) -> Boolean): List<ExecutableElement> {
+fun TypeElement.findMethods(predicate: (ExecutableElement) -> Boolean = { true }): List<ExecutableElement> {
     return methodsIn(enclosedElements)
         .filter(predicate)
 }
