@@ -19,7 +19,9 @@ package io.t28.auto.truth.processor.data
 import com.google.common.base.CaseFormat
 import java.lang.IllegalArgumentException
 import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ElementKind.ENUM_CONSTANT
+import javax.lang.model.element.ElementKind.FIELD
+import javax.lang.model.element.ElementKind.METHOD
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.type.TypeMirror
@@ -32,8 +34,6 @@ sealed class Property(open val element: Element) {
 
     abstract val symbol: String
 
-    abstract fun <R, P> accept(visitor: Visitor<R, P>, parameter: P): R
-
     companion object {
         private val GETTER_PREFIX = Regex("^(is|get)(.+?)$")
 
@@ -41,15 +41,15 @@ sealed class Property(open val element: Element) {
             return object : SimpleElementVisitor8<Property, Void?>() {
                 override fun visitExecutable(e: ExecutableElement, p: Void?): Property {
                     return when (e.kind) {
-                        ElementKind.METHOD -> Getter(e)
+                        METHOD -> Getter(e)
                         else -> defaultAction(e, p)
                     }
                 }
 
                 override fun visitVariable(e: VariableElement, p: Void?): Property {
                     return when (e.kind) {
-                        ElementKind.FIELD -> Field(e)
-                        ElementKind.ENUM_CONSTANT -> EnumConstant(e)
+                        FIELD -> Field(e)
+                        ENUM_CONSTANT -> EnumConstant(e)
                         else -> defaultAction(e, p)
                     }
                 }
@@ -79,10 +79,6 @@ sealed class Property(open val element: Element) {
 
         override val symbol: String
             get() = "${element.simpleName}"
-
-        override fun <R, P> accept(visitor: Visitor<R, P>, parameter: P): R {
-            return visitor.visitField(this, parameter)
-        }
     }
 
     data class Getter internal constructor(override val element: ExecutableElement) : Property(element) {
@@ -94,10 +90,6 @@ sealed class Property(open val element: Element) {
 
         override val symbol: String
             get() = "${element.simpleName}()"
-
-        override fun <R, P> accept(visitor: Visitor<R, P>, parameter: P): R {
-            return visitor.visitGetter(this, parameter)
-        }
     }
 
     data class EnumConstant internal constructor(override val element: VariableElement) : Property(element) {
@@ -112,21 +104,5 @@ sealed class Property(open val element: Element) {
 
         override val symbol: String
             get() = "${element.simpleName}"
-
-        override fun <R, P> accept(visitor: Visitor<R, P>, parameter: P): R {
-            return visitor.visitEnumConstant(this, parameter)
-        }
-    }
-
-    interface Visitor<R, P> {
-        fun visit(property: Property, parameter: P): R {
-            return property.accept(this, parameter)
-        }
-
-        fun visitField(field: Field, parameter: P): R
-
-        fun visitGetter(getter: Getter, parameter: P): R
-
-        fun visitEnumConstant(enumConstant: EnumConstant, parameter: P): R
     }
 }
