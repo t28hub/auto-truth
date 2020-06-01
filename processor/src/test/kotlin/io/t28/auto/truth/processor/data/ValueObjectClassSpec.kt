@@ -17,90 +17,30 @@
 package io.t28.auto.truth.processor.data
 
 import com.google.auto.common.MoreTypes
-import com.google.common.truth.Truth.assertAbout
 import com.google.common.truth.Truth.assertThat
-import com.google.testing.compile.CompileTester
-import com.google.testing.compile.JavaFileObjects.forResource
-import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
-import io.t28.auto.truth.AutoSubject
-import io.t28.auto.truth.processor.testing.TestContext
-import io.t28.auto.truth.processor.testing.TestProcessor
+import io.t28.auto.truth.processor.testing.Resource
+import io.t28.auto.truth.processor.testing.process
 import javax.lang.model.type.DeclaredType
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
-private fun compile(handler: (TestContext) -> Unit): CompileTester {
-    return assertAbout(javaSources())
-        .that(listOf(
-            forResource("io/t28/auto/truth/test/User.java"),
-            forResource("io/t28/auto/truth/test/UserSubject.java")
-        ))
-        .processedWith(TestProcessor.builder()
-            .annotations(AutoSubject::class)
-            .nextHandler { context ->
-                handler(context)
-                true
-            }
-            .build())
-}
-
 object ValueObjectClassSpec : Spek({
     describe("ValueObjectClass") {
-        it("should return TypeMirror corresponding to TypeElement") {
-            compile {
+        it("should instantiate from TypeElement") {
+            process(Resource.User, Resource.UserSubject) {
                 // Arrange
-                val userElement = it.getTypeElement("io.t28.auto.truth.test.User")
-                val userValueObject = ValueObjectClass(userElement)
+                val userElement = it.getTypeElement(Resource.User.qualifiedName)
 
                 // Act
-                val actual = userValueObject.type
+                val actual = ValueObjectClass(userElement)
 
                 // Assert
-                assertThat(actual).isInstanceOf(DeclaredType::class.java)
-                assertThat(MoreTypes.asElement(actual)).isEqualTo(userElement)
+                assertThat(actual.type).isInstanceOf(DeclaredType::class.java)
+                assertThat(MoreTypes.asElement(actual.type)).isEqualTo(userElement)
+                assertThat(actual.simpleName).isEqualTo("User")
+                assertThat(actual.properties).hasSize(5)
+                assertThat(actual.enumConstants).isEmpty()
             }.compilesWithoutError()
-        }
-
-        it("should return simple name") {
-            compile {
-                // Arrange
-                val typeElement = it.getTypeElement("io.t28.auto.truth.test.User.Type")
-                val typeValueObject = ValueObjectClass(typeElement)
-
-                // Act
-                val actual = typeValueObject.simpleName
-
-                // Assert
-                assertThat(actual).isEqualTo("Type")
-            }.compilesWithoutError()
-        }
-
-        it("should return accessible fields and getters") {
-            compile {
-                // Arrange
-                val userElement = it.getTypeElement("io.t28.auto.truth.test.User")
-                val userValueObject = ValueObjectClass(userElement)
-
-                // Act
-                val actual = userValueObject.properties
-
-                // Assert
-                assertThat(actual).hasSize(4)
-            }
-        }
-
-        it("should return enum constants") {
-            compile {
-                // Arrange
-                val typeElement = it.getTypeElement("io.t28.auto.truth.test.User.Type")
-                val typeValueObject = ValueObjectClass(typeElement)
-
-                // Act
-                val actual = typeValueObject.enumConstants
-
-                // Assert
-                assertThat(actual).hasSize(2)
-            }
         }
     }
 })

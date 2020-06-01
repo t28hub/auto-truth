@@ -19,9 +19,9 @@ package io.t28.auto.truth.test;
 import com.google.common.truth.FailureMetadata;
 import io.t28.auto.truth.AutoSubject;
 
-@AutoSubject(MapProperties.class)
-public class MapPropertiesSubject extends AutoMapPropertiesSubject {
-    public MapPropertiesSubject(FailureMetadata failureMetadata, MapProperties actual) {
+@AutoSubject(GuavaTypes.class)
+public class GuavaTypesSubject extends AutoGuavaTypesSubject {
+    public GuavaTypesSubject(FailureMetadata failureMetadata, GuavaTypes actual) {
         super(failureMetadata, actual);
     }
 }

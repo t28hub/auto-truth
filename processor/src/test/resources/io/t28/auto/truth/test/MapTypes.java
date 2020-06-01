@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Tatsuya Maki
+ * Copyright 2019 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package io.t28.auto.truth.test;
 
-import com.google.common.truth.FailureMetadata;
-import io.t28.auto.truth.AutoSubject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
-@AutoSubject(ArrayProperties.class)
-public class ArrayPropertiesSubject extends AutoArrayPropertiesSubject {
-    public ArrayPropertiesSubject(FailureMetadata failureMetadata, ArrayProperties actual) {
-        super(failureMetadata, actual);
-    }
+public class MapTypes {
+    public Map<String, String> map;
+    public HashMap<String, String> hashMap;
+    public TreeMap<String, String> treeMap;
 }

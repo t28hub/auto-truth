@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,12 @@
 
 package io.t28.auto.truth.test;
 
-public class ArrayProperties {
-    public boolean[] booleans;
-    public byte[] bytes;
-    public short[] shorts;
-    public int[] ints;
-    public long[] longs;
-    public char[] chars;
-    public float[] floats;
-    public double[] doubles;
-    public Object[] objects;
-    public String[] strings;
+import com.google.common.truth.FailureMetadata;
+import io.t28.auto.truth.AutoSubject;
+
+@AutoSubject(OptionalTypes.class)
+public class OptionalTypesSubject extends AutoOptionalTypesSubject {
+    public OptionalTypesSubject(FailureMetadata failureMetadata, OptionalTypes actual) {
+        super(failureMetadata, actual);
+    }
 }

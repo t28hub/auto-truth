@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@
 
 package io.t28.auto.truth.test;
 
-import java.util.Map;
+import com.google.common.truth.FailureMetadata;
+import io.t28.auto.truth.AutoSubject;
 
-public class MapProperties {
-    public Map<String, String> map;
+@AutoSubject(BoxedPrimitiveTypes.class)
+public class BoxedPrimitiveTypesSubject extends AutoBoxedPrimitiveTypesSubject {
+    public BoxedPrimitiveTypesSubject(FailureMetadata failureMetadata, BoxedPrimitiveTypes actual) {
+        super(failureMetadata, actual);
+    }
 }

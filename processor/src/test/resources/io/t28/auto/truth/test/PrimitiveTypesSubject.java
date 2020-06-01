@@ -19,9 +19,6 @@ package io.t28.auto.truth.test;
 import com.google.common.truth.FailureMetadata;
 import io.t28.auto.truth.AutoSubject;
 
-@AutoSubject(StreamProperties.class)
-public class StreamPropertiesSubject extends AutoStreamPropertiesSubject {
-    public StreamPropertiesSubject(FailureMetadata failureMetadata, StreamProperties actual) {
-        super(failureMetadata, actual);
-    }
+@AutoSubject(PrimitiveTypes.class)
+public class PrimitiveTypesSubject {
 }

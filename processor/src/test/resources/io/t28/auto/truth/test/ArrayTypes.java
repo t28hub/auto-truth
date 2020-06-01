@@ -16,6 +16,15 @@
 
 package io.t28.auto.truth.test;
 
-public enum EnumTypes {
-    FOO_BAR, BAZ_QUX
+public class ArrayTypes {
+    public boolean[] booleans;
+    public byte[] bytes;
+    public short[] shorts;
+    public int[] ints;
+    public long[] longs;
+    public char[] chars;
+    public float[] floats;
+    public double[] doubles;
+    public Object[] objects;
+    public String[] strings;
 }
