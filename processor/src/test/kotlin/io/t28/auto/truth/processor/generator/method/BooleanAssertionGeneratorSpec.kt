@@ -32,7 +32,7 @@ object BooleanAssertionGeneratorSpec : Spek({
     describe("BooleanAssertionGenerator") {
         describe("matches") {
             it("should return true when type is boolean") {
-                process(Resource.PrimitiveTypes, Resource.PrimitiveTypesSubject) {
+                process(Resource.PrimitiveTypes) {
                     // Arrange
                     val element = it.getTypeElement(Resource.PrimitiveTypes.qualifiedName)
                     val booleanProperty = element.findFields { field ->
@@ -66,7 +66,7 @@ object BooleanAssertionGeneratorSpec : Spek({
             }
 
             it("should return false when type is non-boolean") {
-                process(Resource.PrimitiveTypes, Resource.PrimitiveTypesSubject) {
+                process(Resource.PrimitiveTypes) {
                     // Arrange
                     val element = it.getTypeElement(Resource.PrimitiveTypes.qualifiedName)
                     val nonBooleanProperty = element.findFields { field ->
@@ -85,7 +85,7 @@ object BooleanAssertionGeneratorSpec : Spek({
 
         describe("generate") {
             it("should generate positive assertion method") {
-                process(Resource.PrimitiveTypes, Resource.PrimitiveTypesSubject) {
+                process(Resource.PrimitiveTypes) {
                     // Arrange
                     val element = it.getTypeElement(Resource.PrimitiveTypes.qualifiedName)
                     val booleanProperty = element.findFields { field ->
@@ -107,7 +107,7 @@ object BooleanAssertionGeneratorSpec : Spek({
             }
 
             it("should generate negative assertion method") {
-                process(Resource.PrimitiveTypes, Resource.PrimitiveTypesSubject) {
+                process(Resource.PrimitiveTypes) {
                     // Arrange
                     val element = it.getTypeElement(Resource.PrimitiveTypes.qualifiedName)
                     val booleanProperty = element.findFields { field ->

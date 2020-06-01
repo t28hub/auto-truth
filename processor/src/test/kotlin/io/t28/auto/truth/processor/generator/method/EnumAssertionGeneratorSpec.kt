@@ -33,7 +33,7 @@ object EnumAssertionGeneratorSpec : Spek({
     describe("EnumAssertionGenerator") {
         describe("matches") {
             it("should return true when given type is EnumConstant") {
-                process(Resource.EnumTypes, Resource.EnumTypesSubject) {
+                process(Resource.EnumTypes) {
                     // Arrange
                     val element = it.getTypeElement(Resource.EnumTypes.qualifiedName)
                     val property = element.findEnumConstants { constant ->
@@ -50,7 +50,7 @@ object EnumAssertionGeneratorSpec : Spek({
             }
 
             it("should return false when given type is not EnumConstant") {
-                process(Resource.EnumTypes, Resource.EnumTypesSubject) {
+                process(Resource.EnumTypes) {
                     // Arrange
                     val element = it.getTypeElement(Resource.EnumTypes.qualifiedName)
                     val property = element.findMethods { method ->
@@ -69,7 +69,7 @@ object EnumAssertionGeneratorSpec : Spek({
 
         describe("generate") {
             it("should generate positive assertion method") {
-                process(Resource.EnumTypes, Resource.EnumTypesSubject) {
+                process(Resource.EnumTypes) {
                     // Arrange
                     val element = it.getTypeElement(Resource.EnumTypes.qualifiedName)
                     val property = element.findEnumConstants { constant ->
@@ -91,7 +91,7 @@ object EnumAssertionGeneratorSpec : Spek({
             }
 
             it("should generate negative assertion method") {
-                process(Resource.EnumTypes, Resource.EnumTypesSubject) {
+                process(Resource.EnumTypes) {
                     // Arrange
                     val element = it.getTypeElement(Resource.EnumTypes.qualifiedName)
                     val property = element.findEnumConstants { constant ->
