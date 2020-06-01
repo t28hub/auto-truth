@@ -17,17 +17,12 @@
 package io.t28.auto.truth.processor.generator
 
 import com.google.common.truth.Subject
-import com.google.common.truth.Truth
-import com.google.testing.compile.CompileTester
-import com.google.testing.compile.JavaFileObjects.forResource
-import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
 import com.squareup.javapoet.ClassName
-import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.processor.data.SubjectClass
 import io.t28.auto.truth.processor.data.ValueObjectClass
-import io.t28.auto.truth.processor.testing.TestContext
-import io.t28.auto.truth.processor.testing.TestProcessor
+import io.t28.auto.truth.processor.testing.Resource
 import io.t28.auto.truth.processor.testing.TypeSpecSubject.Companion.assertThat
+import io.t28.auto.truth.processor.testing.process
 import javax.lang.model.element.Modifier.FINAL
 import javax.lang.model.element.Modifier.PRIVATE
 import javax.lang.model.element.Modifier.PROTECTED
@@ -36,35 +31,20 @@ import javax.lang.model.element.Modifier.STATIC
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
-private fun process(handler: (TestContext) -> Unit): CompileTester {
-    return Truth.assertAbout(javaSources())
-        .that(listOf(
-            forResource("io/t28/auto/truth/test/User.java"),
-            forResource("io/t28/auto/truth/test/UserSubject.java")
-        ))
-        .processedWith(TestProcessor.builder()
-            .annotations(AutoSubject::class)
-            .nextHandler { context ->
-                handler(context)
-                true
-            }
-            .build())
-}
-
 object SubjectClassGeneratorSpec : Spek({
     describe("SubjectClassGenerator") {
         val generator = SubjectClassGenerator()
         describe("generate") {
             it("should return Subject class specification") {
-                process { context ->
+                process(Resource.User, Resource.UserSubject) { context ->
                     // Arrange
                     val input = SubjectClass(
-                        packageName = "io.t28.auto.truth.test",
+                        packageName = Resource.UserSubject.packageName,
                         prefix = "Auto",
                         suffix = "",
-                        element = context.getTypeElement("io.t28.auto.truth.test.UserSubject"),
+                        element = context.getTypeElement(Resource.UserSubject.qualifiedName),
                         valueObject = ValueObjectClass(
-                            element = context.getTypeElement("io.t28.auto.truth.test.User")
+                            element = context.getTypeElement(Resource.User.qualifiedName)
                         )
                     )
 

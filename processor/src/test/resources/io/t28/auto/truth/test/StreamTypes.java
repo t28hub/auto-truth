@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Tatsuya Maki
+ * Copyright 2019 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package io.t28.auto.truth.test;
 
-import com.google.common.truth.FailureMetadata;
-import io.t28.auto.truth.AutoSubject;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
-@AutoSubject(GuavaProperties.class)
-public class GuavaPropertiesSubject extends AutoGuavaPropertiesSubject {
-    public GuavaPropertiesSubject(FailureMetadata failureMetadata, GuavaProperties actual) {
-        super(failureMetadata, actual);
-    }
+public class StreamTypes {
+    public IntStream intStream;
+    public LongStream longStream;
+    public DoubleStream doubleStream;
+    public Stream<String> stringStream;
 }

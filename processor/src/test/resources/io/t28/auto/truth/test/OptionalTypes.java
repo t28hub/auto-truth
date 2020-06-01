@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Tatsuya Maki
+ * Copyright 2019 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
 
 package io.t28.auto.truth.test;
 
-import com.google.common.truth.FailureMetadata;
-import io.t28.auto.truth.AutoSubject;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 
-@AutoSubject(OptionalProperties.class)
-public class OptionalPropertiesSubject extends AutoOptionalPropertiesSubject {
-    public OptionalPropertiesSubject(FailureMetadata failureMetadata, OptionalProperties actual) {
-        super(failureMetadata, actual);
-    }
+public class OptionalTypes {
+    public OptionalInt optionalInt;
+    public OptionalLong optionalLong;
+    public OptionalDouble optionalDouble;
+    public Optional<String> optionalString;
 }

@@ -16,62 +16,26 @@
 
 package io.t28.auto.truth.processor.generator.method
 
-import com.google.common.truth.Truth.assertAbout
 import com.google.common.truth.Truth.assertThat
-import com.google.testing.compile.CompileTester
-import com.google.testing.compile.JavaFileObjects.forSourceString
-import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
 import com.squareup.javapoet.TypeName
-import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
 import io.t28.auto.truth.processor.extensions.findEnumConstants
 import io.t28.auto.truth.processor.extensions.findMethods
 import io.t28.auto.truth.processor.testing.MethodSpecSubject.Companion.assertThat
-import io.t28.auto.truth.processor.testing.TestContext
-import io.t28.auto.truth.processor.testing.TestProcessor
+import io.t28.auto.truth.processor.testing.Resource
+import io.t28.auto.truth.processor.testing.process
 import javax.lang.model.element.Modifier.PUBLIC
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-
-private fun compile(handler: (TestContext) -> Unit): CompileTester {
-    return assertAbout(javaSources())
-        .that(listOf(
-            forSourceString("io.t28.auto.truth.test.EnumTypeSubject", """
-                package io.t28.auto.truth.test;
-            
-                import io.t28.auto.truth.AutoSubject;
-            
-                @AutoSubject(value = EnumType.class)
-                public class EnumTypeSubject {
-                }
-            """.trimIndent()),
-            forSourceString("io.t28.auto.truth.test.EnumType", """
-                package io.t28.auto.truth.test;
-                
-                public enum EnumType {
-                    FOO_BAR,
-                    BAR_BAZ,
-                    BAX_QUX;
-                }
-            """.trimIndent())
-        ))
-        .processedWith(TestProcessor.builder()
-            .annotations(AutoSubject::class)
-            .nextHandler { context ->
-                handler(context)
-                true
-            }
-            .build())
-}
 
 object EnumAssertionGeneratorSpec : Spek({
     describe("EnumAssertionGenerator") {
         describe("matches") {
             it("should return true when given type is EnumConstant") {
-                compile {
+                process(Resource.EnumTypes, Resource.EnumTypesSubject) {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.EnumType")
+                    val element = it.getTypeElement(Resource.EnumTypes.qualifiedName)
                     val property = element.findEnumConstants { constant ->
                         constant.simpleName.contentEquals("FOO_BAR")
                     }.map { constant -> Property.get(constant) }.first()
@@ -86,9 +50,9 @@ object EnumAssertionGeneratorSpec : Spek({
             }
 
             it("should return false when given type is not EnumConstant") {
-                compile {
+                process(Resource.EnumTypes, Resource.EnumTypesSubject) {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.EnumType")
+                    val element = it.getTypeElement(Resource.EnumTypes.qualifiedName)
                     val property = element.findMethods { method ->
                         method.simpleName.contentEquals("values")
                     }.map { method -> Property.get(method) }.first()
@@ -105,9 +69,9 @@ object EnumAssertionGeneratorSpec : Spek({
 
         describe("generate") {
             it("should generate positive assertion method") {
-                compile {
+                process(Resource.EnumTypes, Resource.EnumTypesSubject) {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.EnumType")
+                    val element = it.getTypeElement(Resource.EnumTypes.qualifiedName)
                     val property = element.findEnumConstants { constant ->
                         constant.simpleName.contentEquals("FOO_BAR")
                     }.map { constant -> Property.get(constant) }.first()
@@ -127,9 +91,9 @@ object EnumAssertionGeneratorSpec : Spek({
             }
 
             it("should generate negative assertion method") {
-                compile {
+                process(Resource.EnumTypes, Resource.EnumTypesSubject) {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.EnumType")
+                    val element = it.getTypeElement(Resource.EnumTypes.qualifiedName)
                     val property = element.findEnumConstants { constant ->
                         constant.simpleName.contentEquals("FOO_BAR")
                     }.map { constant -> Property.get(constant) }.first()

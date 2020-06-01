@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,12 @@
 
 package io.t28.auto.truth.test;
 
-public enum EnumTypes {
-    FOO_BAR, BAZ_QUX
+import com.google.common.truth.FailureMetadata;
+import io.t28.auto.truth.AutoSubject;
+
+@AutoSubject(ArrayTypes.class)
+public class ArrayTypesSubject extends AutoArrayTypesSubject {
+    public ArrayTypesSubject(FailureMetadata failureMetadata, ArrayTypes actual) {
+        super(failureMetadata, actual);
+    }
 }

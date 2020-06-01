@@ -16,65 +16,27 @@
 
 package io.t28.auto.truth.processor.generator.method
 
-import com.google.common.truth.Truth.assertAbout
 import com.google.common.truth.Truth.assertThat
-import com.google.testing.compile.CompileTester
-import com.google.testing.compile.JavaFileObjects.forSourceString
-import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
 import com.squareup.javapoet.TypeName
-import io.t28.auto.truth.AutoSubject
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
-import io.t28.auto.truth.processor.extensions.findMethods
+import io.t28.auto.truth.processor.extensions.findFields
 import io.t28.auto.truth.processor.testing.MethodSpecSubject.Companion.assertThat
-import io.t28.auto.truth.processor.testing.TestContext
-import io.t28.auto.truth.processor.testing.TestProcessor
+import io.t28.auto.truth.processor.testing.Resource
+import io.t28.auto.truth.processor.testing.process
 import javax.lang.model.element.Modifier.PUBLIC
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
-
-private fun compile(handler: (TestContext) -> Unit): CompileTester {
-    return assertAbout(javaSources())
-        .that(listOf(
-            forSourceString("io.t28.auto.truth.test.DummySubject", """
-                package io.t28.auto.truth.test;
-            
-                import io.t28.auto.truth.AutoSubject;
-            
-                @AutoSubject(value = Dummy.class)
-                public class DummySubject {
-                }
-            """.trimIndent()),
-            forSourceString("io.t28.auto.truth.test.Dummy", """
-                package io.t28.auto.truth.test;
-                
-                public abstract class Dummy {
-                    public abstract boolean booleanValue();
-                    
-                    public abstract Boolean boxedBooleanValue();
-                    
-                    public abstract String nonBooleanValue();
-                }
-            """.trimIndent())
-        ))
-        .processedWith(TestProcessor.builder()
-            .annotations(AutoSubject::class)
-            .nextHandler { context ->
-                handler(context)
-                true
-            }
-            .build())
-}
 
 object BooleanAssertionGeneratorSpec : Spek({
     describe("BooleanAssertionGenerator") {
         describe("matches") {
             it("should return true when type is boolean") {
-                compile {
+                process(Resource.PrimitiveTypes, Resource.PrimitiveTypesSubject) {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.Dummy")
-                    val booleanProperty = element.findMethods { method ->
-                        method.simpleName.contentEquals("booleanValue")
+                    val element = it.getTypeElement(Resource.PrimitiveTypes.qualifiedName)
+                    val booleanProperty = element.findFields { field ->
+                        field.simpleName.contentEquals("booleanValue")
                     }.map { method -> Property.get(method) }.first()
                     val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
@@ -87,11 +49,11 @@ object BooleanAssertionGeneratorSpec : Spek({
             }
 
             it("should return true when type is boxed boolean") {
-                compile {
+                process(Resource.BoxedPrimitiveTypes) {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.Dummy")
-                    val boxedBooleanProperty = element.findMethods { method ->
-                        method.simpleName.contentEquals("boxedBooleanValue")
+                    val element = it.getTypeElement(Resource.BoxedPrimitiveTypes.qualifiedName)
+                    val boxedBooleanProperty = element.findFields { fields ->
+                        fields.simpleName.contentEquals("booleanValue")
                     }.map { method -> Property.get(method) }.first()
                     val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
@@ -104,11 +66,11 @@ object BooleanAssertionGeneratorSpec : Spek({
             }
 
             it("should return false when type is non-boolean") {
-                compile {
+                process(Resource.PrimitiveTypes, Resource.PrimitiveTypesSubject) {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.Dummy")
-                    val nonBooleanProperty = element.findMethods { method ->
-                        method.simpleName.contentEquals("nonBooleanValue")
+                    val element = it.getTypeElement(Resource.PrimitiveTypes.qualifiedName)
+                    val nonBooleanProperty = element.findFields { field ->
+                        field.simpleName.contentEquals("byteValue")
                     }.map { method -> Property.get(method) }.first()
                     val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
@@ -123,11 +85,11 @@ object BooleanAssertionGeneratorSpec : Spek({
 
         describe("generate") {
             it("should generate positive assertion method") {
-                compile {
+                process(Resource.PrimitiveTypes, Resource.PrimitiveTypesSubject) {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.Dummy")
-                    val booleanProperty = element.findMethods { method ->
-                        method.simpleName.contentEquals("booleanValue")
+                    val element = it.getTypeElement(Resource.PrimitiveTypes.qualifiedName)
+                    val booleanProperty = element.findFields { field ->
+                        field.simpleName.contentEquals("booleanValue")
                     }.map { method -> Property.get(method) }.first()
                     val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
@@ -141,17 +103,17 @@ object BooleanAssertionGeneratorSpec : Spek({
                         hasReturnType(TypeName.VOID)
                         parameters().isEmpty()
                     }
-                }
+                }.compilesWithoutError()
             }
 
             it("should generate negative assertion method") {
-                compile {
+                process(Resource.PrimitiveTypes, Resource.PrimitiveTypesSubject) {
                     // Arrange
-                    val element = it.getTypeElement("io.t28.auto.truth.test.Dummy")
-                    val booleanProperty = element.findMethods { method ->
-                        method.simpleName.contentEquals("booleanValue")
+                    val element = it.getTypeElement(Resource.PrimitiveTypes.qualifiedName)
+                    val booleanProperty = element.findFields { field ->
+                        field.simpleName.contentEquals("booleanValue")
                     }.map { method -> Property.get(method) }.first()
-                    val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
+                    val generator = BooleanAssertionGenerator.NegativeAssertionGenerator(Context.get(it.processingEnv))
 
                     // Act
                     val actual = generator.generate(booleanProperty)
@@ -163,7 +125,7 @@ object BooleanAssertionGeneratorSpec : Spek({
                         hasReturnType(TypeName.VOID)
                         parameters().isEmpty()
                     }
-                }
+                }.compilesWithoutError()
             }
         }
     }

@@ -16,13 +16,12 @@
 
 package io.t28.auto.truth.test;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import com.google.common.base.Optional;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
 
-public class IterableProperties {
-    public Iterable<Object> iterable;
-    public Collection<String> collection;
-    public List<Integer> list;
-    public Set<String> set;
+public class GuavaTypes {
+    public Optional<String> optional;
+    public Multiset<String> multiset;
+    public Multimap<String, String> multimap;
 }

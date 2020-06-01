@@ -16,6 +16,13 @@
 
 package io.t28.auto.truth.test;
 
-public enum EnumTypes {
-    FOO_BAR, BAZ_QUX
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+public class IterableTypes {
+    public Iterable<Object> iterable;
+    public Collection<String> collection;
+    public List<Integer> list;
+    public Set<String> set;
 }

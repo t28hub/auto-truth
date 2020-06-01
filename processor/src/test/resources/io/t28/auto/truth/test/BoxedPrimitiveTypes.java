@@ -16,12 +16,13 @@
 
 package io.t28.auto.truth.test;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
-
-public class GuavaProperties {
-    public Optional<String> optional;
-    public Multiset<String> multiset;
-    public Multimap<String, String> multimap;
+public class BoxedPrimitiveTypes {
+    public Boolean booleanValue;
+    public Byte byteValue;
+    public Character characterValue;
+    public Short shortValue;
+    public Integer integerValue;
+    public Long longValue;
+    public Float floatValue;
+    public Double doubleValue;
 }
