@@ -51,7 +51,7 @@ dependencies {
     kapt("com.google.auto.service:auto-service:$autoServiceVersion")
 
     // JavaPoet
-    implementation("com.squareup:javapoet:1.11.1")
+    implementation("com.squareup:javapoet:1.13.0")
 
     // Spek
     val spekVersion = "2.0.11"
