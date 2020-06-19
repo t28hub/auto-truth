@@ -30,16 +30,10 @@ import java.util.stream.Stream
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
-private val SUPPORTED_CLASSES = arrayOf(
-    Stream::class,
-    IntStream::class,
-    LongStream::class
-)
-
 class StreamSubjectGenerator(context: Context) : Truth8SubjectGenerator(context) {
     override fun matches(type: DeclaredType): Boolean {
         val utils = context.utils
-        return SUPPORTED_CLASSES
+        return arrayOf(Stream::class, IntStream::class, LongStream::class)
             .map { utils.getDeclaredType(it) }
             .any { utils.isAssignableType(type, it) }
     }

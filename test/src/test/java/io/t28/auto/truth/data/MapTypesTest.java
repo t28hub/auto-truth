@@ -1,0 +1,73 @@
+/*
+ * Copyright 2020 Tatsuya Maki
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package io.t28.auto.truth.data;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.truth.MapSubject;
+import com.google.common.truth.Subject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.Truth.assertThat;
+import static io.t28.auto.truth.data.MapTypesSubject.assertThat;
+import static io.t28.auto.truth.data.MapTypesSubject.expectFailure;
+
+class MapTypesTest {
+    private MapTypes underTest;
+
+    @BeforeEach
+    void setup() {
+        underTest = MapTypes.builder()
+            .map(ImmutableMap.of("type", "User"))
+            .sortedMap(ImmutableSortedMap.of(1L, "Alice", 2L, "Bob"))
+            .build();
+    }
+
+    @Test
+    void shouldReturnMapSubject() {
+        // Act
+        final Subject mapSubject = assertThat(underTest).map();
+        final Subject sortedMapSubject = assertThat(underTest).sortedMap();
+
+        // Assert
+        assertThat(mapSubject).isInstanceOf(MapSubject.class);
+        assertThat(sortedMapSubject).isInstanceOf(MapSubject.class);
+    }
+
+    @Test
+    void shouldPassAssertion() {
+        // Assert
+        assertThat(underTest).map().hasSize(1);
+        assertThat(underTest).sortedMap().containsKey(1L);
+        assertThat(underTest).sortedMap().containsEntry(2L, "Bob");
+    }
+
+    @Test
+    void shouldFailAssertion() {
+        // Act
+        final AssertionError error = expectFailure(callback -> {
+            callback.that(underTest).sortedMap().containsEntry(1L, "Charlie");
+        });
+
+        // Assert
+        assertThat(error).factValue("value of").isEqualTo("mapTypes.sortedMap().get(1)");
+        assertThat(error).factValue("expected").isEqualTo("Charlie");
+        assertThat(error).factValue("but was").isEqualTo("Alice");
+    }
+}
