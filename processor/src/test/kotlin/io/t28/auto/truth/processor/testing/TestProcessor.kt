@@ -56,6 +56,9 @@ class TestProcessor private constructor(
     }
 
     override fun process(annotations: Set<TypeElement>, roundEnv: RoundEnvironment): Boolean {
+        if (roundEnv.processingOver()) {
+            return false
+        }
         val context = TestContext(processingEnv, roundEnv, annotations)
         return handlers.map { it(context) }.any()
     }

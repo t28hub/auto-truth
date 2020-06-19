@@ -20,48 +20,25 @@ import com.google.auto.common.AnnotationMirrors
 import com.google.common.truth.Truth.assertAbout
 import com.google.common.truth.Truth.assertThat
 import com.google.testing.compile.CompileTester
-import com.google.testing.compile.JavaFileObjects
 import com.google.testing.compile.JavaSourcesSubjectFactory.javaSources
+import io.t28.auto.truth.processor.testing.Resource.AnnotatedClass
+import io.t28.auto.truth.processor.testing.Resource.CustomAnnotation
 import io.t28.auto.truth.processor.testing.TestProcessor
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.type.TypeMirror
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
-private const val ANNOTATION_CLASS_NAME = "io.t28.auto.truth.test.CustomAnnotation"
-private const val ANNOTATED_CLASS_NAME = "io.t28.auto.truth.test.AnnotatedClass"
-
-private val ANNOTATION_CLASS = JavaFileObjects.forSourceString(ANNOTATION_CLASS_NAME, """
-    package io.t28.auto.truth.test;
-    
-    @interface CustomAnnotation {
-        Class<?> classValue();
-        
-        String stringValue();
-    }
-""".trimIndent())
-
-private val ANNOTATED_CLASS = JavaFileObjects.forSourceString(ANNOTATED_CLASS_NAME, """
-    package io.t28.auto.truth.test;
-    
-    @CustomAnnotation(
-        classValue = String.class,
-        stringValue = "foobarbaz"
-    )
-    class AnnotatedClass {
-    }
-""".trimIndent())
-
 private fun process(handler: (annotationMirror: AnnotationMirror) -> Unit): CompileTester {
     return assertAbout(javaSources())
-        .that(listOf(ANNOTATION_CLASS, ANNOTATED_CLASS))
+        .that(listOf(CustomAnnotation.toJavaFileObject(), AnnotatedClass.toJavaFileObject()))
         .processedWith(TestProcessor.builder()
-            .annotations(ANNOTATION_CLASS_NAME)
+            .annotations(CustomAnnotation.qualifiedName)
             .nextHandler { context ->
-                val annotatedElement = context.getTypeElement(ANNOTATED_CLASS_NAME)
+                val annotatedElement = context.getTypeElement(AnnotatedClass.qualifiedName)
                 val annotationMirror = annotatedElement.annotationMirrors.first { mirror ->
                     val annotationType = mirror.annotationType.asTypeElement()
-                    annotationType.qualifiedName.contentEquals(ANNOTATION_CLASS_NAME)
+                    annotationType.qualifiedName.contentEquals(CustomAnnotation.qualifiedName)
                 }
                 handler(annotationMirror)
                 false
