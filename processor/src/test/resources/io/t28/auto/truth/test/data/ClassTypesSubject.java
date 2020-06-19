@@ -16,14 +16,12 @@
 
 package io.t28.auto.truth.test.data;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.Table;
+import com.google.common.truth.FailureMetadata;
+import io.t28.auto.truth.AutoSubject;
 
-public class GuavaTypes {
-    public Optional<String> optional;
-    public Multiset<String> multiset;
-    public Multimap<String, String> multimap;
-    public Table<String, String, Integer> table;
+@AutoSubject(ClassTypes.class)
+public class ClassTypesSubject extends AutoClassTypesSubject {
+    public ClassTypesSubject(FailureMetadata failureMetadata, ClassTypes actual) {
+        super(failureMetadata, actual);
+    }
 }

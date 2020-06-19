@@ -208,8 +208,10 @@ object AutoTruthProcessorSpec : Spek({
                     fixture(Resource.ArrayTypes, Resource.ArrayTypesSubject, "AutoArrayTypesSubject.class"),
                     fixture(Resource.IterableTypes, Resource.IterableTypesSubject, "AutoIterableTypesSubject.class"),
                     fixture(Resource.MapTypes, Resource.MapTypesSubject, "AutoMapTypesSubject.class"),
+                    fixture(Resource.ClassTypes, Resource.ClassTypesSubject, "AutoClassTypesSubject.class"),
                     fixture(Resource.OptionalTypes, Resource.OptionalTypesSubject, "AutoOptionalTypesSubject.class"),
                     fixture(Resource.StreamTypes, Resource.StreamTypesSubject, "AutoStreamTypesSubject.class"),
+                    fixture(Resource.PathTypes, Resource.PathTypesSubject, "AutoPathTypesSubject.class"),
                     fixture(Resource.EnumTypes, Resource.EnumTypesSubject, "AutoEnumTypesSubject.class"),
                     fixture(Resource.GuavaTypes, Resource.GuavaTypesSubject, "AutoGuavaTypesSubject.class")
                 ).forEach { (valueObject, subject, expected) ->
