@@ -16,19 +16,10 @@
 
 package io.t28.auto.truth.processor.extensions
 
-import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
-import javax.lang.model.util.SimpleElementVisitor8
 
 fun DeclaredType.asTypeElement(): TypeElement {
-    return asElement().accept(object : SimpleElementVisitor8<TypeElement, Unit>() {
-        override fun visitType(element: TypeElement, parameter: Unit): TypeElement {
-            return element
-        }
-
-        override fun defaultAction(element: Element, parameter: Unit): TypeElement {
-            throw IllegalStateException("Element cannot be cast as TypeElement: $element")
-        }
-    }, Unit)
+    // Use cast instead of ElementVisitor, since DeclaredType corresponds to TypeElement
+    return asElement() as TypeElement
 }

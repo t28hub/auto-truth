@@ -17,6 +17,7 @@
 package io.t28.auto.truth.processor.testing
 
 import com.google.testing.compile.JavaFileObjects.forResource
+import com.google.testing.compile.JavaFileObjects.forSourceString
 import java.io.File
 import javax.tools.JavaFileObject
 
@@ -30,7 +31,7 @@ abstract class Resource(val packageName: String = "io.t28.auto.truth.test") {
         private const val JAVA_EXTENSION = ".java"
     }
 
-    fun toJavaFileObject(): JavaFileObject {
+    open fun toJavaFileObject(): JavaFileObject {
         val path = packageName.replace(PACKAGE_SEPARATOR, File.separatorChar)
         return forResource("$path${File.separatorChar}$simpleName$JAVA_EXTENSION")
     }
@@ -75,4 +76,33 @@ abstract class Resource(val packageName: String = "io.t28.auto.truth.test") {
     object PrimitiveTypesSubject : Resource("io.t28.auto.truth.test.data")
     object ValidPrefixUserSubject : Resource("io.t28.auto.truth.test.prefix")
     object ValidSuffixUserSubject : Resource("io.t28.auto.truth.test.suffix")
+
+    object CustomAnnotation : Resource("io.t28.auto.truth.test") {
+        override fun toJavaFileObject(): JavaFileObject {
+            return forSourceString(qualifiedName, """
+                package $packageName;
+    
+                @interface CustomAnnotation {
+                    Class<?> classValue();
+    
+                    String stringValue();
+                }
+            """.trimIndent())
+        }
+    }
+
+    object AnnotatedClass : Resource("io.t28.auto.truth.test") {
+        override fun toJavaFileObject(): JavaFileObject {
+            return forSourceString(qualifiedName, """
+                package $packageName;
+                    
+                @CustomAnnotation(
+                    classValue = String.class,
+                    stringValue = "foobarbaz"
+                )
+                class AnnotatedClass {
+                }
+            """.trimIndent())
+        }
+    }
 }
