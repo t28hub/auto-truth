@@ -23,7 +23,7 @@ plugins {
     kotlin("kapt") version kotlinVersion
     jacoco
     id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
-    id("io.gitlab.arturbosch.detekt") version "1.9.1"
+    id("io.gitlab.arturbosch.detekt") version "1.10.0"
     id("org.sonarqube") version "3.0"
 }
 
