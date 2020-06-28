@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,24 @@
  * limitations under the License.
  */
 
-rootProject.name = "auto-truth"
-include(":annotations")
-include(":processor")
-include(":test")
+package io.t28.auto.truth.data;
+
+import com.google.auto.value.AutoValue;
+
+import java.nio.file.Path;
+
+@AutoValue
+public abstract class PathTypes {
+    public abstract Path path();
+
+    public static Builder builder() {
+        return new AutoValue_PathTypes.Builder();
+    }
+
+    @AutoValue.Builder
+    public static abstract class Builder {
+        public abstract Builder path(Path path);
+
+        public abstract PathTypes build();
+    }
+}

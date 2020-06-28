@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Tatsuya Maki
+ * Copyright 2020 Tatsuya Maki
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,21 @@
  * limitations under the License.
  */
 
-rootProject.name = "auto-truth"
-include(":annotations")
-include(":processor")
-include(":test")
+package io.t28.auto.truth.data;
+
+import com.google.common.truth.Subject;
+import org.junit.jupiter.api.Test;
+
+import static com.google.common.truth.Truth.assertThat;
+import static io.t28.auto.truth.data.NoTypesSubject.assertThat;
+
+class NoTypesTest {
+    @Test
+    void shouldGenerateNoAssertionMethod() {
+        // Act
+        final Subject subject = assertThat(new NoTypes());
+
+        // Assert
+        assertThat(subject).isNotNull();
+    }
+}
