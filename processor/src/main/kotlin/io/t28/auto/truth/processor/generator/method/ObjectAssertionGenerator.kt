@@ -16,6 +16,7 @@
 
 package io.t28.auto.truth.processor.generator.method
 
+import com.google.common.base.Preconditions
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
@@ -41,7 +42,8 @@ class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
         return MethodSpec.methodBuilder("has${input.name.capitalize()}").apply {
             addModifiers(PUBLIC)
             addParameter(ParameterSpec.builder(TypeName.get(input.type), "expected").build())
-            addStatement("check(\$S).that(this.\$L.\$L).isEqualTo(\$L)", input.symbol, "actual", input.symbol, "expected")
+            addStatement("final \$T actual = \$T.checkNotNull(this.actual).\$L", input.type, Preconditions::class.java, input.symbol)
+            addStatement("check(\$S).that(actual).isEqualTo(\$L)", input.symbol, "expected")
         }.build()
     }
 
@@ -49,7 +51,6 @@ class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
         // Following classes are handled by other generators
         private val IGNORED_CLASSES = arrayOf(
             java.lang.Void::class,
-            java.lang.Boolean::class,
             java.lang.Class::class,
             java.lang.Iterable::class,
             java.util.Map::class,

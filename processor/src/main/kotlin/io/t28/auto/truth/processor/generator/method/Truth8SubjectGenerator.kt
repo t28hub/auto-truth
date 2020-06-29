@@ -16,6 +16,7 @@
 
 package io.t28.auto.truth.processor.generator.method
 
+import com.google.common.base.Preconditions
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
@@ -41,7 +42,8 @@ abstract class Truth8SubjectGenerator(protected val context: Context) : MethodGe
         return MethodSpec.methodBuilder(input.name.decapitalize()).apply {
             returns(subjectClass)
             addModifiers(Modifier.PUBLIC)
-            addStatement("return check(\$S).about(\$T.\$L).that(\$L.\$L)", symbol, subjectClass, factoryMethod, "actual", symbol)
+            addStatement("final \$T actual = \$T.checkNotNull(this.actual).\$L", input.type, Preconditions::class.java, symbol)
+            addStatement("return check(\$S).about(\$T.\$L).that(actual)", symbol, subjectClass, factoryMethod)
         }.build()
     }
 
