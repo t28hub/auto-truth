@@ -25,21 +25,24 @@ repositories {
 
 dependencies {
     // AutoValue
-    val autoValueVersion = "1.7.3"
+    val autoValueVersion: String by rootProject.extra
     implementation("com.google.auto.value:auto-value-annotations:$autoValueVersion")
     annotationProcessor("com.google.auto.value:auto-value:$autoValueVersion")
 
     // Guava
-    implementation("com.google.guava:guava:29.0-jre")
+    val guavaVersion: String by rootProject.extra
+    implementation("com.google.guava:guava:$guavaVersion")
 
     // JSR305
-    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+    val jsr305Version: String by rootProject.extra
+    implementation("com.google.code.findbugs:jsr305:$jsr305Version")
 
     // JUnit
-    testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
+    val junitVersion: String by rootProject.extra
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
 
     // Truth
-    val truthVersion = "1.0.1"
+    val truthVersion: String by rootProject.extra
     testImplementation("com.google.truth:truth:$truthVersion")
     testImplementation("com.google.truth.extensions:truth-java8-extension:$truthVersion")
 
