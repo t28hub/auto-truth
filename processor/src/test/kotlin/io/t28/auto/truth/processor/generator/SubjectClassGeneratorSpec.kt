@@ -69,10 +69,6 @@ object SubjectClassGeneratorSpec : Spek({
                             modifiers().containsExactly(PUBLIC, STATIC)
                             parameters().hasSize(1)
                         }
-                        methodSpec { method -> method.name == "user" }.apply {
-                            modifiers().containsExactly(PUBLIC, STATIC)
-                            parameters().isEmpty()
-                        }
                     }
                 }.compilesWithoutError()
             }

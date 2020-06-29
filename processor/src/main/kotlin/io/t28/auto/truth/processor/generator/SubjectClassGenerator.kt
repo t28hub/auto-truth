@@ -24,7 +24,6 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
-import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
 import io.t28.auto.truth.processor.AutoTruthProcessor
@@ -53,7 +52,6 @@ class SubjectClassGenerator(
             addFields(generateFields(input))
             addMethod(generateConstructor(input))
             addMethod(generateAssertThat(input))
-            addMethod(generateFactory(input))
             addMethods(generateAssertions(input))
         }.build()
     }
@@ -100,19 +98,7 @@ class SubjectClassGenerator(
             addParameter(ParameterSpec.builder(valueObjectType, "actual").apply {
                 addAnnotation(Nullable::class.java)
             }.build())
-            addStatement("return \$T.assertAbout(\$L()).that(\$L)", Truth::class.java, valueObject.simpleName.decapitalize(), "actual")
-        }.build()
-    }
-
-    private fun generateFactory(input: SubjectClass): MethodSpec {
-        val valueObject = input.valueObject
-        val valueObjectType = TypeName.get(valueObject.type)
-        val className = ClassName.get(input.packageName, input.simpleName)
-        return MethodSpec.methodBuilder(valueObject.simpleName.decapitalize()).apply {
-            returns(ParameterizedTypeName.get(ClassName.get(Subject.Factory::class.java), className, valueObjectType))
-            addModifiers(PUBLIC, STATIC)
-            addAnnotation(Nonnull::class.java)
-            addStatement("return \$T::new", className)
+            addStatement("return \$T.assertAbout(\$T::new).that(\$L)", Truth::class.java, className, "actual")
         }.build()
     }
 
