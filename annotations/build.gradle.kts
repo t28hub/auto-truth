@@ -19,6 +19,10 @@ plugins {
 }
 
 dependencies {
-    api("javax.annotation:javax.annotation-api:1.3.2")
-    api("com.google.code.findbugs:jsr305:3.0.2")
+    // Java
+    val javaxAnnotationVersion: String by rootProject.extra
+    api("javax.annotation:javax.annotation-api:$javaxAnnotationVersion")
+
+    val jsr305Version: String by rootProject.extra
+    api("com.google.code.findbugs:jsr305:$jsr305Version")
 }

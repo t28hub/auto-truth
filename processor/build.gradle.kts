@@ -22,6 +22,7 @@ plugins {
     kotlin("jvm") version kotlinVersion
     kotlin("kapt") version kotlinVersion
     jacoco
+    `java-library`
     id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
     id("io.gitlab.arturbosch.detekt") version "1.10.0"
     id("org.sonarqube") version "3.0"
@@ -38,33 +39,31 @@ dependencies {
     implementation(kotlin("reflect"))
 
     // Truth
-    val truthVersion = "1.0.1"
+    val truthVersion: String by rootProject.extra
     implementation("com.google.truth:truth:$truthVersion")
     implementation("com.google.truth.extensions:truth-java8-extension:$truthVersion")
-
-    // AutoTruth
     implementation(project(":annotations"))
 
     // AutoService
-    val autoServiceVersion = "1.0-rc7"
+    val autoServiceVersion: String by rootProject.extra
     implementation("com.google.auto.service:auto-service-annotations:$autoServiceVersion")
     kapt("com.google.auto.service:auto-service:$autoServiceVersion")
 
     // JavaPoet
-    implementation("com.squareup:javapoet:1.13.0")
+    val javapoetVersion: String by rootProject.extra
+    implementation("com.squareup:javapoet:$javapoetVersion")
 
-    // Spek
-    val spekVersion = "2.0.11"
+    // Testing
+    val spekVersion: String by rootProject.extra
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
 
-    // Compile Testing
-    testImplementation("com.google.testing.compile:compile-testing:0.18")
+    val compileTestingVersion: String by rootProject.extra
+    testImplementation("com.google.testing.compile:compile-testing:$compileTestingVersion")
 
-    // Mockito
-    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    val mockitoVersion: String by rootProject.extra
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoVersion")
 
-    // Compiler Tree API
     testImplementation(files(Jvm.current().toolsJar))
 }
 

@@ -14,19 +14,32 @@
  * limitations under the License.
  */
 
+val kotlinVersion by extra { "1.3.72" }
+val jsr305Version by extra { "3.0.2" }
+val javaxAnnotationVersion by extra { "1.3.2" }
+val truthVersion by extra { "1.0.1" }
+val guavaVersion by extra { "29.0-jre" }
+val autoValueVersion by extra { "1.7.3" }
+val autoServiceVersion by extra { "1.0-rc7" }
+val javapoetVersion by extra { "1.13.0" }
+val spekVersion by extra { "2.0.11" }
+val junitVersion by extra { "5.6.2" }
+val mockitoVersion by extra { "2.2.0" }
+val compileTestingVersion by extra { "0.18" }
+
 subprojects {
     apply(plugin = "java")
 
     group = "io.t28.auto.truth"
     version = "1.0.0-SNAPSHOT"
 
-    configure<JavaPluginConvention> {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
     repositories {
         mavenCentral()
         jcenter()
+    }
+
+    configure<JavaPluginConvention> {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
