@@ -18,6 +18,31 @@ package io.t28.auto.truth.processor.extensions
 
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
+import javax.lang.model.type.TypeMirror
+import javax.lang.model.util.SimpleTypeVisitor8
+
+fun TypeMirror.isBoxedPrimitive(): Boolean {
+    return accept(object : SimpleTypeVisitor8<Boolean, Void>() {
+        override fun visitDeclared(type: DeclaredType, p: Void?): Boolean {
+            val typeElement = type.asTypeElement()
+            return when ("${typeElement.qualifiedName}") {
+                "java.lang.Boolean" -> true
+                "java.lang.Byte" -> true
+                "java.lang.Character" -> true
+                "java.lang.Short" -> true
+                "java.lang.Integer" -> true
+                "java.lang.Long" -> true
+                "java.lang.Float" -> true
+                "java.lang.Double" -> true
+                else -> false
+            }
+        }
+
+        override fun defaultAction(type: TypeMirror, p: Void?): Boolean {
+            return false
+        }
+    }, null)
+}
 
 fun DeclaredType.asTypeElement(): TypeElement {
     // Use cast instead of ElementVisitor, since DeclaredType corresponds to TypeElement

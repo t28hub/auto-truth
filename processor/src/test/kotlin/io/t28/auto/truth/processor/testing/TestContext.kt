@@ -19,23 +19,12 @@ package io.t28.auto.truth.processor.testing
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
 import javax.lang.model.element.TypeElement
-import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.PrimitiveType
-import javax.lang.model.type.TypeKind
 
 data class TestContext(
     val processingEnv: ProcessingEnvironment,
     val roundEnv: RoundEnvironment,
     val annotations: Set<TypeElement>
 ) {
-    fun getPrimitiveType(kind: TypeKind): PrimitiveType {
-        return processingEnv.typeUtils.getPrimitiveType(kind)
-    }
-
-    fun getDeclaredType(name: String): DeclaredType {
-        return processingEnv.typeUtils.getDeclaredType(getTypeElement(name))
-    }
-
     fun getTypeElement(name: String): TypeElement {
         return processingEnv.elementUtils.getTypeElement(name)
     }

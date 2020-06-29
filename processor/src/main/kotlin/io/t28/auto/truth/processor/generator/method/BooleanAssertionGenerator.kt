@@ -16,11 +16,13 @@
 
 package io.t28.auto.truth.processor.generator.method
 
+import com.google.common.base.Preconditions
 import com.google.common.truth.Fact
 import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.MethodSpec
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
+import io.t28.auto.truth.processor.extensions.isBoxedPrimitive
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.PrimitiveType
@@ -45,6 +47,10 @@ sealed class BooleanAssertionGenerator(protected val context: Context) : MethodG
         context.logger.debug(input.element, "Generating an assertion method for boolean and Boolean")
         return MethodSpec.methodBuilder(generateName(input)).apply {
             addModifiers(Modifier.PUBLIC)
+            addStatement("\$T.checkNotNull(\$L)", Preconditions::class.java, "actual")
+            if (input.type.isBoxedPrimitive()) {
+                addCode(generateNullCheckCode(input))
+            }
             addCode(generateCode(input))
         }.build()
     }
@@ -53,6 +59,18 @@ sealed class BooleanAssertionGenerator(protected val context: Context) : MethodG
 
     protected abstract fun generateCode(input: Property): CodeBlock
 
+    protected abstract fun generateExpectedFact(input: Property): CodeBlock
+
+    private fun generateNullCheckCode(input: Property): CodeBlock {
+        return CodeBlock.builder().apply {
+            beginControlFlow("if (\$L.\$L == null)", "actual", input.symbol).apply {
+                addStatement("failWithActual(\$L)", generateExpectedFact(input))
+                addStatement("return")
+            }
+            endControlFlow()
+        }.build()
+    }
+
     class PositiveAssertionGenerator(context: Context) : BooleanAssertionGenerator(context) {
         override fun generateName(input: Property): String {
             return "is${input.name.capitalize()}"
@@ -60,11 +78,15 @@ sealed class BooleanAssertionGenerator(protected val context: Context) : MethodG
 
         override fun generateCode(input: Property): CodeBlock {
             return CodeBlock.builder().apply {
-                beginControlFlow("if (!this.\$L.\$L)", "actual", input.symbol).apply {
-                    addStatement("failWithActual(\$T.simpleFact(\$S))", Fact::class.java, "expected to be ${input.name}")
+                beginControlFlow("if (!\$L.\$L)", "actual", input.symbol).apply {
+                    addStatement("failWithActual(\$L)", generateExpectedFact(input))
                 }
                 endControlFlow()
             }.build()
+        }
+
+        override fun generateExpectedFact(input: Property): CodeBlock {
+            return CodeBlock.of("\$T.simpleFact(\$S)", Fact::class.java, "expected to be ${input.name}")
         }
     }
 
@@ -75,11 +97,15 @@ sealed class BooleanAssertionGenerator(protected val context: Context) : MethodG
 
         override fun generateCode(input: Property): CodeBlock {
             return CodeBlock.builder().apply {
-                beginControlFlow("if (this.\$L.\$L)", "actual", input.symbol).apply {
-                    addStatement("failWithActual(\$T.simpleFact(\$S))", Fact::class.java, "expected not to be ${input.name}")
+                beginControlFlow("if (\$L.\$L)", "actual", input.symbol).apply {
+                    addStatement("failWithActual(\$L)", generateExpectedFact(input))
                 }
                 endControlFlow()
             }.build()
+        }
+
+        override fun generateExpectedFact(input: Property): CodeBlock {
+            return CodeBlock.of("\$T.simpleFact(\$S)", Fact::class.java, "expected not to be ${input.name}")
         }
     }
 }

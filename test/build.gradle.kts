@@ -32,6 +32,9 @@ dependencies {
     // Guava
     implementation("com.google.guava:guava:29.0-jre")
 
+    // JSR305
+    compileOnly("com.google.code.findbugs:jsr305:3.0.2")
+
     // JUnit
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
 

@@ -16,6 +16,7 @@
 
 package io.t28.auto.truth.processor.generator.method
 
+import com.google.common.base.Preconditions
 import com.squareup.javapoet.CodeBlock
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
@@ -50,6 +51,7 @@ sealed class IterableAssertionGenerator(protected val context: Context) : Method
             addModifiers(Modifier.PUBLIC)
             addParameter(ParameterSpec.builder(TypeName.get(parameterType), "expected").build())
             varargs(true)
+            addStatement("\$T.checkNotNull(\$L)", Preconditions::class.java, "actual")
             addCode(generateCode(input))
         }.build()
     }

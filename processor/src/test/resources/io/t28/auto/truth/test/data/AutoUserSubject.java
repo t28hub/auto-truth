@@ -16,6 +16,7 @@
 
 package io.t28.auto.truth.test.data;
 
+import com.google.common.base.Preconditions;
 import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
@@ -41,25 +42,30 @@ public class AutoUserSubject extends Subject {
     }
 
     public void hasId(long expected) {
-        check("getId()").that(this.actual.getId()).isEqualTo(expected);
+        final long actual = Preconditions.checkNotNull(this.actual).getId();
+        check("getId()").that(actual).isEqualTo(expected);
     }
 
     public void hasName(String expected) {
-        check("getName()").that(this.actual.getName()).isEqualTo(expected);
+        final String actual = Preconditions.checkNotNull(this.actual).getName();
+        check("getName()").that(actual).isEqualTo(expected);
     }
 
     public void hasAge(int expected) {
-        check("getAge()").that(this.actual.getAge()).isEqualTo(expected);
+        final int actual = Preconditions.checkNotNull(this.actual).getAge();
+        check("getAge()").that(actual).isEqualTo(expected);
     }
 
     public void isAdmin() {
-        if (!this.actual.isAdmin()) {
+        Preconditions.checkNotNull(actual);
+        if (!actual.isAdmin()) {
             failWithActual(Fact.simpleFact("expected to be admin"));
         }
     }
 
     public void isNotAdmin() {
-        if (this.actual.isAdmin()) {
+        Preconditions.checkNotNull(actual);
+        if (actual.isAdmin()) {
             failWithActual(Fact.simpleFact("expected not to be admin"));
         }
     }
