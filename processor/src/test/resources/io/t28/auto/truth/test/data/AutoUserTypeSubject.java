@@ -36,12 +36,7 @@ public class AutoUserTypeSubject extends Subject {
 
     @Nonnull
     public static AutoUserTypeSubject assertThat(@Nullable User.Type actual) {
-        return Truth.assertAbout(type()).that(actual);
-    }
-
-    @Nonnull
-    public static Subject.Factory<AutoUserTypeSubject, User.Type> type() {
-        return AutoUserTypeSubject::new;
+        return Truth.assertAbout(AutoUserTypeSubject::new).that(actual);
     }
 
     public void isGuest() {

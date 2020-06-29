@@ -37,12 +37,7 @@ public class AutoUserSubject extends Subject {
 
     @Nonnull
     public static AutoUserSubject assertThat(@Nullable User actual) {
-        return Truth.assertAbout(user()).that(actual);
-    }
-
-    @Nonnull
-    public static Subject.Factory<AutoUserSubject, User> user() {
-        return AutoUserSubject::new;
+        return Truth.assertAbout(AutoUserSubject::new).that(actual);
     }
 
     public void hasId(long expected) {
