@@ -30,8 +30,8 @@ val compileTestingVersion by extra { "0.18" }
 subprojects {
     apply(plugin = "java")
 
-    group = "io.t28.auto.truth"
-    version = "1.0.0-SNAPSHOT"
+    group = "io.t28.auto"
+    version = "0.0.1-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -41,5 +41,20 @@ subprojects {
     configure<JavaPluginConvention> {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    plugins.withId("maven-publish") {
+        configure<PublishingExtension> {
+            repositories {
+                maven {
+                    name = project.name
+                    url = uri("https://maven.pkg.github.com/t28hub/auto-truth")
+                    credentials {
+                        username = System.getenv("GITHUB_ACTOR")
+                        password = System.getenv("GITHUB_TOKEN")
+                    }
+                }
+            }
+        }
     }
 }
