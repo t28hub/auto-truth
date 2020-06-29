@@ -16,6 +16,7 @@
 
 plugins {
     `java-library`
+    `maven-publish`
 }
 
 dependencies {
@@ -25,4 +26,14 @@ dependencies {
 
     val jsr305Version: String by rootProject.extra
     api("com.google.code.findbugs:jsr305:$jsr305Version")
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("maven") {
+            group = project.group
+            artifactId = "auto-truth-annotations"
+            version = "${project.version}"
+        }
+    }
 }

@@ -23,6 +23,7 @@ plugins {
     kotlin("kapt") version kotlinVersion
     jacoco
     `java-library`
+    `maven-publish`
     id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
     id("io.gitlab.arturbosch.detekt") version "1.10.0"
     id("org.sonarqube") version "3.0"
@@ -129,5 +130,15 @@ sonarqube {
         property("sonar.projectKey", "io.t28.auto.truth")
         property("sonar.projectName", "auto-truth")
         property("sonar.jacoco.reportPaths", "build/jacoco/test.exec")
+    }
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("maven") {
+            group = project.group
+            artifactId = "auto-truth-processor"
+            version = "${project.version}"
+        }
     }
 }
