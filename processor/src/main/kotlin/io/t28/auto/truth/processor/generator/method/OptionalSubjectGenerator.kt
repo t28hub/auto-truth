@@ -23,7 +23,8 @@ import com.google.common.truth.OptionalSubject
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
-import io.t28.auto.truth.processor.utils.getDeclaredType
+import io.t28.auto.truth.processor.utils.TypeUtils
+import io.t28.auto.truth.processor.utils.isAssignable
 import java.lang.IllegalArgumentException
 import java.util.Optional
 import java.util.OptionalDouble
@@ -39,12 +40,14 @@ private val SUPPORTED_CLASSES = arrayOf(
     OptionalDouble::class
 )
 
-class OptionalSubjectGenerator(context: Context) : Truth8SubjectGenerator(context) {
+class OptionalSubjectGenerator(
+    context: Context,
+    private val utils: TypeUtils = context.utils
+) : Truth8SubjectGenerator(context) {
     override fun matches(type: DeclaredType): Boolean {
-        val utils = context.utils
         return SUPPORTED_CLASSES
-            .map { utils.getDeclaredType(it) }
-            .any { utils.isAssignableType(type, it) }
+            .mapNotNull { supportedClass -> utils.getDeclaredType(supportedClass) }
+            .any { supportedType -> utils.isAssignableType(type, supportedType) }
     }
 
     override fun factoryMethodName(type: TypeMirror): String {
@@ -72,23 +75,12 @@ class OptionalSubjectGenerator(context: Context) : Truth8SubjectGenerator(contex
     }
 
     private fun <R : Any> TypeMirror.accept(visitor: OptionalTypeVisitor<R>): R {
-        val utils = context.utils
         return when {
-            utils.isAssignableType(this, utils.getDeclaredType<Optional<*>>()) -> {
-                visitor.visitOptional(this)
-            }
-            utils.isAssignableType(this, utils.getDeclaredType<OptionalInt>()) -> {
-                visitor.visitOptionalInt(this)
-            }
-            utils.isAssignableType(this, utils.getDeclaredType<OptionalLong>()) -> {
-                visitor.visitOptionalLong(this)
-            }
-            utils.isAssignableType(this, utils.getDeclaredType<OptionalDouble>()) -> {
-                visitor.visitOptionalDouble(this)
-            }
-            else -> {
-                throw IllegalArgumentException("Unsupported type and not Optional: $this")
-            }
+            utils.isAssignable<Optional<*>>(this) -> visitor.visitOptional(this)
+            utils.isAssignable<OptionalInt>(this) -> visitor.visitOptionalInt(this)
+            utils.isAssignable<OptionalLong>(this) -> visitor.visitOptionalLong(this)
+            utils.isAssignable<OptionalDouble>(this) -> visitor.visitOptionalDouble(this)
+            else -> throw IllegalArgumentException("Unsupported and non-Optional type: $this")
         }
     }
 

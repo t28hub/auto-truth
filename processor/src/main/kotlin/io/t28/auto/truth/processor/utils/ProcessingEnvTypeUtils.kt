@@ -36,15 +36,17 @@ class ProcessingEnvTypeUtils(private val types: Types, private val elements: Ele
         return types.getArrayType(componentType)
     }
 
-    override fun getDeclaredType(type: KClass<*>): DeclaredType {
+    override fun getDeclaredType(type: KClass<*>): DeclaredType? {
         val typeArgs = type.typeParameters.map {
             types.getWildcardType(null, null)
         }.toTypedArray()
-        val element = elements.getTypeElement(type.java.canonicalName)
-        return try {
-            types.getDeclaredType(element, *typeArgs)
-        } catch (e: IllegalArgumentException) {
-            types.getDeclaredType(element)
+
+        return elements.getTypeElement(type.java.canonicalName)?.let { element ->
+            return try {
+                types.getDeclaredType(element, *typeArgs)
+            } catch (e: IllegalArgumentException) {
+                types.getDeclaredType(element)
+            }
         }
     }
 }

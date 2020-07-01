@@ -23,12 +23,18 @@ import com.squareup.javapoet.MethodSpec
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
 import io.t28.auto.truth.processor.extensions.isBoxedPrimitive
+import io.t28.auto.truth.processor.log.Logger
+import io.t28.auto.truth.processor.utils.TypeUtils
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind
 
-sealed class BooleanAssertionGenerator(protected val context: Context) : MethodGenerator {
+sealed class BooleanAssertionGenerator(
+    protected val context: Context,
+    private val utils: TypeUtils = context.utils,
+    private val logger: Logger = context.logger
+) : MethodGenerator {
     final override fun matches(property: Property): Boolean {
         return object : SupportedTypeMatcher<Void?>() {
             override fun visitPrimitive(type: PrimitiveType, p: Void?): Boolean {
@@ -36,15 +42,17 @@ sealed class BooleanAssertionGenerator(protected val context: Context) : MethodG
             }
 
             override fun visitDeclared(type: DeclaredType, p: Void?): Boolean {
-                val boxedBooleanType = context.utils.getDeclaredType(java.lang.Boolean::class)
-                return context.utils.isAssignableType(type, boxedBooleanType)
+                return utils.getDeclaredType(java.lang.Boolean::class)?.let { booleanType ->
+                    utils.isAssignableType(type, booleanType)
+                } ?: false
             }
         }.visit(property.type)
     }
 
     final override fun generate(input: Property): MethodSpec {
         require(matches(input))
-        context.logger.debug(input.element, "Generating an assertion method for boolean and Boolean")
+        logger.debug(input.element, "Generating an assertion method for boolean and Boolean")
+
         return MethodSpec.methodBuilder(generateName(input)).apply {
             addModifiers(Modifier.PUBLIC)
             addStatement("\$T.checkNotNull(\$L)", Preconditions::class.java, "actual")

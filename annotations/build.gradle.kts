@@ -30,10 +30,11 @@ dependencies {
 
 publishing {
     publications {
-        register<MavenPublication>("maven") {
+        register<MavenPublication>("gpr") {
             group = project.group
             artifactId = "auto-truth-annotations"
             version = "${project.version}"
+            from(components["java"])
         }
     }
 }

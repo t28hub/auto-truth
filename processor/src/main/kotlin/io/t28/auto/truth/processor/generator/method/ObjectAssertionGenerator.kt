@@ -80,8 +80,8 @@ class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
 
             val utils = context.utils
             return IGNORED_CLASSES
-                .map { utils.getDeclaredType(it) }
-                .all { !utils.isAssignableType(type, it) }
+                .mapNotNull { ignoredClass -> utils.getDeclaredType(ignoredClass) }
+                .all { ignoredType -> !utils.isAssignableType(type, ignoredType) }
         }
 
         override fun visitError(type: ErrorType, context: Context): Boolean {

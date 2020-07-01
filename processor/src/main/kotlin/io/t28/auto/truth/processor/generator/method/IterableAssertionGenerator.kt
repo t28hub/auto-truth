@@ -23,6 +23,7 @@ import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
+import io.t28.auto.truth.processor.utils.isAssignable
 import java.util.Arrays
 import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
@@ -31,8 +32,7 @@ sealed class IterableAssertionGenerator(protected val context: Context) : Method
     override fun matches(property: Property): Boolean {
         return object : SupportedTypeMatcher<Void?>() {
             override fun visitDeclared(type: DeclaredType, p: Void?): Boolean {
-                val iterableType = context.utils.getDeclaredType(Iterable::class)
-                if (!context.utils.isAssignableType(type, iterableType)) {
+                if (!context.utils.isAssignable<Iterable<*>>(type)) {
                     return false
                 }
                 return type.typeArguments.size == 1

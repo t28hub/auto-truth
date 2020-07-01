@@ -93,7 +93,6 @@ class AutoTruthProcessor : AbstractProcessor() {
             .filterIsInstance<TypeElement>()
             .forEach { element ->
                 logger.debug(element, "Found annotated class: %s", element.simpleName)
-                @Suppress("TooGenericExceptionCaught")
                 try {
                     val subjectClass = processor.process(element)
                     val typeSpec = generator.generate(subjectClass)
@@ -103,8 +102,6 @@ class AutoTruthProcessor : AbstractProcessor() {
                         .build().writeTo(processingEnv.filer)
                 } catch (e: ProcessingException) {
                     logger.error(e.element, e.message)
-                } catch (e: Exception) {
-                    logger.error(element, "Failed to compile: %s", "${e.message}")
                 }
             }
         return true

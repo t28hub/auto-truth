@@ -22,7 +22,8 @@ import com.google.common.truth.StreamSubject
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
-import io.t28.auto.truth.processor.utils.getDeclaredType
+import io.t28.auto.truth.processor.utils.TypeUtils
+import io.t28.auto.truth.processor.utils.isAssignable
 import java.lang.IllegalArgumentException
 import java.util.stream.IntStream
 import java.util.stream.LongStream
@@ -30,12 +31,14 @@ import java.util.stream.Stream
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
-class StreamSubjectGenerator(context: Context) : Truth8SubjectGenerator(context) {
+class StreamSubjectGenerator(
+    context: Context,
+    private val utils: TypeUtils = context.utils
+) : Truth8SubjectGenerator(context) {
     override fun matches(type: DeclaredType): Boolean {
-        val utils = context.utils
         return arrayOf(Stream::class, IntStream::class, LongStream::class)
-            .map { utils.getDeclaredType(it) }
-            .any { utils.isAssignableType(type, it) }
+            .mapNotNull { supportedClass -> utils.getDeclaredType(supportedClass) }
+            .any { supportedType -> utils.isAssignableType(type, supportedType) }
     }
 
     override fun factoryMethodName(type: TypeMirror): String {
@@ -59,20 +62,11 @@ class StreamSubjectGenerator(context: Context) : Truth8SubjectGenerator(context)
     }
 
     private fun <R : Any> TypeMirror.accept(visitor: StreamTypeVisitor<R>): R {
-        val utils = context.utils
         return when {
-            utils.isAssignableType(this, utils.getDeclaredType<Stream<*>>()) -> {
-                visitor.visitStream(this)
-            }
-            utils.isAssignableType(this, utils.getDeclaredType<IntStream>()) -> {
-                visitor.visitIntStream(this)
-            }
-            utils.isAssignableType(this, utils.getDeclaredType<LongStream>()) -> {
-                visitor.visitLongStream(this)
-            }
-            else -> {
-                throw IllegalArgumentException("Unsupported type and not Stream: $this")
-            }
+            utils.isAssignable<Stream<*>>(this) -> visitor.visitStream(this)
+            utils.isAssignable<IntStream>(this) -> visitor.visitIntStream(this)
+            utils.isAssignable<LongStream>(this) -> visitor.visitLongStream(this)
+            else -> throw IllegalArgumentException("Unsupported and non-Stream type: $this")
         }
     }
 

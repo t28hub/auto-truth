@@ -135,10 +135,11 @@ sonarqube {
 
 publishing {
     publications {
-        register<MavenPublication>("maven") {
+        register<MavenPublication>("gpr") {
             group = project.group
             artifactId = "auto-truth-processor"
             version = "${project.version}"
+            from(components["java"])
         }
     }
 }
