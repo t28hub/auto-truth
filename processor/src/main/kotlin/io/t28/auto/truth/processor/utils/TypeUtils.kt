@@ -28,9 +28,11 @@ interface TypeUtils {
 
     fun getArrayType(componentType: TypeMirror): ArrayType
 
-    fun getDeclaredType(type: KClass<*>): DeclaredType
+    fun getDeclaredType(type: KClass<*>): DeclaredType?
 }
 
-inline fun <reified T : Any> TypeUtils.getDeclaredType(): DeclaredType {
-    return getDeclaredType(T::class)
+inline fun <reified T : Any> TypeUtils.isAssignable(type: TypeMirror): Boolean {
+    return getDeclaredType(T::class)?.let { declaredType ->
+        isAssignableType(type, declaredType)
+    } ?: false
 }

@@ -21,13 +21,13 @@ import com.google.common.truth.GuavaOptionalSubject
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
+import io.t28.auto.truth.processor.utils.isAssignable
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 class GuavaOptionalSubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
     override fun matches(type: DeclaredType): Boolean {
-        val optionalType = context.utils.getDeclaredType(Optional::class)
-        return context.utils.isAssignableType(type, optionalType)
+        return context.utils.isAssignable<Optional<*>>(type)
     }
 
     override fun subjectClass(type: TypeMirror): TypeName {

@@ -20,13 +20,16 @@ import com.google.common.truth.ClassSubject
 import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
+import io.t28.auto.truth.processor.utils.TypeUtils
+import io.t28.auto.truth.processor.utils.isAssignable
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
 
 class ClassSubjectGenerator(context: Context) : TruthSubjectGenerator(context) {
+    private val typeUtils: TypeUtils = context.utils
+
     override fun matches(type: DeclaredType): Boolean {
-        val classType = context.utils.getDeclaredType(Class::class)
-        return context.utils.isAssignableType(type, classType)
+        return typeUtils.isAssignable<Class<*>>(type)
     }
 
     override fun subjectClass(type: TypeMirror): TypeName {
