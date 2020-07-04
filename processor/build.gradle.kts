@@ -55,9 +55,8 @@ dependencies {
     implementation("com.squareup:javapoet:$javapoetVersion")
 
     // Testing
-    val spekVersion: String by rootProject.extra
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spekVersion")
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spekVersion")
+    val junitVersion: String by rootProject.extra
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
 
     val compileTestingVersion: String by rootProject.extra
     testImplementation("com.google.testing.compile:compile-testing:$compileTestingVersion")
@@ -79,8 +78,9 @@ tasks {
     }
 
     test {
-        useJUnitPlatform {
-            includeEngines("spek2")
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
         }
     }
 
