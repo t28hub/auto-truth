@@ -22,7 +22,6 @@ val guavaVersion by extra { "29.0-jre" }
 val autoValueVersion by extra { "1.7.3" }
 val autoServiceVersion by extra { "1.0-rc7" }
 val javapoetVersion by extra { "1.13.0" }
-val spekVersion by extra { "2.0.11" }
 val junitVersion by extra { "5.6.2" }
 val mockitoVersion by extra { "2.2.0" }
 val compileTestingVersion by extra { "0.18" }
