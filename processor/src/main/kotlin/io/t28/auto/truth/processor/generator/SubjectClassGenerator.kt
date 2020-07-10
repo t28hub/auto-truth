@@ -104,8 +104,8 @@ class SubjectClassGenerator(
 
     private fun generateAssertions(input: SubjectClass): List<MethodSpec> {
         val valueObject = input.valueObject
-        return (valueObject.properties + valueObject.enumConstants).flatMap { property ->
-            methodGenerators.filter { generator -> generator.matches(property) }
+        return (valueObject.findProperties() + valueObject.findEnumConstants()).flatMap { property ->
+            methodGenerators.filter { generator -> generator.isSupported(property) }
                 .map { generator -> generator.generate(property) }
         }
     }

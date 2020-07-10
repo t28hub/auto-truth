@@ -19,6 +19,8 @@ package io.t28.auto.truth.processor.generator.method
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.SimpleTypeVisitor8
 
-internal abstract class SupportedTypeMatcher<P> : SimpleTypeVisitor8<Boolean, P>() {
-    override fun defaultAction(type: TypeMirror, p: P) = false
+abstract class SupportedTypeMatcher<T> : SimpleTypeVisitor8<Boolean, T>() {
+    override fun defaultAction(type: TypeMirror, p: T): Boolean {
+        return false
+    }
 }

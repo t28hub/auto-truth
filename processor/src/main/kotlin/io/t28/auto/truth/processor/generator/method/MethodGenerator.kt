@@ -21,5 +21,5 @@ import io.t28.auto.truth.processor.data.Property
 import io.t28.auto.truth.processor.generator.Generator
 
 interface MethodGenerator : Generator<Property, MethodSpec> {
-    fun matches(property: Property): Boolean
+    fun isSupported(property: Property): Boolean
 }

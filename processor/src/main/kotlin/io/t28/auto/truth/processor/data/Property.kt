@@ -17,7 +17,6 @@
 package io.t28.auto.truth.processor.data
 
 import com.google.common.base.CaseFormat
-import java.lang.IllegalArgumentException
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind.ENUM_CONSTANT
 import javax.lang.model.element.ElementKind.FIELD

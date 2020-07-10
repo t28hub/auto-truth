@@ -25,7 +25,6 @@ import io.t28.auto.truth.processor.extensions.asType
 import io.t28.auto.truth.processor.extensions.asTypeElement
 import io.t28.auto.truth.processor.extensions.findAnnotationMirror
 import io.t28.auto.truth.processor.extensions.getAnnotationValue
-import io.t28.auto.truth.processor.extensions.getPackage
 import io.t28.auto.truth.processor.extensions.isValidClassPrefix
 import io.t28.auto.truth.processor.extensions.isValidClassSuffix
 import javax.lang.model.element.TypeElement
@@ -46,7 +45,6 @@ class AutoSubjectProcessor(context: Context) : Processor<TypeElement, SubjectCla
             throw IllegalStateException("Required annotation ${AutoSubject::class.simpleName} does not exist ${element.qualifiedName}")
         }
 
-        val packageName = "${element.getPackage().qualifiedName}"
         val valueObjectType = requireNotNull(annotation.getAnnotationValue(VALUE_OBJECT_CLASS)).asType()
         val valueObjectElement = requireNotNull(valueObjectType as? DeclaredType).asTypeElement()
 
@@ -61,7 +59,6 @@ class AutoSubjectProcessor(context: Context) : Processor<TypeElement, SubjectCla
         }
 
         return SubjectClass(
-            packageName = packageName,
             prefix = classPrefix,
             suffix = classSuffix,
             element = element,

@@ -52,6 +52,15 @@ fun Element.getPackage(): PackageElement {
     return packagesIn(setOf(enclosing)).first()
 }
 
+fun Element.asTypeElement(): TypeElement {
+    require(this is TypeElement)
+    return this
+}
+
+inline fun <reified T : Annotation> Element.getAnnotation(): T? {
+    return getAnnotation(T::class.java)
+}
+
 inline fun <reified T : Annotation> Element.findAnnotationMirror(): AnnotationMirror? {
     val annotationName = T::class.java.canonicalName
     return annotationMirrors.firstOrNull {

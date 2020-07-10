@@ -35,22 +35,22 @@ sealed class BooleanAssertionGenerator(
     private val utils: TypeUtils = context.utils,
     private val logger: Logger = context.logger
 ) : MethodGenerator {
-    final override fun matches(property: Property): Boolean {
+    final override fun isSupported(property: Property): Boolean {
         return object : SupportedTypeMatcher<Void?>() {
             override fun visitPrimitive(type: PrimitiveType, p: Void?): Boolean {
                 return type.kind == TypeKind.BOOLEAN
             }
 
             override fun visitDeclared(type: DeclaredType, p: Void?): Boolean {
-                return utils.getDeclaredType(java.lang.Boolean::class)?.let { booleanType ->
-                    utils.isAssignableType(type, booleanType)
+                return utils.getDeclaredType(java.lang.Boolean::class)?.let { boxedBooleanType ->
+                    utils.isAssignableType(type, boxedBooleanType)
                 } ?: false
             }
         }.visit(property.type)
     }
 
     final override fun generate(input: Property): MethodSpec {
-        require(matches(input))
+        require(isSupported(input))
         logger.debug(input.element, "Generating an assertion method for boolean and Boolean")
 
         return MethodSpec.methodBuilder(generateName(input)).apply {

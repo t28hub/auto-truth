@@ -29,7 +29,7 @@ import javax.lang.model.element.Modifier
 import javax.lang.model.type.DeclaredType
 
 sealed class IterableAssertionGenerator(protected val context: Context) : MethodGenerator {
-    override fun matches(property: Property): Boolean {
+    override fun isSupported(property: Property): Boolean {
         return object : SupportedTypeMatcher<Void?>() {
             override fun visitDeclared(type: DeclaredType, p: Void?): Boolean {
                 if (!context.utils.isAssignable<Iterable<*>>(type)) {
@@ -41,7 +41,7 @@ sealed class IterableAssertionGenerator(protected val context: Context) : Method
     }
 
     final override fun generate(input: Property): MethodSpec {
-        require(matches(input))
+        require(isSupported(input))
         context.logger.debug(input.element, "Generating an assertion method for Iterable<T>")
 
         val type = input.type as DeclaredType

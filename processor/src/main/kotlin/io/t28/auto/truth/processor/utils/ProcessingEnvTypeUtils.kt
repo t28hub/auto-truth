@@ -16,6 +16,7 @@
 
 package io.t28.auto.truth.processor.utils
 
+import javax.lang.model.element.Element
 import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
@@ -48,5 +49,9 @@ class ProcessingEnvTypeUtils(private val types: Types, private val elements: Ele
                 types.getDeclaredType(element)
             }
         }
+    }
+
+    override fun asElement(type: TypeMirror): Element {
+        return types.asElement(type)
     }
 }

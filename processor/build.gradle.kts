@@ -61,6 +61,9 @@ dependencies {
     val compileTestingVersion: String by rootProject.extra
     testImplementation("com.google.testing.compile:compile-testing:$compileTestingVersion")
 
+    val kotlinCompileTestingVersion: String by rootProject.extra
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:$kotlinCompileTestingVersion")
+
     val mockitoVersion: String by rootProject.extra
     testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoVersion")
 

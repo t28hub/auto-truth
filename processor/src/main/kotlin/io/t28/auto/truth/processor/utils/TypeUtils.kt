@@ -16,6 +16,7 @@
 
 package io.t28.auto.truth.processor.utils
 
+import javax.lang.model.element.Element
 import javax.lang.model.type.ArrayType
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeMirror
@@ -29,6 +30,8 @@ interface TypeUtils {
     fun getArrayType(componentType: TypeMirror): ArrayType
 
     fun getDeclaredType(type: KClass<*>): DeclaredType?
+
+    fun asElement(type: TypeMirror): Element
 }
 
 inline fun <reified T : Any> TypeUtils.isAssignable(type: TypeMirror): Boolean {

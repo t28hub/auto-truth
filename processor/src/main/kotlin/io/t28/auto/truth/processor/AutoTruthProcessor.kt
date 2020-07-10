@@ -19,6 +19,7 @@ package io.t28.auto.truth.processor
 import com.google.auto.service.AutoService
 import com.squareup.javapoet.JavaFile
 import io.t28.auto.truth.AutoSubject
+import io.t28.auto.truth.processor.data.SubjectClass
 import io.t28.auto.truth.processor.extensions.getAnnotatedElements
 import io.t28.auto.truth.processor.generator.SubjectClassGenerator
 import io.t28.auto.truth.processor.generator.method.AbstractArraySubjectGenerator
@@ -70,6 +71,21 @@ class AutoTruthProcessor : AbstractProcessor() {
 
         val logger = context.logger
         val processor = AutoSubjectProcessor(context)
+        roundEnv.getAnnotatedElements<AutoSubject>()
+            .filterIsInstance<TypeElement>()
+            .forEach { element ->
+                logger.debug(element, "Found annotated class: %s", element.simpleName)
+                try {
+                    val subjectClass = processor.process(element)
+                    generateJavaFile(subjectClass)
+                } catch (e: ProcessingException) {
+                    logger.error(e.element, e.message)
+                }
+            }
+        return true
+    }
+
+    private fun generateJavaFile(subjectClass: SubjectClass) {
         val generator = SubjectClassGenerator(
             AbstractArraySubjectGenerator(context),
             BooleanAssertionGenerator.PositiveAssertionGenerator(context),
@@ -89,21 +105,10 @@ class AutoTruthProcessor : AbstractProcessor() {
             StreamSubjectGenerator(context),
             PathSubjectGenerator(context)
         )
-        roundEnv.getAnnotatedElements<AutoSubject>()
-            .filterIsInstance<TypeElement>()
-            .forEach { element ->
-                logger.debug(element, "Found annotated class: %s", element.simpleName)
-                try {
-                    val subjectClass = processor.process(element)
-                    val typeSpec = generator.generate(subjectClass)
-                    JavaFile.builder(subjectClass.packageName, typeSpec)
-                        .skipJavaLangImports(true)
-                        .indent("    ")
-                        .build().writeTo(processingEnv.filer)
-                } catch (e: ProcessingException) {
-                    logger.error(e.element, e.message)
-                }
-            }
-        return true
+        val typeSpec = generator.generate(subjectClass)
+        JavaFile.builder(subjectClass.packageName, typeSpec)
+            .skipJavaLangImports(true)
+            .indent("    ")
+            .build().writeTo(processingEnv.filer)
     }
 }
