@@ -23,12 +23,12 @@ import io.t28.auto.truth.processor.data.Property
 import javax.lang.model.element.Modifier.PUBLIC
 
 sealed class EnumAssertionGenerator(private val context: Context) : MethodGenerator {
-    final override fun matches(property: Property): Boolean {
+    final override fun isSupported(property: Property): Boolean {
         return property is Property.EnumConstant
     }
 
     final override fun generate(input: Property): MethodSpec {
-        require(matches(input))
+        require(isSupported(input))
         context.logger.debug(input.element, "Generating an assertion method for %s", input.type)
         return MethodSpec.methodBuilder(generateName(input)).apply {
             addModifiers(PUBLIC)

@@ -44,7 +44,7 @@ internal class EnumAssertionGeneratorTest {
                 val generator = EnumAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                 // Act
-                val actual = generator.matches(property)
+                val actual = generator.isSupported(property)
 
                 // Assert
                 assertThat(actual).isTrue()
@@ -62,7 +62,7 @@ internal class EnumAssertionGeneratorTest {
                 val generator = EnumAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                 // Act
-                val actual = generator.matches(property)
+                val actual = generator.isSupported(property)
 
                 // Assert
                 assertThat(actual).isFalse()

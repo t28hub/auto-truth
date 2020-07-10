@@ -32,7 +32,6 @@ internal class SubjectClassTest {
 
             // Act
             val subjectClass = SubjectClass(
-                packageName = UserSubject.packageName,
                 prefix = "Prefix",
                 suffix = "Suffix",
                 element = userSubjectElement,

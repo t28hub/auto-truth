@@ -44,7 +44,7 @@ internal class BooleanAssertionGeneratorTest {
                 val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                 // Act
-                val actual = generator.matches(booleanProperty)
+                val actual = generator.isSupported(booleanProperty)
 
                 // Assert
                 assertThat(actual).isTrue()
@@ -62,7 +62,7 @@ internal class BooleanAssertionGeneratorTest {
                 val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                 // Act
-                val actual = generator.matches(boxedBooleanProperty)
+                val actual = generator.isSupported(boxedBooleanProperty)
 
                 // Assert
                 assertThat(actual).isTrue()
@@ -80,7 +80,7 @@ internal class BooleanAssertionGeneratorTest {
                 val generator = BooleanAssertionGenerator.PositiveAssertionGenerator(Context.get(it.processingEnv))
 
                 // Act
-                val actual = generator.matches(nonBooleanProperty)
+                val actual = generator.isSupported(nonBooleanProperty)
 
                 // Assert
                 assertThat(actual).isFalse()

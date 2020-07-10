@@ -69,4 +69,9 @@ public class AutoUserSubject extends Subject {
             failWithActual(Fact.simpleFact("expected not to be admin"));
         }
     }
+
+    public void hasType(User.Type expected) {
+        final User.Type actual = Preconditions.checkNotNull(this.actual).getType();
+        check("getType()").that(actual).isEqualTo(expected);
+    }
 }

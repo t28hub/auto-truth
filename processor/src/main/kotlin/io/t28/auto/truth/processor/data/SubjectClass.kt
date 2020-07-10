@@ -16,15 +16,18 @@
 
 package io.t28.auto.truth.processor.data
 
+import io.t28.auto.truth.processor.extensions.getPackage
 import javax.lang.model.element.TypeElement
 
 data class SubjectClass(
-    val packageName: String,
     val prefix: String,
     val suffix: String,
     val element: TypeElement,
     val valueObject: ValueObjectClass
 ) {
+    val packageName: String
+        get() = "${element.getPackage().qualifiedName}"
+
     val simpleName: String
         get() = "$prefix${element.simpleName}$suffix"
 }

@@ -22,8 +22,6 @@ import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
-import io.t28.auto.truth.processor.extensions.asTypeElement
-import io.t28.auto.truth.processor.extensions.isEnum
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
@@ -31,12 +29,15 @@ import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind.BOOLEAN
 
 class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
-    override fun matches(property: Property): Boolean {
+    override fun isSupported(property: Property): Boolean {
+        if (property is Property.EnumConstant) {
+            return false
+        }
         return SupportedObjectTypeMatcher.visit(property.type, context)
     }
 
     override fun generate(input: Property): MethodSpec {
-        require(matches(input))
+        require(isSupported(input))
         context.logger.debug(input.element, "Generating an assertion method for %s", input.type)
 
         return MethodSpec.methodBuilder("has${input.name.capitalize()}").apply {
@@ -73,11 +74,6 @@ class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
         }
 
         override fun visitDeclared(type: DeclaredType, context: Context): Boolean {
-            val element = type.asTypeElement()
-            if (element.isEnum) {
-                return false
-            }
-
             val utils = context.utils
             return IGNORED_CLASSES
                 .mapNotNull { ignoredClass -> utils.getDeclaredType(ignoredClass) }

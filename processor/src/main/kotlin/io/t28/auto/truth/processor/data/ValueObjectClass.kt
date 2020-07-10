@@ -19,6 +19,7 @@ package io.t28.auto.truth.processor.data
 import io.t28.auto.truth.processor.extensions.findEnumConstants
 import io.t28.auto.truth.processor.extensions.findFields
 import io.t28.auto.truth.processor.extensions.findMethods
+import io.t28.auto.truth.processor.extensions.getAnnotation
 import io.t28.auto.truth.processor.extensions.hasParameter
 import io.t28.auto.truth.processor.extensions.isPublic
 import io.t28.auto.truth.processor.extensions.isStatic
@@ -32,23 +33,35 @@ data class ValueObjectClass(val element: TypeElement) {
     val simpleName: String
         get() = "${element.simpleName}"
 
-    val properties: List<Property>
-        get() {
-            // Find public and non-static properties
-            val fieldProperties = element.findFields {
-                it.isPublic and !it.isStatic
-            }.map { Property.get(it) }
+    fun findProperties(): List<Property> {
+        // Find public and non-static properties
+        val fieldProperties = element.findFields {
+            it.isPublic and !it.isStatic
+        }.map { Property.get(it) }
 
-            // Find public and non-static getter methods
-            val getterProperties = element.findMethods {
-                it.isPublic and !it.isStatic and !it.hasParameter
-            }.map { Property.get(it) }
-            return fieldProperties + getterProperties
-        }
+        // Find public and non-static getter methods
+        val getterProperties = element
+            .findMethods { method ->
+                method.isPublic and !method.isStatic and !method.hasParameter
+            }
+            .filterNot { method ->
+                // Ignore component functions
+                if (isKotlinClass()) {
+                    method.simpleName.matches("""component\d+""".toRegex())
+                } else {
+                    false
+                }
+            }
+            .map { Property.get(it) }
+        return fieldProperties + getterProperties
+    }
 
-    val enumConstants: List<Property>
-        get() {
-            return element.findEnumConstants()
-                .map { Property.get(it) }
-        }
+    fun findEnumConstants(): List<Property> {
+        return element.findEnumConstants()
+            .map { Property.get(it) }
+    }
+
+    private fun isKotlinClass(): Boolean {
+        return element.getAnnotation<Metadata>() != null
+    }
 }

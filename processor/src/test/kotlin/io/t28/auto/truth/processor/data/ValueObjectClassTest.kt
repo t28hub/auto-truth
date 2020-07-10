@@ -37,8 +37,8 @@ internal class ValueObjectClassTest {
             assertThat(actual.type).isInstanceOf(DeclaredType::class.java)
             assertThat(MoreTypes.asElement(actual.type)).isEqualTo(userElement)
             assertThat(actual.simpleName).isEqualTo("User")
-            assertThat(actual.properties).hasSize(5)
-            assertThat(actual.enumConstants).isEmpty()
+            assertThat(actual.findProperties()).hasSize(5)
+            assertThat(actual.findEnumConstants()).isEmpty()
         }.compilesWithoutError()
     }
 }

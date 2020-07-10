@@ -38,7 +38,6 @@ internal class SubjectClassGeneratorTest {
         process(Resource.User, Resource.UserSubject) { context ->
             // Arrange
             val input = SubjectClass(
-                packageName = Resource.UserSubject.packageName,
                 prefix = "Auto",
                 suffix = "",
                 element = context.getTypeElement(Resource.UserSubject.qualifiedName),
