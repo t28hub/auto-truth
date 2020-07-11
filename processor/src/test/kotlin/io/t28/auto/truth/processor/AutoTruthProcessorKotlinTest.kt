@@ -16,11 +16,10 @@
 
 package io.t28.auto.truth.processor
 
-import com.google.common.truth.Truth.assertThat
 import com.tschuchort.compiletesting.KotlinCompilation
-import com.tschuchort.compiletesting.KotlinCompilation.ExitCode
 import com.tschuchort.compiletesting.KotlinCompilation.Result
 import com.tschuchort.compiletesting.SourceFile.Companion.kotlin
+import io.t28.auto.truth.processor.testing.ResultSubject.Companion.assertThat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 
@@ -41,7 +40,10 @@ internal class AutoTruthProcessorKotlinTest {
         """.trimIndent())
 
         // Assert
-        assertThat(result.exitCode).isEqualTo(ExitCode.OK)
+        assertThat(result).apply {
+            isOk()
+            generatedFile("AutoCustomerSubject.java").exists()
+        }
     }
 
     @Test
@@ -65,7 +67,10 @@ internal class AutoTruthProcessorKotlinTest {
         """.trimIndent())
 
         // Assert
-        assertThat(result.exitCode).isEqualTo(ExitCode.OK)
+        assertThat(result).apply {
+            isOk()
+            generatedFile("AutoNestedSubject.java").exists()
+        }
     }
 
     @Test
@@ -86,7 +91,10 @@ internal class AutoTruthProcessorKotlinTest {
         """.trimIndent())
 
         // Assert
-        assertThat(result.exitCode).isEqualTo(ExitCode.OK)
+        assertThat(result).apply {
+            isOk()
+            generatedFile("AutoUserSubject.java").exists()
+        }
     }
 
     @Test
@@ -107,7 +115,10 @@ internal class AutoTruthProcessorKotlinTest {
         """.trimIndent())
 
         // Assert
-        assertThat(result.exitCode).isEqualTo(ExitCode.OK)
+        assertThat(result).apply {
+            isOk()
+            generatedFile("AutoUserSubject.java").exists()
+        }
     }
 
     @Test
@@ -126,7 +137,10 @@ internal class AutoTruthProcessorKotlinTest {
         """.trimIndent())
 
         // Assert
-        assertThat(result.exitCode).isEqualTo(ExitCode.OK)
+        assertThat(result).apply {
+            isOk()
+            generatedFile("AutoUserSubject.java").exists()
+        }
     }
 
     @Test
@@ -146,7 +160,10 @@ internal class AutoTruthProcessorKotlinTest {
         """.trimIndent())
 
         // Assert
-        assertThat(result.exitCode).isEqualTo(ExitCode.OK)
+        assertThat(result).apply {
+            isOk()
+            generatedFile("AutoExprSubject.java").exists()
+        }
     }
 
     @Test
@@ -166,7 +183,10 @@ internal class AutoTruthProcessorKotlinTest {
         """.trimIndent())
 
         // Assert
-        assertThat(result.exitCode).isEqualTo(ExitCode.OK)
+        assertThat(result).apply {
+            isOk()
+            generatedFile("AutoDirectionSubject.java").exists()
+        }
     }
 
     @Test
@@ -179,14 +199,17 @@ internal class AutoTruthProcessorKotlinTest {
             import io.t28.auto.truth.AutoSubject
             
             sealed class Expr
-            object NotANumber : Expr()
+            object NaN : Expr()
             
-            @AutoSubject(NotANumber::class)
-            class NotANumberSubject
+            @AutoSubject(NaN::class)
+            class NaNSubject
         """.trimIndent())
 
         // Assert
-        assertThat(result.exitCode).isEqualTo(ExitCode.OK)
+        assertThat(result).apply {
+            isOk()
+            generatedFile("AutoNaNSubject.java").exists()
+        }
     }
 
     @Test
@@ -213,8 +236,10 @@ internal class AutoTruthProcessorKotlinTest {
         """.trimIndent())
 
         // Assert
-        assertThat(result.exitCode).isEqualTo(ExitCode.COMPILATION_ERROR)
-        assertThat(result.messages).contains("An annotation argument must be a compile-time constant")
+        assertThat(result).apply {
+            isCompilationError()
+            message().contains("An annotation argument must be a compile-time constant")
+        }
     }
 
     private fun compile(source: String): Result {
