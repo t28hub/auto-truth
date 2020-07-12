@@ -59,6 +59,8 @@ abstract class Resource(val packageName: String = "io.t28.auto.truth.test") {
     object EmptySuffixUserSubject : Resource("io.t28.auto.truth.test.suffix")
     object EnumTypes : Resource("io.t28.auto.truth.test.data")
     object EnumTypesSubject : Resource("io.t28.auto.truth.test.data")
+    object GenericTypes : Resource("io.t28.auto.truth.test.data")
+    object GenericTypesSubject : Resource("io.t28.auto.truth.test.data")
     object GuavaTypes : Resource("io.t28.auto.truth.test.data")
     object GuavaTypesSubject : Resource("io.t28.auto.truth.test.data")
     object InvalidPrefixUserSubject : Resource("io.t28.auto.truth.test.prefix")

@@ -38,7 +38,12 @@ public class AutoUserSubject extends Subject {
 
     @Nonnull
     public static AutoUserSubject assertThat(@Nullable User actual) {
-        return Truth.assertAbout(AutoUserSubject::new).that(actual);
+        return Truth.assertAbout(new Subject.Factory<AutoUserSubject, User>() {
+            @Override
+            public final AutoUserSubject createSubject(FailureMetadata metadata, User _actual) {
+                return new AutoUserSubject(metadata, _actual);
+            }
+        }).that(actual);
     }
 
     public void hasId(long expected) {

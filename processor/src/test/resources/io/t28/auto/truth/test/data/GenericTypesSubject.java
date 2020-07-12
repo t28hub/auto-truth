@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.generator.method
+package io.t28.auto.truth.test.data;
 
-import javax.lang.model.util.SimpleTypeVisitor8
+import com.google.common.truth.FailureMetadata;
+import io.t28.auto.truth.AutoSubject;
 
-abstract class SupportedTypeMatcher<T> : SimpleTypeVisitor8<Boolean, T>(false)
+@AutoSubject(GenericTypes.class)
+public class GenericTypesSubject<T extends String> extends AutoGenericTypesSubject<T> {
+    public GenericTypesSubject(FailureMetadata failureMetadata, GenericTypes<T> actual) {
+        super(failureMetadata, actual);
+    }
+}

@@ -24,10 +24,13 @@ import com.squareup.javapoet.ClassName
 import com.squareup.javapoet.FieldSpec
 import com.squareup.javapoet.MethodSpec
 import com.squareup.javapoet.ParameterSpec
+import com.squareup.javapoet.ParameterizedTypeName
 import com.squareup.javapoet.TypeName
 import com.squareup.javapoet.TypeSpec
+import com.squareup.javapoet.TypeVariableName
 import io.t28.auto.truth.processor.AutoTruthProcessor
 import io.t28.auto.truth.processor.data.SubjectClass
+import io.t28.auto.truth.processor.data.ValueObjectClass
 import io.t28.auto.truth.processor.generator.method.MethodGenerator
 import javax.annotation.Generated
 import javax.annotation.Nonnull
@@ -47,6 +50,7 @@ class SubjectClassGenerator(
         val className = ClassName.get(input.packageName, input.simpleName)
         return TypeSpec.classBuilder(className).apply {
             addAnnotations(generateAnnotations())
+            addTypeVariables(input.valueObject.typeVariables())
             superclass(Subject::class.java)
             addModifiers(PUBLIC)
             addFields(generateFields(input))
@@ -89,16 +93,39 @@ class SubjectClassGenerator(
 
     private fun generateAssertThat(input: SubjectClass): MethodSpec {
         val valueObject = input.valueObject
-        val valueObjectType = TypeName.get(valueObject.type)
-        val className = ClassName.get(input.packageName, input.simpleName)
+        val valueObjectName = TypeName.get(valueObject.type)
+        val subjectClassName = valueObject.typeVariables().let { variables ->
+            if (variables.isEmpty()) {
+                ClassName.get(input.packageName, input.simpleName)
+            } else {
+                ParameterizedTypeName.get(ClassName.get(input.packageName, input.simpleName), *variables.toTypedArray())
+            }
+        }
+
         return MethodSpec.methodBuilder("assertThat").apply {
-            returns(className)
+            returns(subjectClassName)
+            addTypeVariables(valueObject.typeVariables())
             addModifiers(PUBLIC, STATIC)
             addAnnotation(Nonnull::class.java)
-            addParameter(ParameterSpec.builder(valueObjectType, "actual").apply {
+            addParameter(ParameterSpec.builder(valueObjectName, "actual").apply {
                 addAnnotation(Nullable::class.java)
             }.build())
-            addStatement("return \$T.assertAbout(\$T::new).that(\$L)", Truth::class.java, className, "actual")
+            addStatement("return \$T.assertAbout(\$L).that(\$L)",
+                Truth::class.java, generateFactory(subjectClass = subjectClassName, valueObject = valueObjectName), "actual")
+        }.build()
+    }
+
+    private fun generateFactory(subjectClass: TypeName, valueObject: TypeName): TypeSpec {
+        return TypeSpec.anonymousClassBuilder("").apply {
+            addSuperinterface(ParameterizedTypeName.get(ClassName.get(Subject.Factory::class.java), subjectClass, valueObject))
+            addMethod(MethodSpec.methodBuilder("createSubject").apply {
+                addAnnotation(Override::class.java)
+                addModifiers(PUBLIC, FINAL)
+                returns(subjectClass)
+                addParameter(FailureMetadata::class.java, "metadata")
+                addParameter(valueObject, "_actual")
+                addStatement("return new \$T(metadata, _actual)", subjectClass)
+            }.build())
         }.build()
     }
 
@@ -107,6 +134,12 @@ class SubjectClassGenerator(
         return (valueObject.findProperties() + valueObject.findEnumConstants()).flatMap { property ->
             methodGenerators.filter { generator -> generator.isSupported(property) }
                 .map { generator -> generator.generate(property) }
+        }
+    }
+
+    private fun ValueObjectClass.typeVariables(): List<TypeVariableName> {
+        return element.typeParameters.map { typeParameter ->
+            TypeVariableName.get(typeParameter)
         }
     }
 }

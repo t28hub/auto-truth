@@ -18,8 +18,12 @@ package io.t28.auto.truth.processor.extensions
 
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.DeclaredType
+import javax.lang.model.type.TypeKind.NULL
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.util.SimpleTypeVisitor8
+
+val TypeMirror.isNull: Boolean
+    get() = kind == NULL
 
 fun TypeMirror.isBoxedPrimitive(): Boolean {
     return accept(object : SimpleTypeVisitor8<Boolean, Void>() {

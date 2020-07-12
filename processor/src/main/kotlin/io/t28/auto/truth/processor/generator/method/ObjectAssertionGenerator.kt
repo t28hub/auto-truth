@@ -22,15 +22,20 @@ import com.squareup.javapoet.ParameterSpec
 import com.squareup.javapoet.TypeName
 import io.t28.auto.truth.processor.Context
 import io.t28.auto.truth.processor.data.Property
+import io.t28.auto.truth.processor.extensions.isNull
 import javax.lang.model.element.Modifier.PUBLIC
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ErrorType
 import javax.lang.model.type.PrimitiveType
 import javax.lang.model.type.TypeKind.BOOLEAN
+import javax.lang.model.type.TypeVariable
 
 class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
     override fun isSupported(property: Property): Boolean {
         if (property is Property.EnumConstant) {
+            return false
+        }
+        if (property is Property.Getter && property.element.typeParameters.isNotEmpty()) {
             return false
         }
         return SupportedObjectTypeMatcher.visit(property.type, context)
@@ -82,6 +87,13 @@ class ObjectAssertionGenerator(private val context: Context) : MethodGenerator {
 
         override fun visitError(type: ErrorType, context: Context): Boolean {
             return visitDeclared(type, context)
+        }
+
+        override fun visitTypeVariable(type: TypeVariable, context: Context): Boolean {
+            if (type.lowerBound.isNull) {
+                return true
+            }
+            return SupportedObjectTypeMatcher.visit(type.lowerBound, context)
         }
     }
 }
