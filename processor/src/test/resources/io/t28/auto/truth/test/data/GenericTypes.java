@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
-package io.t28.auto.truth.processor.generator.method
+package io.t28.auto.truth.test.data;
 
-import javax.lang.model.util.SimpleTypeVisitor8
+public class GenericTypes<T extends String> {
+    private final T value;
 
-abstract class SupportedTypeMatcher<T> : SimpleTypeVisitor8<Boolean, T>(false)
+    public GenericTypes(T value) {
+        this.value = value;
+    }
+
+    public T value() {
+        return value;
+    }
+
+    public <S> S value2() {
+        return null;
+    }
+}

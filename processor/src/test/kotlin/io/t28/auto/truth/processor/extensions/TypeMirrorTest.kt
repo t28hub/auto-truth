@@ -25,6 +25,33 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
 internal class TypeMirrorTest {
+    @Test
+    fun `should return true when type is NULL`() {
+        process(Resource.User, Resource.UserSubject) {
+            // Arrange
+            val typeMirror = it.processingEnv.typeUtils.nullType
+
+            // Act
+            val actual = typeMirror.isNull
+
+            // Assert
+            assertThat(actual).isTrue()
+        }.compilesWithoutError()
+    }
+    @Test
+    fun `should return true when type is not NULL`() {
+        process(Resource.User, Resource.UserSubject) {
+            // Arrange
+            val typeMirror = it.processingEnv.typeUtils.getPrimitiveType(BOOLEAN)
+
+            // Act
+            val actual = typeMirror.isNull
+
+            // Assert
+            assertThat(actual).isFalse()
+        }.compilesWithoutError()
+    }
+
     @ParameterizedTest
     @MethodSource("provideBoxedPrimitiveTypes")
     fun `should return true when type is BoxedPrimitive`(canonicalName: String) {
