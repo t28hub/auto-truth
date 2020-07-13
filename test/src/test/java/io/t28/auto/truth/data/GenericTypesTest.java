@@ -16,11 +16,14 @@
 
 package io.t28.auto.truth.data;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.truth.ExpectFailure;
 import com.google.common.truth.FailureMetadata;
 import io.t28.auto.truth.AutoSubject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.Serializable;
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,23 +31,31 @@ import javax.annotation.Nullable;
 import static com.google.common.truth.ExpectFailure.assertThat;
 import static com.google.common.truth.ExpectFailure.expectFailureAbout;
 import static com.google.common.truth.Truth.assertAbout;
-import static io.t28.auto.truth.data.GenericTypesTest.GenericTypesSubject.assertThat;
-import static io.t28.auto.truth.data.GenericTypesTest.GenericTypesSubject.expectFailure;
 
 class GenericTypesTest {
+    private GenericTypes<Serializable> underTest;
+
+    @BeforeEach
+    void setup() {
+        underTest = GenericTypes.<Serializable>builder()
+            .value("foo_bar_baz")
+            .valueList(ImmutableList.of("foo", "bar", "baz"))
+            .build();
+    }
+
     @Test
     void shouldPassAssertion() {
         // Act & Assert
-        final GenericTypes<String> underTest = new GenericTypes<>("foo_bar_baz");
-        assertThat(underTest).isNotNull();
-        assertThat(underTest).hasValue("foo_bar_baz");
+        GenericTypesSubject.assertThat(underTest).isNotNull();
+        GenericTypesSubject.assertThat(underTest).hasValue("foo_bar_baz");
+        GenericTypesSubject.assertThat(underTest).valueArray().isNull();
+        GenericTypesSubject.assertThat(underTest).valueList().hasSize(3);
     }
 
     @Test
     void shouldFailAssertion() {
         // Act & Assert
-        final AssertionError error = expectFailure((ExpectFailure.SimpleSubjectBuilderCallback<GenericTypesSubject<String>, GenericTypes<String>>) callback -> {
-            final GenericTypes<String> underTest = new GenericTypes<>("foo_bar_baz");
+        final AssertionError error = GenericTypesSubject.expectFailure((ExpectFailure.SimpleSubjectBuilderCallback<GenericTypesSubject<Serializable>, GenericTypes<Serializable>>) callback -> {
             callback.that(underTest).hasValue("foo_bar");
         });
         assertThat(error).factValue("value of").isEqualTo("genericTypes.value()");
@@ -53,19 +64,19 @@ class GenericTypesTest {
     }
 
     @AutoSubject(GenericTypes.class)
-    static class GenericTypesSubject<T extends CharSequence> extends AutoGenericTypesSubject<T> {
+    public static class GenericTypesSubject<T> extends AutoGenericTypesSubject<T> {
         GenericTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable GenericTypes<T> actual) {
             super(failureMetadata, actual);
         }
 
         @Nonnull
         @CheckReturnValue
-        public static <T extends CharSequence> GenericTypesSubject<T> assertThat(GenericTypes<T> actual) {
+        public static <T> GenericTypesSubject<T> assertThat(GenericTypes<T> actual) {
             return assertAbout((Factory<GenericTypesSubject<T>, GenericTypes<T>>) GenericTypesSubject::new).that(actual);
         }
 
         @Nonnull
-        public static <T extends CharSequence> AssertionError expectFailure(
+        public static <T> AssertionError expectFailure(
             @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<GenericTypesSubject<T>, GenericTypes<T>> callback) {
             return expectFailureAbout(GenericTypesSubject::new, callback);
         }

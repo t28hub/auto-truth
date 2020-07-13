@@ -18,17 +18,26 @@ package io.t28.auto.truth.data;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.IterableSubject;
 import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
 import static com.google.common.truth.Truth.assertThat;
-import static io.t28.auto.truth.data.IterableTypesSubject.assertThat;
-import static io.t28.auto.truth.data.IterableTypesSubject.expectFailure;
+import static io.t28.auto.truth.data.IterableTypesTest.IterableTypesSubject.assertThat;
+import static io.t28.auto.truth.data.IterableTypesTest.IterableTypesSubject.expectFailure;
 
 class IterableTypesTest {
     private IterableTypes underTest;
@@ -78,5 +87,24 @@ class IterableTypesTest {
         assertThat(error).factValue("value of").isEqualTo("iterableTypes.collection()");
         assertThat(error).factValue("expected").isEqualTo("[Alice, Bob]");
         assertThat(error).factValue("but was").isEqualTo("[Alice, Bob, Charlie]");
+    }
+
+    @AutoSubject(IterableTypes.class)
+    public static class IterableTypesSubject extends AutoIterableTypesSubject {
+        protected IterableTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable IterableTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static IterableTypesSubject assertThat(@Nullable IterableTypes actual) {
+            return assertAbout(IterableTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<IterableTypesSubject, IterableTypes> callback) {
+            return expectFailureAbout(IterableTypesSubject::new, callback);
+        }
     }
 }

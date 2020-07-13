@@ -16,13 +16,22 @@
 
 package io.t28.auto.truth.data;
 
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
-import static io.t28.auto.truth.data.PrimitiveTypesSubject.assertThat;
-import static io.t28.auto.truth.data.PrimitiveTypesSubject.expectFailure;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
+import static io.t28.auto.truth.data.PrimitiveTypesTest.PrimitiveTypesSubject.assertThat;
+import static io.t28.auto.truth.data.PrimitiveTypesTest.PrimitiveTypesSubject.expectFailure;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PrimitiveTypesTest {
@@ -215,6 +224,25 @@ class PrimitiveTypesTest {
             assertThat(error).factValue("value of").isEqualTo("primitiveTypes.doubleValue()");
             assertThat(error).factValue("expected").isEqualTo("1.2345678");
             assertThat(error).factValue("but was").isEqualTo("1.23456789");
+        }
+    }
+
+    @AutoSubject(PrimitiveTypes.class)
+    public static class PrimitiveTypesSubject extends AutoPrimitiveTypesSubject {
+        protected PrimitiveTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable PrimitiveTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static PrimitiveTypesSubject assertThat(@Nullable PrimitiveTypes actual) {
+            return assertAbout(PrimitiveTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<PrimitiveTypesSubject, PrimitiveTypes> callback) {
+            return expectFailureAbout(PrimitiveTypesSubject::new, callback);
         }
     }
 }

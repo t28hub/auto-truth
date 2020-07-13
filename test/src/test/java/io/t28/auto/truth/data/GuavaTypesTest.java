@@ -19,19 +19,28 @@ package io.t28.auto.truth.data;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ImmutableTable;
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.GuavaOptionalSubject;
 import com.google.common.truth.MultimapSubject;
 import com.google.common.truth.MultisetSubject;
 import com.google.common.truth.Subject;
 import com.google.common.truth.TableSubject;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
 import static com.google.common.truth.Truth.assertThat;
-import static io.t28.auto.truth.data.GuavaTypesSubject.assertThat;
-import static io.t28.auto.truth.data.GuavaTypesSubject.expectFailure;
+import static io.t28.auto.truth.data.GuavaTypesTest.GuavaTypesSubject.assertThat;
+import static io.t28.auto.truth.data.GuavaTypesTest.GuavaTypesSubject.expectFailure;
 
 class GuavaTypesTest {
     private GuavaTypes underTest;
@@ -171,6 +180,25 @@ class GuavaTypesTest {
             assertThat(error).factValue("value of").isEqualTo("guavaTypes.table()");
             assertThat(error).factKeys().contains("expected to be empty");
             assertThat(error).factValue("but was").isEqualTo("{Row={Column=100}}");
+        }
+    }
+
+    @AutoSubject(GuavaTypes.class)
+    public static class GuavaTypesSubject extends AutoGuavaTypesSubject {
+        protected GuavaTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable GuavaTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static GuavaTypesSubject assertThat(@Nullable GuavaTypes actual) {
+            return assertAbout(GuavaTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<GuavaTypesSubject, GuavaTypes> callback) {
+            return expectFailureAbout(GuavaTypesSubject::new, callback);
         }
     }
 }

@@ -16,14 +16,30 @@
 
 package io.t28.auto.truth.data;
 
-public class GenericTypes<T extends CharSequence> {
-    private final T value;
+import com.google.auto.value.AutoValue;
 
-    public GenericTypes(T value) {
-        this.value = value;
+import java.util.List;
+
+@AutoValue
+public abstract class GenericTypes<T> {
+    public abstract T value();
+
+    public T[] valueArray() {
+        return null;
     }
 
-    public T value() {
-        return value;
+    public abstract List<T> valueList();
+
+    public static <T> Builder<T> builder() {
+        return new AutoValue_GenericTypes.Builder<>();
+    }
+
+    @AutoValue.Builder
+    public static abstract class Builder<T> {
+        public abstract Builder<T> value(T value);
+
+        public abstract Builder<T> valueList(List<T> values);
+
+        public abstract GenericTypes<T> build();
     }
 }
