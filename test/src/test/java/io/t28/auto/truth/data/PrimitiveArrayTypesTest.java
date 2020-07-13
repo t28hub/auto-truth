@@ -16,6 +16,8 @@
 
 package io.t28.auto.truth.data;
 
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.PrimitiveBooleanArraySubject;
 import com.google.common.truth.PrimitiveByteArraySubject;
 import com.google.common.truth.PrimitiveCharArraySubject;
@@ -25,14 +27,21 @@ import com.google.common.truth.PrimitiveIntArraySubject;
 import com.google.common.truth.PrimitiveLongArraySubject;
 import com.google.common.truth.PrimitiveShortArraySubject;
 import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
 import static com.google.common.truth.Truth.assertThat;
-import static io.t28.auto.truth.data.PrimitiveArrayTypesSubject.assertThat;
-import static io.t28.auto.truth.data.PrimitiveArrayTypesSubject.expectFailure;
+import static io.t28.auto.truth.data.PrimitiveArrayTypesTest.PrimitiveArrayTypesSubject.assertThat;
+import static io.t28.auto.truth.data.PrimitiveArrayTypesTest.PrimitiveArrayTypesSubject.expectFailure;
 
 class PrimitiveArrayTypesTest {
     private PrimitiveArrayTypes underTest;
@@ -296,6 +305,25 @@ class PrimitiveArrayTypesTest {
             assertThat(error).factValue("value of").isEqualTo("primitiveArrayTypes.doubleArray()");
             assertThat(error).factValue("expected", 0).isEqualTo("[NaN]");
             assertThat(error).factValue("but was", 0).isEqualTo("[-Infinity, Infinity]");
+        }
+    }
+
+    @AutoSubject(PrimitiveArrayTypes.class)
+    public static class PrimitiveArrayTypesSubject extends AutoPrimitiveArrayTypesSubject {
+        protected PrimitiveArrayTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable PrimitiveArrayTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static PrimitiveArrayTypesSubject assertThat(@Nullable PrimitiveArrayTypes actual) {
+            return assertAbout(PrimitiveArrayTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<PrimitiveArrayTypesSubject, PrimitiveArrayTypes> callback) {
+            return expectFailureAbout(PrimitiveArrayTypesSubject::new, callback);
         }
     }
 }

@@ -16,6 +16,9 @@
 
 package io.t28.auto.truth.data;
 
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -24,9 +27,15 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
-import static io.t28.auto.truth.data.EnumTypesSubject.assertThat;
-import static io.t28.auto.truth.data.EnumTypesSubject.expectFailure;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
+import static io.t28.auto.truth.data.EnumTypesTest.EnumTypesSubject.assertThat;
+import static io.t28.auto.truth.data.EnumTypesTest.EnumTypesSubject.expectFailure;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class EnumTypesTest {
@@ -60,5 +69,24 @@ class EnumTypesTest {
             arguments(EnumTypes.BAR, (Consumer<EnumTypesSubject>) AutoEnumTypesSubject::isFoo, "expected to be FOO"),
             arguments(EnumTypes.BAR, (Consumer<EnumTypesSubject>) AutoEnumTypesSubject::isNotBar, "expected not to be BAR")
         );
+    }
+
+    @AutoSubject(EnumTypes.class)
+    public static class EnumTypesSubject extends AutoEnumTypesSubject {
+        protected EnumTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable EnumTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static EnumTypesSubject assertThat(@Nullable EnumTypes actual) {
+            return assertAbout(EnumTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<EnumTypesSubject, EnumTypes> callback) {
+            return expectFailureAbout(EnumTypesSubject::new, callback);
+        }
     }
 }

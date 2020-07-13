@@ -17,14 +17,23 @@
 package io.t28.auto.truth.data;
 
 import com.google.common.truth.ClassSubject;
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
 import static com.google.common.truth.Truth.assertThat;
-import static io.t28.auto.truth.data.ClassTypesSubject.assertThat;
-import static io.t28.auto.truth.data.ClassTypesSubject.expectFailure;
+import static io.t28.auto.truth.data.ClassTypesTest.ClassTypesSubject.assertThat;
+import static io.t28.auto.truth.data.ClassTypesTest.ClassTypesSubject.expectFailure;
 
 class ClassTypesTest {
     private ClassTypes underTest;
@@ -70,5 +79,24 @@ class ClassTypesTest {
         assertThat(error).factValue("value of").isEqualTo("classTypes.objectClass()");
         assertThat(error).factValue("expected to be assignable to").isEqualTo("java.lang.String");
         assertThat(error).factValue("but was").isEqualTo("class java.lang.Object");
+    }
+
+    @AutoSubject(ClassTypes.class)
+    public static class ClassTypesSubject extends AutoClassTypesSubject {
+        protected ClassTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable ClassTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static ClassTypesSubject assertThat(@Nullable ClassTypes actual) {
+            return assertAbout(ClassTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<ClassTypesSubject, ClassTypes> callback) {
+            return expectFailureAbout(ClassTypesSubject::new, callback);
+        }
     }
 }

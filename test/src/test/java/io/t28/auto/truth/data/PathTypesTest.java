@@ -16,18 +16,27 @@
 
 package io.t28.auto.truth.data;
 
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.PathSubject;
 import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
 import static com.google.common.truth.Truth.assertThat;
-import static io.t28.auto.truth.data.PathTypesSubject.assertThat;
-import static io.t28.auto.truth.data.PathTypesSubject.expectFailure;
+import static io.t28.auto.truth.data.PathTypesTest.PathTypesSubject.assertThat;
+import static io.t28.auto.truth.data.PathTypesTest.PathTypesSubject.expectFailure;
 
 class PathTypesTest {
     @TempDir
@@ -68,5 +77,24 @@ class PathTypesTest {
         assertThat(error).factValue("value of").isEqualTo("pathTypes.path()");
         assertThat(error).factValue("expected").isEqualTo("null");
         assertThat(error).factValue("but was").isNotEmpty();
+    }
+
+    @AutoSubject(PathTypes.class)
+    public static class PathTypesSubject extends AutoPathTypesSubject {
+        protected PathTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable PathTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static PathTypesSubject assertThat(@Nullable PathTypes actual) {
+            return assertAbout(PathTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<PathTypesSubject, PathTypes> callback) {
+            return expectFailureAbout(PathTypesSubject::new, callback);
+        }
     }
 }

@@ -18,15 +18,24 @@ package io.t28.auto.truth.data;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.MapSubject;
 import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
 import static com.google.common.truth.Truth.assertThat;
-import static io.t28.auto.truth.data.MapTypesSubject.assertThat;
-import static io.t28.auto.truth.data.MapTypesSubject.expectFailure;
+import static io.t28.auto.truth.data.MapTypesTest.MapTypesSubject.assertThat;
+import static io.t28.auto.truth.data.MapTypesTest.MapTypesSubject.expectFailure;
 
 class MapTypesTest {
     private MapTypes underTest;
@@ -69,5 +78,24 @@ class MapTypesTest {
         assertThat(error).factValue("value of").isEqualTo("mapTypes.sortedMap().get(1)");
         assertThat(error).factValue("expected").isEqualTo("Charlie");
         assertThat(error).factValue("but was").isEqualTo("Alice");
+    }
+
+    @AutoSubject(MapTypes.class)
+    public static class MapTypesSubject extends AutoMapTypesSubject {
+        protected MapTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable MapTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static MapTypesSubject assertThat(@Nullable MapTypes actual) {
+            return assertAbout(MapTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<MapTypesSubject, MapTypes> callback) {
+            return expectFailureAbout(MapTypesSubject::new, callback);
+        }
     }
 }

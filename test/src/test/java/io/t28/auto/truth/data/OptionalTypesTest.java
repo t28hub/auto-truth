@@ -16,18 +16,27 @@
 
 package io.t28.auto.truth.data;
 
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.OptionalDoubleSubject;
 import com.google.common.truth.OptionalIntSubject;
 import com.google.common.truth.OptionalLongSubject;
 import com.google.common.truth.OptionalSubject;
 import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
 import static com.google.common.truth.Truth.assertThat;
-import static io.t28.auto.truth.data.OptionalTypesSubject.assertThat;
-import static io.t28.auto.truth.data.OptionalTypesSubject.expectFailure;
+import static io.t28.auto.truth.data.OptionalTypesTest.OptionalTypesSubject.assertThat;
+import static io.t28.auto.truth.data.OptionalTypesTest.OptionalTypesSubject.expectFailure;
 
 class OptionalTypesTest {
     private OptionalTypes underTest;
@@ -76,5 +85,24 @@ class OptionalTypesTest {
         assertThat(error).factValue("value of").isEqualTo("optionalTypes.optionalString().get()");
         assertThat(error).factValue("expected").isEqualTo("Bob");
         assertThat(error).factValue("but was").isEqualTo("Alice");
+    }
+
+    @AutoSubject(OptionalTypes.class)
+    public static class OptionalTypesSubject extends AutoOptionalTypesSubject {
+        protected OptionalTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable OptionalTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static OptionalTypesSubject assertThat(@Nullable OptionalTypes actual) {
+            return assertAbout(OptionalTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<OptionalTypesSubject, OptionalTypes> callback) {
+            return expectFailureAbout(OptionalTypesSubject::new, callback);
+        }
     }
 }

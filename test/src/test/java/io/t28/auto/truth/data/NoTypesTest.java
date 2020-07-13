@@ -16,11 +16,18 @@
 
 package io.t28.auto.truth.data;
 
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import static com.google.common.truth.Truth.assertAbout;
 import static com.google.common.truth.Truth.assertThat;
-import static io.t28.auto.truth.data.NoTypesSubject.assertThat;
+import static io.t28.auto.truth.data.NoTypesTest.NoTypesSubject.assertThat;
 
 class NoTypesTest {
     @Test
@@ -30,5 +37,18 @@ class NoTypesTest {
 
         // Assert
         assertThat(subject).isNotNull();
+    }
+
+    @AutoSubject(NoTypes.class)
+    public static class NoTypesSubject extends AutoNoTypesSubject {
+        protected NoTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable NoTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static NoTypesSubject assertThat(@Nullable NoTypes actual) {
+            return assertAbout(NoTypesSubject::new).that(actual);
+        }
     }
 }

@@ -16,15 +16,24 @@
 
 package io.t28.auto.truth.data;
 
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.ObjectArraySubject;
 import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
 import static com.google.common.truth.Truth.assertThat;
-import static io.t28.auto.truth.data.DeclaredArrayTypesSubject.assertThat;
-import static io.t28.auto.truth.data.DeclaredArrayTypesSubject.expectFailure;
+import static io.t28.auto.truth.data.DeclaredArrayTypesTest.DeclaredArrayTypesSubject.assertThat;
+import static io.t28.auto.truth.data.DeclaredArrayTypesTest.DeclaredArrayTypesSubject.expectFailure;
 
 class DeclaredArrayTypesTest {
     private DeclaredArrayTypes underTest;
@@ -66,5 +75,24 @@ class DeclaredArrayTypesTest {
         assertThat(error).factValue("value of").isEqualTo("declaredArrayTypes.objectArray().asList()");
         assertThat(error).factValue("expected", 0).isEqualTo("[class java.lang.Short, class java.lang.Integer]");
         assertThat(error).factValue("but was", 0).isEqualTo("[class java.lang.Short, class java.lang.Integer, class java.lang.Long]");
+    }
+
+    @AutoSubject(DeclaredArrayTypes.class)
+    public static class DeclaredArrayTypesSubject extends AutoDeclaredArrayTypesSubject {
+        protected DeclaredArrayTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable DeclaredArrayTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static DeclaredArrayTypesSubject assertThat(@Nullable DeclaredArrayTypes actual) {
+            return assertAbout(DeclaredArrayTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<DeclaredArrayTypesSubject, DeclaredArrayTypes> callback) {
+            return expectFailureAbout(DeclaredArrayTypesSubject::new, callback);
+        }
     }
 }

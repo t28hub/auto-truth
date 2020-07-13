@@ -16,10 +16,13 @@
 
 package io.t28.auto.truth.data;
 
+import com.google.common.truth.ExpectFailure;
+import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.IntStreamSubject;
 import com.google.common.truth.LongStreamSubject;
 import com.google.common.truth.StreamSubject;
 import com.google.common.truth.Subject;
+import io.t28.auto.truth.AutoSubject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -28,10 +31,16 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import static com.google.common.truth.ExpectFailure.assertThat;
+import static com.google.common.truth.ExpectFailure.expectFailureAbout;
+import static com.google.common.truth.Truth.assertAbout;
 import static com.google.common.truth.Truth.assertThat;
-import static io.t28.auto.truth.data.StreamTypesSubject.assertThat;
-import static io.t28.auto.truth.data.StreamTypesSubject.expectFailure;
+import static io.t28.auto.truth.data.StreamTypesTest.StreamTypesSubject.assertThat;
+import static io.t28.auto.truth.data.StreamTypesTest.StreamTypesSubject.expectFailure;
 
 class StreamTypesTest {
     private StreamTypes underTest;
@@ -77,5 +86,24 @@ class StreamTypesTest {
         // Act
         assertThat(error).factValue("expected to contain").isEqualTo("Dave");
         assertThat(error).factValue("but was").isEqualTo("[Alice, Bob, Charlie]");
+    }
+
+    @AutoSubject(StreamTypes.class)
+    public static class StreamTypesSubject extends AutoStreamTypesSubject {
+        protected StreamTypesSubject(@Nonnull FailureMetadata failureMetadata, @Nullable StreamTypes actual) {
+            super(failureMetadata, actual);
+        }
+
+        @Nonnull
+        @CheckReturnValue
+        public static StreamTypesSubject assertThat(@Nullable StreamTypes actual) {
+            return assertAbout(StreamTypesSubject::new).that(actual);
+        }
+
+        @Nonnull
+        public static AssertionError expectFailure(
+            @Nonnull ExpectFailure.SimpleSubjectBuilderCallback<StreamTypesSubject, StreamTypes> callback) {
+            return expectFailureAbout(StreamTypesSubject::new, callback);
+        }
     }
 }
