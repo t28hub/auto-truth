@@ -54,9 +54,9 @@ jobs:
           key: gradle-${{ runner.os }}-${{ hashFiles('**/build.gradle.kts') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: gradle-${{ runner.os }}
       - name: Build 'annotations' module
-        run: ./gradlew :annotations:build --stacktrace
+        run: ./gradlew :annotations:build --exclude-task :annotations:check --stacktrace
       - name: Build 'processor' module
-        run: ./gradlew :processor:build --stacktrace
+        run: ./gradlew :processor:build --exclude-task :processor:check --stacktrace
 
   unit-test:
     runs-on: ubuntu-latest
