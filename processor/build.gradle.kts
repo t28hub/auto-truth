@@ -24,7 +24,7 @@ plugins {
     jacoco
     `java-library`
     `maven-publish`
-    id("org.jlleitschuh.gradle.ktlint") version "9.2.1"
+    id("org.jlleitschuh.gradle.ktlint") version "9.3.0"
     id("io.gitlab.arturbosch.detekt") version "1.10.0"
     id("org.sonarqube") version "3.0"
 }
