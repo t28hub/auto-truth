@@ -4,7 +4,11 @@ on:
   push:
     branches:
       - master
-  pull_request:
+      - release/*
+    pull_request:
+      paths:
+        - '*.gradle'
+        - '*.gradle.kts'
 
 jobs:
   license:
@@ -21,9 +25,5 @@ jobs:
         run: "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | bash"
       - name: Analyze dependencies
         run: fossa analyze --config .fossa.yml --branch "$GITHUB_REF"
-        env:
-          FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
-      - name: Test dependencies
-        run: fossa test --config .fossa.yml --branch "$GITHUB_REF"
         env:
           FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}

@@ -31,7 +31,7 @@ subprojects {
     apply(plugin = "java")
 
     group = "io.t28.auto"
-    version = "0.0.2-SNAPSHOT"
+    version = "0.0.3-SNAPSHOT"
 
     repositories {
         mavenCentral()
