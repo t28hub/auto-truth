@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-val kotlinVersion by extra { "1.3.72" }
+val kotlinVersion by extra { "1.4.0" }
 val jsr305Version by extra { "3.0.2" }
 val javaxAnnotationVersion by extra { "1.3.2" }
 val truthVersion by extra { "1.0.1" }

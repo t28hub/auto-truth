@@ -18,7 +18,7 @@ import org.gradle.internal.jvm.Jvm
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    val kotlinVersion = "1.3.72"
+    val kotlinVersion = "1.4.0"
     kotlin("jvm") version kotlinVersion
     kotlin("kapt") version kotlinVersion
     jacoco
