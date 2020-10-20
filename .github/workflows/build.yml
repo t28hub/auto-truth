@@ -26,12 +26,12 @@ jobs:
       - name: Check code style and run lint
         run: ./gradlew :processor:ktlintCheck :processor:detektMain --stacktrace
       - name: Archive ktlint report
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: ktlint
           path: ./processor/build/reports/ktlint
       - name: Archive detekt report
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: detekt
           path: ./processor/build/reports/detekt
@@ -78,7 +78,7 @@ jobs:
         run: ./gradlew :processor:test --stacktrace
         timeout-minutes: 5
       - name: Archive test report
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: unit-test
           path: ./processor/build/reports/tests/test
@@ -91,7 +91,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_ACCESS_TOKEN }}
       - name: Archive code coverage report
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: jacoco
           path: ./processor/build/reports/jacoco
@@ -117,7 +117,7 @@ jobs:
         run: ./gradlew :test:build --stacktrace
         timeout-minutes: 5
       - name: Archive test report
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: integraion-test
           path: ./test/build/reports/tests/test
