@@ -24,7 +24,7 @@ val autoServiceVersion by extra { "1.0-rc7" }
 val javapoetVersion by extra { "1.13.0" }
 val junitVersion by extra { "5.6.2" }
 val mockitoVersion by extra { "2.2.0" }
-val compileTestingVersion by extra { "0.18" }
+val compileTestingVersion by extra { "0.19" }
 val kotlinCompileTestingVersion by extra { "1.2.9" }
 
 subprojects {
