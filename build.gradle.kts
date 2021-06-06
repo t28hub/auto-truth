@@ -17,7 +17,7 @@
 val kotlinVersion by extra { "1.3.72" }
 val jsr305Version by extra { "3.0.2" }
 val javaxAnnotationVersion by extra { "1.3.2" }
-val truthVersion by extra { "1.0.1" }
+val truthVersion by extra { "1.1.3" }
 val guavaVersion by extra { "29.0-jre" }
 val autoValueVersion by extra { "1.7.3" }
 val autoServiceVersion by extra { "1.0-rc7" }
