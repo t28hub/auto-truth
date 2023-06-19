@@ -20,7 +20,7 @@ val javaxAnnotationVersion by extra { "1.3.2" }
 val truthVersion by extra { "1.0.1" }
 val guavaVersion by extra { "29.0-jre" }
 val autoValueVersion by extra { "1.7.3" }
-val autoServiceVersion by extra { "1.0-rc7" }
+val autoServiceVersion by extra { "1.1.1" }
 val javapoetVersion by extra { "1.13.0" }
 val junitVersion by extra { "5.6.2" }
 val mockitoVersion by extra { "2.2.0" }
